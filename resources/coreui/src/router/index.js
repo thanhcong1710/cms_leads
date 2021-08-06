@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import Customer from './pages/customer'
 
 // Containers
 const TheContainer = () => import('@/containers/TheContainer')
@@ -91,6 +92,7 @@ function configRoutes () {
       name: 'Home',
       component: TheContainer,
       children: [
+        Customer.router,
         {
           path: 'media',
           name: 'Media',

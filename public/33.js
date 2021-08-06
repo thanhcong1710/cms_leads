@@ -1,14 +1,16 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[33],{
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/base/Tabs.vue?vue&type=script&lang=js&":
-/*!***********************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/coreui/src/views/base/Tabs.vue?vue&type=script&lang=js& ***!
-  \***********************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/menu/EditMenu.vue?vue&type=script&lang=js&":
+/*!***************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/coreui/src/views/menu/EditMenu.vue?vue&type=script&lang=js& ***!
+  \***************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./resources/coreui/node_modules/axios/index.js");
+/* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 //
 //
 //
@@ -33,202 +35,71 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+
 /* harmony default export */ __webpack_exports__["default"] = ({
-  name: 'Tabs',
+  name: 'EditMenu',
   data: function data() {
     return {
-      tabs: ['Calculator', 'Shopping cart', 'Charts'],
-      activeTab: 1
+      name: '',
+      message: '',
+      dismissSecs: 7,
+      dismissCountDown: 0
     };
+  },
+  methods: {
+    goBack: function goBack() {
+      this.$router.go(-1);
+    },
+    update: function update() {
+      var self = this;
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/menu/menu/update' + '?token=' + localStorage.getItem("api_token"), {
+        name: self.name,
+        id: self.$route.params.id
+      }).then(function (response) {
+        self.message = 'Successfully updated note.';
+        self.showAlert();
+      })["catch"](function (error) {
+        if (error.response.data.message == 'The given data was invalid.') {
+          self.message = '';
+
+          for (var key in error.response.data.errors) {
+            if (error.response.data.errors.hasOwnProperty(key)) {
+              self.message += error.response.data.errors[key][0] + '  ';
+            }
+          }
+
+          self.showAlert();
+        } else {
+          console.log(error);
+          self.$router.push({
+            path: '/login'
+          });
+        }
+      });
+    },
+    showAlert: function showAlert() {
+      this.dismissCountDown = this.dismissSecs;
+    }
+  },
+  mounted: function mounted() {
+    var self = this;
+    axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/menu/menu/edit?token=' + localStorage.getItem("api_token") + '&id=' + self.$route.params.id).then(function (response) {
+      self.name = response.data.menulist.name;
+    })["catch"](function (error) {
+      console.log(error);
+      self.$router.push({
+        path: '/login'
+      });
+    });
   }
 });
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/base/Tabs.vue?vue&type=template&id=8f5c4ca8&":
-/*!***************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/coreui/src/views/base/Tabs.vue?vue&type=template&id=8f5c4ca8& ***!
-  \***************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/menu/EditMenu.vue?vue&type=template&id=10e95869&":
+/*!*******************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/coreui/src/views/menu/EditMenu.vue?vue&type=template&id=10e95869& ***!
+  \*******************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -241,437 +112,73 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c(
-    "div",
+    "CRow",
     [
       _c(
-        "CRow",
+        "CCol",
+        { attrs: { col: "12", lg: "6" } },
         [
           _c(
-            "CCol",
-            { attrs: { xs: "12", lg: "6" } },
+            "CCard",
             [
               _c(
-                "CCard",
+                "CCardBody",
                 [
-                  _c("CCardHeader", [
-                    _vm._v("\n          Tabs\n          "),
-                    _c("div", { staticClass: "card-header-actions" }, [
-                      _c(
-                        "a",
-                        {
-                          staticClass: "card-header-action",
-                          attrs: {
-                            href: "https://coreui.io/vue/docs/components/tabs",
-                            rel: "noreferrer noopener",
-                            target: "_blank"
-                          }
-                        },
-                        [
-                          _c("small", { staticClass: "text-muted" }, [
-                            _vm._v("docs")
-                          ])
-                        ]
-                      )
-                    ])
-                  ]),
+                  _c("h3", [_vm._v("\n          Edit Menu\n        ")]),
                   _vm._v(" "),
                   _c(
-                    "CCardBody",
+                    "CAlert",
+                    {
+                      attrs: {
+                        show: _vm.dismissCountDown,
+                        color: "primary",
+                        fade: ""
+                      },
+                      on: {
+                        "update:show": function($event) {
+                          _vm.dismissCountDown = $event
+                        }
+                      }
+                    },
                     [
-                      _c(
-                        "CTabs",
-                        [
-                          _c("CTab", { attrs: { title: "Home", active: "" } }, [
-                            _vm._v(
-                              "\n              1. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c(
-                            "CTab",
-                            { attrs: { title: "Profile", active: "" } },
-                            [
-                              _vm._v(
-                                "\n              2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                              )
-                            ]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "CTab",
-                            { attrs: { title: "Disabled", disabled: "" } },
-                            [
-                              _vm._v(
-                                "\n              3. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                              )
-                            ]
-                          )
-                        ],
-                        1
+                      _vm._v(
+                        "\n          (" +
+                          _vm._s(_vm.dismissCountDown) +
+                          ") " +
+                          _vm._s(_vm.message) +
+                          "\n        "
                       )
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "CCol",
-            { attrs: { xs: "12", lg: "6" } },
-            [
-              _c(
-                "CCard",
-                [
-                  _c("CCardHeader", [_vm._v("\n          Tabs\n        ")]),
+                    ]
+                  ),
+                  _vm._v(" "),
+                  _c("CInput", {
+                    attrs: { label: "Name", type: "text", placeholder: "Name" },
+                    model: {
+                      value: _vm.name,
+                      callback: function($$v) {
+                        _vm.name = $$v
+                      },
+                      expression: "name"
+                    }
+                  }),
                   _vm._v(" "),
                   _c(
-                    "CCardBody",
-                    [
-                      _c(
-                        "CTabs",
-                        { attrs: { variant: "pills" } },
-                        [
-                          _c("CTab", { attrs: { title: "Home", active: "" } }, [
-                            _vm._v(
-                              "\n              1. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c("CTab", { attrs: { title: "Profile" } }, [
-                            _vm._v(
-                              "\n              2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _c(
-                            "CTab",
-                            { attrs: { title: "Disabled", disabled: "" } },
-                            [
-                              _vm._v(
-                                "\n              3. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                              )
-                            ]
-                          )
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "CCol",
-            { attrs: { xs: "12", lg: "6" } },
-            [
-              _c(
-                "CCard",
-                [
-                  _c("CCardHeader", [
-                    _vm._v("\n          Tabs with icons\n        ")
-                  ]),
+                    "CButton",
+                    {
+                      attrs: { color: "primary" },
+                      on: {
+                        click: function($event) {
+                          return _vm.update()
+                        }
+                      }
+                    },
+                    [_vm._v("Save")]
+                  ),
                   _vm._v(" "),
                   _c(
-                    "CCardBody",
-                    [
-                      _c(
-                        "CTabs",
-                        {
-                          attrs: { "active-tab": _vm.activeTab },
-                          on: {
-                            "update:activeTab": function($event) {
-                              _vm.activeTab = $event
-                            },
-                            "update:active-tab": function($event) {
-                              _vm.activeTab = $event
-                            }
-                          }
-                        },
-                        [
-                          _c(
-                            "CTab",
-                            { attrs: { active: "" } },
-                            [
-                              _c(
-                                "template",
-                                { slot: "title" },
-                                [
-                                  _c("CIcon", {
-                                    attrs: { name: "cil-calculator" }
-                                  })
-                                ],
-                                1
-                              ),
-                              _vm._v(
-                                "\n              1. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                              )
-                            ],
-                            2
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "CTab",
-                            [
-                              _c(
-                                "template",
-                                { slot: "title" },
-                                [
-                                  _c("CIcon", { attrs: { name: "cil-basket" } })
-                                ],
-                                1
-                              ),
-                              _vm._v(
-                                "\n              2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                              )
-                            ],
-                            2
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "CTab",
-                            [
-                              _c(
-                                "template",
-                                { slot: "title" },
-                                [
-                                  _c("CIcon", {
-                                    attrs: { name: "cil-chart-pie" }
-                                  })
-                                ],
-                                1
-                              ),
-                              _vm._v(
-                                "\n              3. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                              )
-                            ],
-                            2
-                          )
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "CCol",
-            { attrs: { xs: "12", lg: "6" } },
-            [
-              _c(
-                "CCard",
-                [
-                  _c("CCardHeader", [
-                    _vm._v("\n          Tabs with icons\n        ")
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "CCardBody",
-                    [
-                      _c(
-                        "CTabs",
-                        { attrs: { "add-tab-classes": "mt-1" } },
-                        [
-                          _c(
-                            "CTab",
-                            [
-                              _c(
-                                "template",
-                                { slot: "title" },
-                                [
-                                  _c("CIcon", {
-                                    attrs: { name: "cil-calculator" }
-                                  }),
-                                  _vm._v(
-                                    " " +
-                                      _vm._s(_vm.tabs[0]) +
-                                      "\n              "
-                                  )
-                                ],
-                                1
-                              ),
-                              _vm._v(
-                                "\n              1. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                              )
-                            ],
-                            2
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "CTab",
-                            { attrs: { active: "" } },
-                            [
-                              _c(
-                                "template",
-                                { slot: "title" },
-                                [
-                                  _c("CIcon", {
-                                    attrs: { name: "cil-basket" }
-                                  }),
-                                  _vm._v(
-                                    " " +
-                                      _vm._s(_vm.tabs[1]) +
-                                      "\n              "
-                                  )
-                                ],
-                                1
-                              ),
-                              _vm._v(
-                                "\n              2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                              )
-                            ],
-                            2
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "CTab",
-                            [
-                              _c(
-                                "template",
-                                { slot: "title" },
-                                [
-                                  _c("CIcon", {
-                                    attrs: { name: "cil-chart-pie" }
-                                  }),
-                                  _vm._v(
-                                    " " +
-                                      _vm._s(_vm.tabs[2]) +
-                                      "\n              "
-                                  )
-                                ],
-                                1
-                              ),
-                              _vm._v(
-                                "\n              3. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                              )
-                            ],
-                            2
-                          )
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "CCol",
-            { attrs: { xs: "12", lg: "6" } },
-            [
-              _c(
-                "CCard",
-                [
-                  _c("CCardHeader", [
-                    _vm._v("\n          Tabs vertical\n        ")
-                  ]),
-                  _vm._v(" "),
-                  _c(
-                    "CCardBody",
-                    [
-                      _c(
-                        "CTabs",
-                        { attrs: { variant: "pills", vertical: "" } },
-                        [
-                          _c(
-                            "CTab",
-                            { attrs: { active: "" } },
-                            [
-                              _c(
-                                "template",
-                                { slot: "title" },
-                                [
-                                  _c("CIcon", {
-                                    attrs: { name: "cil-calculator" }
-                                  }),
-                                  _vm._v(
-                                    " " +
-                                      _vm._s(_vm.tabs[0]) +
-                                      "\n              "
-                                  )
-                                ],
-                                1
-                              ),
-                              _vm._v(
-                                "\n              1. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                              )
-                            ],
-                            2
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "CTab",
-                            [
-                              _c(
-                                "template",
-                                { slot: "title" },
-                                [
-                                  _c("CIcon", {
-                                    attrs: { name: "cil-basket" }
-                                  }),
-                                  _vm._v(
-                                    " " +
-                                      _vm._s(_vm.tabs[1]) +
-                                      "\n              "
-                                  )
-                                ],
-                                1
-                              ),
-                              _vm._v(
-                                "\n              2. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                              )
-                            ],
-                            2
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "CTab",
-                            [
-                              _c(
-                                "template",
-                                { slot: "title" },
-                                [
-                                  _c("CIcon", {
-                                    attrs: { name: "cil-chart-pie" }
-                                  }),
-                                  _vm._v(
-                                    " " +
-                                      _vm._s(_vm.tabs[2]) +
-                                      "\n              "
-                                  )
-                                ],
-                                1
-                              ),
-                              _vm._v(
-                                "\n              3. Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore\n              et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut\n              aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum\n              dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui\n              officia deserunt mollit anim id est laborum.\n            "
-                              )
-                            ],
-                            2
-                          )
-                        ],
-                        1
-                      )
-                    ],
-                    1
+                    "CButton",
+                    { attrs: { color: "primary" }, on: { click: _vm.goBack } },
+                    [_vm._v("Back")]
                   )
                 ],
                 1
@@ -693,17 +200,17 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./resources/coreui/src/views/base/Tabs.vue":
-/*!**************************************************!*\
-  !*** ./resources/coreui/src/views/base/Tabs.vue ***!
-  \**************************************************/
+/***/ "./resources/coreui/src/views/menu/EditMenu.vue":
+/*!******************************************************!*\
+  !*** ./resources/coreui/src/views/menu/EditMenu.vue ***!
+  \******************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Tabs_vue_vue_type_template_id_8f5c4ca8___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Tabs.vue?vue&type=template&id=8f5c4ca8& */ "./resources/coreui/src/views/base/Tabs.vue?vue&type=template&id=8f5c4ca8&");
-/* harmony import */ var _Tabs_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Tabs.vue?vue&type=script&lang=js& */ "./resources/coreui/src/views/base/Tabs.vue?vue&type=script&lang=js&");
+/* harmony import */ var _EditMenu_vue_vue_type_template_id_10e95869___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./EditMenu.vue?vue&type=template&id=10e95869& */ "./resources/coreui/src/views/menu/EditMenu.vue?vue&type=template&id=10e95869&");
+/* harmony import */ var _EditMenu_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./EditMenu.vue?vue&type=script&lang=js& */ "./resources/coreui/src/views/menu/EditMenu.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -713,9 +220,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _Tabs_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _Tabs_vue_vue_type_template_id_8f5c4ca8___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _Tabs_vue_vue_type_template_id_8f5c4ca8___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _EditMenu_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _EditMenu_vue_vue_type_template_id_10e95869___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _EditMenu_vue_vue_type_template_id_10e95869___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -725,38 +232,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/coreui/src/views/base/Tabs.vue"
+component.options.__file = "resources/coreui/src/views/menu/EditMenu.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/coreui/src/views/base/Tabs.vue?vue&type=script&lang=js&":
-/*!***************************************************************************!*\
-  !*** ./resources/coreui/src/views/base/Tabs.vue?vue&type=script&lang=js& ***!
-  \***************************************************************************/
+/***/ "./resources/coreui/src/views/menu/EditMenu.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************!*\
+  !*** ./resources/coreui/src/views/menu/EditMenu.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Tabs_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Tabs.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/base/Tabs.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Tabs_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_EditMenu_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./EditMenu.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/menu/EditMenu.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_EditMenu_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/coreui/src/views/base/Tabs.vue?vue&type=template&id=8f5c4ca8&":
-/*!*********************************************************************************!*\
-  !*** ./resources/coreui/src/views/base/Tabs.vue?vue&type=template&id=8f5c4ca8& ***!
-  \*********************************************************************************/
+/***/ "./resources/coreui/src/views/menu/EditMenu.vue?vue&type=template&id=10e95869&":
+/*!*************************************************************************************!*\
+  !*** ./resources/coreui/src/views/menu/EditMenu.vue?vue&type=template&id=10e95869& ***!
+  \*************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Tabs_vue_vue_type_template_id_8f5c4ca8___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Tabs.vue?vue&type=template&id=8f5c4ca8& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/base/Tabs.vue?vue&type=template&id=8f5c4ca8&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Tabs_vue_vue_type_template_id_8f5c4ca8___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_EditMenu_vue_vue_type_template_id_10e95869___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./EditMenu.vue?vue&type=template&id=10e95869& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/menu/EditMenu.vue?vue&type=template&id=10e95869&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_EditMenu_vue_vue_type_template_id_10e95869___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Tabs_vue_vue_type_template_id_8f5c4ca8___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_EditMenu_vue_vue_type_template_id_10e95869___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 
