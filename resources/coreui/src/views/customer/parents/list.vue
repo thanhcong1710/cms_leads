@@ -1,11 +1,11 @@
 <template>
   <div class="animated fadeIn">
     <div class="row">
-      <div class="col-sm-12">
+      <div class="col-lg-12">
         <div class="card">
           <loader :active="loading.processing" :text="loading.text" />
           <div class="card-header">
-            <strong>Bộ lọc</strong>
+            <strong>Danh sách khách hàng</strong>
           </div>
           <div class="card-body">
             <div class="row">
@@ -26,32 +26,22 @@
                   <option value="1">Hoạt động</option>
                 </select>
               </div>
+              <div class="form-group col-sm-12">
+                <router-link class="btn btn-sm btn-success" :to="'/parents/add'">
+                  <i class="fa fa-plus"></i> Thêm mới
+                </router-link>
+                <button class="btn btn-sm btn-info" type="submit" @click="search()">
+                  <i class="fa fa-search"></i> Tìm kiếm
+                </button>
+                <button
+                  class="btn btn-sm btn-secondary"
+                  type="reset"
+                  @click="reset()"
+                >
+                  <i class="fas fa-undo-alt"></i> Reset
+                </button>
+              </div>
             </div>
-          </div>
-          <div class="card-footer">
-            <router-link class="btn btn-sm btn-success" :to="'/students/add'">
-              <i class="fa fa-plus"></i> Thêm mới
-            </router-link>
-            <button class="btn btn-sm btn-info" type="submit" @click="search()">
-              <i class="fa fa-search"></i> Tìm kiếm
-            </button>
-            <button
-              class="btn btn-sm btn-secondary"
-              type="reset"
-              @click="reset()"
-            >
-              <i class="fas fa-undo-alt"></i> Reset
-            </button>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-12">
-        <div class="card">
-          <loader :active="loading.processing" :text="loading.text" />
-          <div class="card-header">
-            <strong>Danh sách</strong>
-          </div>
-          <div class="card-body">
             <table class="table table-responsive-sm">
               <thead>
                 <tr>
@@ -143,7 +133,7 @@ export default {
     loader: loader,
     paging: paging,
   },
-  name: "List-Product",
+  name: "List-Parent",
   data() {
     return {
       loading: {
@@ -157,9 +147,7 @@ export default {
       },
       students: [],
       pagination: {
-        url:
-          "/api/students/list?token=" +
-          localStorage.getItem("api_token"),
+        url: "/api/parents/list",
         id: "",
         style: "line",
         class: "",
@@ -177,7 +165,7 @@ export default {
         title: "THÔNG BÁO",
         show: false,
         color: "success",
-        body: "Cập nhật lớp học thành công",
+        body: "Cập nhật khách hàng thành công",
         closeOnBackdrop: false,
       },
     };
@@ -194,12 +182,10 @@ export default {
         keyword: this.searchData.keyword,
         status: this.searchData.status,
       };
-      const link =
-        "/api/students/list?token=" + localStorage.getItem("api_token");
+      const link = "/api/parents/list";
 
       this.loading.processing = true;
-      axios
-        .post(link, data)
+      u.p(link, data)
         .then((response) => {
           this.loading.processing = false;
           this.students = response.data.list;
@@ -225,16 +211,12 @@ export default {
       this.search();
     },
     deleteItem(id) {
-      axios
-        .get(
-          `/api/students/delete/${id}?token=` +
-            localStorage.getItem("api_token")
-        )
+      u.g(`/api/students/delete/${id}`)
         .then((response) => {
           this.loading.processing = false;
           if (response.status == 200) {
             this.modal.color = "success";
-            this.modal.body = "Xóa học sinh thành công";
+            this.modal.body = "Xóa khách hàng thành công";
             this.modal.show = true;
             this.search();
           }

@@ -1,71 +1,115 @@
 <template>
   <div class="animated fadeIn">
     <div class="row">
-      <div class="col-sm-6">
+      <div class="col-sm-12">
         <div class="card">
           <loader :active="loading.processing" :text="loading.text" />
           <div class="card-header">
-            <strong>Thêm mới học sinh </strong>
+            <strong>Thêm mới khách hàng </strong>
           </div>
           <div class="card-body">
             <form action method="post">
-              <div class="form-group">
-                <label for="nf-email"
-                  >Tên học sinh <span class="text-danger"> (*)</span></label
-                >
-                <input
-                  class="form-control"
-                  type="text"
-                  name="title"
-                  v-model="student.name"
-                />
-              </div>
-              <div class="form-group">
-                <label for="nf-email"
-                  >Ngày sinh <span class="text-danger"> (*)</span></label
-                >
-                <datepicker
-                  class="form-control calendar"
-                  v-model="student.birthday"
-                  placeholder="Chọn ngày sinh nhật"
-                  lang="lang"
-                  @change="selectDate"
-                />
-              </div>
-              <div class="form-group">
-                <label for="nf-email"
-                  >Số điện thoại <span class="text-danger"> (*)</span></label
-                >
-                <input
-                  class="form-control"
-                  type="text"
-                  name="title"
-                  v-model="student.phone"
-                />
-              </div>
-              <div class="form-group">
-                <label for="nf-email">Email</label>
-                <input
-                  class="form-control"
-                  type="text"
-                  name="title"
-                  v-model="student.email"
-                />
-              </div>
-              <div class="form-group">
-                <label for="nf-email">Ghi chú</label>
-                <editor
-                  :api-key="tinymce.key"
-                  :init="tinymce.init"
-                  id="input_tinymce"
-                />
-              </div>
-              <div class="form-group">
-                <label for="nf-email">Trạng thái</label>
-                <select class="form-control" v-model="student.status">
-                  <option value="0">Ngừng hoạt động</option>
-                  <option value="1">Hoạt động</option>
-                </select>
+              <div class="row">
+                <div class="col-sm-6">
+                  <div class="row no-margin">
+                    <div class="form-group col-sm-4">
+                      <label for="nf-email">Danh xưng <span class="text-danger"> (*)</span></label>
+                      <select class="form-control" v-model="parent.gender">
+                        <option value="M">Ông</option>
+                        <option value="F">Bà</option>
+                      </select>
+                    </div>
+                    <div class="form-group col-sm-8">
+                      <label for="nf-email">Họ tên <span class="text-danger"> (*)</span></label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        name="title"
+                        v-model="parent.name"
+                      />
+                    </div>
+                    <div class="form-group col-sm-6">
+                      <label for="nf-email" >Điện thoại <span class="text-danger"> (*)</span></label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        name="title"
+                        v-model="parent.mobile_1"
+                      />
+                    </div>
+                    <div class="form-group col-sm-6">
+                      <label for="nf-email">Email</label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        name="title"
+                        v-model="parent.mobile_1"
+                      />
+                    </div>
+                    <div class="form-group  col-sm-6">
+                      <label for="nf-email">Ngày sinh </label>
+                      <datepicker
+                        class="form-control calendar"
+                        v-model="parent.birthday"
+                        placeholder="Chọn ngày sinh nhật"
+                        lang="lang"
+                        @change="selectDate"
+                      />
+                    </div>
+                    <div class="form-group col-sm-6">
+                      <label for="nf-email">Nghề nghiệp</label>
+                      <select class="form-control" v-model="parent.gender">
+                        <option value="M">Ông</option>
+                        <option value="F">Bà</option>
+                      </select>
+                    </div>
+                    <div class="form-group col-sm-12">
+                      <label for="nf-email">Ghi chú</label>
+                      <editor
+                        :api-key="tinymce.key"
+                        :init="tinymce.init"
+                        id="input_tinymce"
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-6">
+                  <div class="row no-margin">
+                    <div class="form-group col-sm-6">
+                      <label for="nf-email">Tỉnh Thành Phố</label>
+                      <vue-select
+                        label="name"
+                        placeholder="Chọn Tỉnh/Thành Phố"
+                        :options="html.province.list"
+                        v-model="parent.province"
+                        :searchable="true"
+                        language="tv-VN"
+                        :onChange="getDistrict"
+                      ></vue-select>
+                    </div>
+                    <div class="form-group col-sm-6">
+                      <label for="nf-email">Quận huyện</label>
+                      <vue-select
+                            label="name"
+                            placeholder="Chọn Quận/Huyện/Thị Xã"
+                            :options="html.district.list"
+                            v-model="parent.district"
+                            :searchable="true"
+                            language="tv-VN"
+                            :onChange="saveDistrict"
+                        ></vue-select>
+                    </div>
+                    <div class="form-group col-sm-12">
+                      <label for="nf-email">Địa chỉ</label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        name="title"
+                        v-model="parent.address"
+                      />
+                    </div>
+                  </div>
+                </div>
               </div>
             </form>
           </div>
@@ -106,12 +150,14 @@ import loader from "../../../components/Loading";
 import Editor from "@tinymce/tinymce-vue";
 import datepicker from "vue2-datepicker";
 import moment from 'moment';
+import select from 'vue-select'
 
 export default {
   components: {
     loader: loader,
     editor: Editor,
     datepicker,
+    "vue-select": select
   },
   name: "Add-Product",
   data() {
@@ -120,7 +166,7 @@ export default {
         key: "68xdyo8hz3oyr5p47zv3jyvj3h6xg0hc0khthuj123tnskcx",
         init: {
           entity_encoding: "raw",
-          height: 300,
+          height: 240,
           menubar: true,
           plugins: [
             "advlist autolink lists link image charmap print preview anchor",
@@ -149,17 +195,38 @@ export default {
         closeOnBackdrop: false,
         action_exit: "exit",
       },
-      student: {
+      html:{
+        province: {
+          item: '',
+          list: []
+        },
+        district: {
+          item: '',
+          list: []
+        },
+      },
+      parent: {
+        gender: "",
         name: "",
         birthday: "",
-        phone: "",
+        mobile_1: "",
         note: "",
         email: "",
         status: 1,
+        province_id:"",
+        district_id:"",
+        province:"",
+        district:"",
+        address:""
       },
     };
   },
   created() {
+    u.g(`/api/provinces`)
+      .then(response => {
+      this.html.province.list = response.data
+      console.log(this.html.province.list)
+    })
   },
   methods: {
     selectDate(date) {
@@ -208,7 +275,7 @@ export default {
           this.loading.processing = false;
           if (response.status == 200) {
             this.modal.color = "success";
-            this.modal.body = "Thêm mới học sinh thành công";
+            this.modal.body = "Thêm mới khách hàng thành công";
             this.modal.show = true;
             this.modal.action_exit = "exit";
           }
@@ -219,9 +286,37 @@ export default {
     },
     exit() {
       if (this.modal.action_exit == "exit") {
-        this.$router.push({ path: "/students" });
+        this.$router.push({ path: "/parents" });
       } else {
         this.modal.show = false;
+      }
+    },
+    getDistrict(data = null){
+      if (data && typeof data === 'object') {
+        const province_id = data.id
+        this.parent.province = data
+        this.parent.province_id = province_id
+        u.g(`/api/provinces/${province_id}/districts`).then(response => {
+          this.html.district.list = response.data
+          this.parent.district_id = ""
+          this.parent.district = ""
+        })
+      }else{
+        this.parent.province = ""
+        this.parent.province_id = ""
+        this.html.district.list = []
+        this.parent.district = ""
+        this.parent.district_id = ""
+      }
+    },
+    saveDistrict(data = null){
+      if (data && typeof data === 'object') {
+        const district_id = data.id
+        this.parent.district = data
+        this.parent.district_id = district_id
+      }else{
+        this.parent.district = ""
+        this.parent.district_id = ""
       }
     },
   },

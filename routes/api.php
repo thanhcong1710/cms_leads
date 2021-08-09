@@ -67,6 +67,12 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('/roles/move/move-up',      'RolesController@moveUp')->name('roles.up');
         Route::get('/roles/move/move-down',    'RolesController@moveDown')->name('roles.down');
         Route::get('/language/{language}', 'LangController@setLanguage');
+        Route::post('/parents/list', 'ParentsController@list');
+        Route::post('/parents/add', 'ParentsController@add');
+        Route::post('/parents/update/{parent_id}', 'ParentsController@update');
+        Route::get('/parents/detail/{parent_id}', 'ParentsController@detail');
+        Route::get('/provinces', 'SystemInfoController@getAllProvices');
+        Route::get('/provinces/{province_id}/districts', 'SystemInfoController@getDistrictsByProvice');
     });
 });
 
