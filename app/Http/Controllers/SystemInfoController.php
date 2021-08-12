@@ -19,4 +19,13 @@ class SystemInfoController extends Controller
         $data = u::getMultiObject(['province_id'=>$province_id], 'cms_districts');
         return response()->json($data);
     }
+    public function getAllJobs()
+    {
+        $data = u::query("SELECT * FROM jobs WHERE status=1");
+        return response()->json($data);
+    }
+    public function getAllSources(){
+        $data = u::query("SELECT * FROM sources WHERE status=1");
+        return response()->json($data);
+    }
 }

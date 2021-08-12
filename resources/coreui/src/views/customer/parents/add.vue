@@ -43,7 +43,7 @@
                         class="form-control"
                         type="text"
                         name="title"
-                        v-model="parent.mobile_1"
+                        v-model="parent.email"
                       />
                     </div>
                     <div class="form-group  col-sm-6">
@@ -58,10 +58,15 @@
                     </div>
                     <div class="form-group col-sm-6">
                       <label for="nf-email">Nghề nghiệp</label>
-                      <select class="form-control" v-model="parent.gender">
-                        <option value="M">Ông</option>
-                        <option value="F">Bà</option>
-                      </select>
+                      <vue-select
+                            label="title"
+                            placeholder="Chọn nghề nghiệp"
+                            :options="html.jobs.list"
+                            v-model="parent.job"
+                            :searchable="true"
+                            language="tv-VN"
+                            :onChange="saveJob"
+                        ></vue-select>
                     </div>
                     <div class="form-group col-sm-12">
                       <label for="nf-email">Ghi chú</label>
@@ -107,6 +112,18 @@
                         name="title"
                         v-model="parent.address"
                       />
+                    </div>
+                    <div class="form-group col-sm-6">
+                      <label for="nf-email">Nguồn</label>
+                      <vue-select
+                            label="name"
+                            placeholder="Chọn nguồn"
+                            :options="html.source.list"
+                            v-model="parent.source"
+                            :searchable="true"
+                            language="tv-VN"
+                            :onChange="saveSource"
+                        ></vue-select>
                     </div>
                   </div>
                 </div>
@@ -204,6 +221,14 @@ export default {
           item: '',
           list: []
         },
+        jobs: {
+          item: '',
+          list: []
+        },
+        source: {
+          item: '',
+          list: []
+        },
       },
       parent: {
         gender: "",
@@ -215,6 +240,8 @@ export default {
         status: 1,
         province_id:"",
         district_id:"",
+        job_id:"",
+        job:"",
         province:"",
         district:"",
         address:""
@@ -225,7 +252,14 @@ export default {
     u.g(`/api/provinces`)
       .then(response => {
       this.html.province.list = response.data
-      console.log(this.html.province.list)
+    })
+    u.g(`/api/jobs`)
+      .then(response => {
+      this.html.jobs.list = response.data
+    })
+     u.g(`/api/sources`)
+      .then(response => {
+      this.html.source.list = response.data
     })
   },
   methods: {
@@ -237,40 +271,32 @@ export default {
     save() {
       let mess = "";
       let resp = true;
-      if (this.student.name == "") {
-        mess += " - Tên học sinh không được để trống<br/>";
+      if (this.parent.gender == "") {
+        mess += " - Danh xưng không được để trống<br/>";
         resp = false;
       }
-      if (this.student.birthday == "") {
-        mess += " - Ngày sinh không được để trống<br/>";
+      if (this.parent.name == "") {
+        mess += " - Họ tên không được để trống<br/>";
         resp = false;
       }
-      if (this.student.phone == "") {
+      if (this.parent.mobile_1 == "") {
         mess += " - Số điện thoại không được để trống<br/>";
         resp = false;
       }
-      if (this.student.phone != "" && !u.vld.phone(this.student.phone)) {
+      if (this.parent.mobile_1 != "" && !u.vld.phone(this.parent.mobile_1)) {
         mess += " - Số điện thoại không đúng định dạng<br/>";
         resp = false;
       }
-      if (this.student.email != "" && !u.vld.email(this.student.email)) {
-        mess += " - Email không đúng định dạng<br/>";
-        resp = false;
-      }
       if (!resp) {
-        this.modal.color = "success";
+        this.modal.color = "warning";
         this.modal.body = mess;
         this.modal.show = true;
         this.modal.action_exit = "close";
         return false;
       }
-      this.student.note = tinymce.get("input_tinymce").getContent();
+      this.parent.note = tinymce.get("input_tinymce").getContent();
       this.loading.processing = true;
-      axios
-        .post(
-          "/api/students/add?token=" + localStorage.getItem("api_token"),
-          this.student
-        )
+      u.p("/api/parents/add",this.parent)
         .then((response) => {
           this.loading.processing = false;
           if (response.status == 200) {
@@ -296,7 +322,9 @@ export default {
         const province_id = data.id
         this.parent.province = data
         this.parent.province_id = province_id
+        this.loading.processing = true
         u.g(`/api/provinces/${province_id}/districts`).then(response => {
+          this.loading.processing = false
           this.html.district.list = response.data
           this.parent.district_id = ""
           this.parent.district = ""
@@ -319,6 +347,26 @@ export default {
         this.parent.district_id = ""
       }
     },
+    saveJob(data = null){
+      if (data && typeof data === 'object') {
+        const job_id = data.id
+        this.parent.job = data
+        this.parent.job_id = job_id
+      }else{
+        this.parent.job = ""
+        this.parent.job_id = ""
+      }
+    },
+    saveSource(data = null){
+      if (data && typeof data === 'object') {
+        const source_id = data.id
+        this.parent.source = data
+        this.parent.source_id = source_id
+      }else{
+        this.parent.source = ""
+        this.parent.source_id = ""
+      }
+    }
   },
 };
 </script>

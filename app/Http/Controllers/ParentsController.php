@@ -40,16 +40,20 @@ class ParentsController extends Controller
     public function add(Request $request)
     {
         $data = u::insertSimpleRow(array(
-            'branch_id'=>Auth::user()->branch_id,
             'name'=>$request->name,
+            'email'=>$request->email,
+            'mobile_1' => $request->mobile_1,
+            'address' => $request->address,
+            'province_id' => $request->province_id,
+            'district_id' => $request->district_id,
+            'gender' => $request->gender,
             'birthday' => $request->birthday,
-            'phone' => $request->phone,
-            'email' => $request->email,
-            'status' => $request->status,
+            'job_id' => $request->job_id,
+            'source_id' => $request->source_id,
+            'note' => $request->note,
             'created_at' => date('Y-m-d H:i:s'),
             'creator_id' => Auth::user()->id,
-            'note' => $request->note,
-        ), 'lms_students');
+        ), 'cms_parents');
         return response()->json($data);
     }
     public function detail($student_id)
