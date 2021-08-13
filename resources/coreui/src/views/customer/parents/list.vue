@@ -9,16 +9,16 @@
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="form-group col-sm-4">
+              <div class="form-group col-sm-3">
                 <label for="name">Từ khóa</label>
                 <input
                   class="form-control"
                   v-model="searchData.keyword"
                   type="text"
-                  placeholder="Nhập tên học sinh hoặc SĐT"
+                  placeholder="Tên khách hàng, số điện thoại"
                 />
               </div>
-              <div class="form-group col-sm-4">
+              <div class="form-group col-sm-3">
                 <label for="ccmonth">Trạng thái</label>
                 <select class="form-control" v-model="searchData.status">
                   <option value>Chọn trạng thái</option>
@@ -27,14 +27,14 @@
                 </select>
               </div>
               <div class="form-group col-sm-12">
-                <router-link class="btn btn-sm btn-success" :to="'/parents/add'">
+                <router-link class="btn btn-success" :to="'/parents/add'">
                   <i class="fa fa-plus"></i> Thêm mới
                 </router-link>
-                <button class="btn btn-sm btn-info" type="submit" @click="search()">
+                <button class="btn btn-info" type="submit" @click="search()">
                   <i class="fa fa-search"></i> Tìm kiếm
                 </button>
                 <button
-                  class="btn btn-sm btn-secondary"
+                  class="btn btn-secondary"
                   type="reset"
                   @click="reset()"
                 >
@@ -46,36 +46,45 @@
               <thead>
                 <tr>
                   <th>STT</th>
-                  <th>Tên học sinh</th>
-                  <th>SĐT</th>
+                  <th>Tên khách hàng</th>
+                  <th>Số điện thoại</th>
                   <th>Email</th>
+                  <th>Nguồn</th>
+                  <th>Người phụ trách</th>
+                  <th>Lần cuối liên hệ</th>
                   <th>Trạng thái</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="(item, index) in students" :key="index">
+                <tr v-for="(item, index) in parents" :key="index">
                   <td>
                     {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
                   </td>
-                  <td>{{ item.name }}</td>
-                  <td>{{ item.phone }}</td>
+                  <td><router-link :to="`/parents/${item.id}/detail`"><a>{{ item.name }}</a></router-link></td>
+                  <td>{{ item.mobile_1 }}</td>
                   <td>{{ item.email }}</td>
+                  <td>{{ item.source_name }}</td>
+                  <td>{{ item.owner_name }}</td>
+                  <td>{{  }}</td>
                   <td>{{ item.status | getStatusName }}</td>
                   <td>
                     <router-link
                       class="btn btn-sm btn-success"
-                      :to="`/students/${item.id}/edit`"
+                      :to="`/parents/${item.id}/edit`"
                     >
-                      <i class="fa fa-edit"></i> Sửa
-                    </router-link>
+                      <i class="fa fa-edit"></i> </router-link>
                     <button
                       class="btn btn-sm btn-danger"
                       type="button"
                       @click="deleteItem(item.id)"
                     >
-                      <i class="fas fa-times"></i> Xóa
-                    </button>
+                      <i class="fas fa-times"></i></button>
+                    <router-link
+                      class="btn btn-sm  btn-info"
+                      :to="`/parents/${item.id}/detail`"
+                    >
+                      <i class="fa fa-eye"></i></router-link>  
                   </td>
                 </tr>
               </tbody>
@@ -145,7 +154,7 @@ export default {
         status: "",
         pagination: this.pagination
       },
-      students: [],
+      parents: [],
       pagination: {
         url: "/api/parents/list",
         id: "",
@@ -188,7 +197,7 @@ export default {
       u.p(link, data)
         .then((response) => {
           this.loading.processing = false;
-          this.students = response.data.list;
+          this.parents = response.data.list;
           this.pagination.spage = response.data.paging.spage;
           this.pagination.ppage = response.data.paging.ppage;
           this.pagination.npage = response.data.paging.npage;
@@ -211,7 +220,7 @@ export default {
       this.search();
     },
     deleteItem(id) {
-      u.g(`/api/students/delete/${id}`)
+      u.g(`/api/parents/delete/${id}`)
         .then((response) => {
           this.loading.processing = false;
           if (response.status == 200) {

@@ -2,6 +2,7 @@ import u from '../../utilities/utility'
 const ParentsList = () => import('../../views/customer/parents/list')
 const ParentsAdd = () => import('../../views/customer/parents/add')
 const ParentsEdit = () => import('../../views/customer/parents/edit')
+const ParentsDetail = () => import('../../views/customer/parents/detail')
 
 export default {
   router: {
@@ -27,6 +28,11 @@ export default {
         path: '/parents/:id/edit',
         name: 'Cập Nhật Khách Hàng',
         component: ParentsEdit
+      },
+      {
+        path: '/parents/:id/detail',
+        name: 'Chi tiết Khách Hàng',
+        component: ParentsDetail
       }
     ]
   }

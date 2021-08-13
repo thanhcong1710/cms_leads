@@ -131,7 +131,7 @@
             </form>
           </div>
           <div class="card-footer">
-            <router-link class="btn btn-danger" :to="`/students`">
+            <router-link class="btn btn-danger" :to="`/parents`">
               <i class="fas fa-undo-alt"></i> Hủy
             </router-link>
             <button class="btn btn-success" type="button" @click="save">
@@ -241,6 +241,8 @@ export default {
         province_id:"",
         district_id:"",
         job_id:"",
+        source_id:"",
+        source:"",
         job:"",
         province:"",
         district:"",
