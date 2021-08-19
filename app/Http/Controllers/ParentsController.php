@@ -37,7 +37,7 @@ class ParentsController extends Controller
         $total = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond ");
         $list = u::query("SELECT p.*, (SELECT name FROM sources WHERE id=p.source_id) AS source_name,
                 (SELECT name FROM users WHERE id=p.owner_id) AS owner_name 
-            FROM cms_parents AS p WHERE $cond ORDER p.id DESC $limitation");
+            FROM cms_parents AS p WHERE $cond ORDER BY p.id DESC $limitation");
         $data = u::makingPagination($list, $total->total, $page, $limit);
         return response()->json($data);
     }

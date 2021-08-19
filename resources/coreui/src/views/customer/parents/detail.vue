@@ -5,131 +5,93 @@
         <div class="card">
           <loader :active="loading.processing" :text="loading.text" />
           <div class="card-header">
-            <strong>Cập nhật khách hàng </strong>
+            <div class="row">
+              <div class="col-sm-4 border-right">
+                  <div style="float: left; width: 90px;">
+                    <img class="c-avatar-img" src="img/avatars/1.jpg" >
+                  </div>
+                  <div style="float: left; padding: 10px;">
+                    <h5 style="margin-bottom:0px">{{parent.name}} </h5>
+                    <p><strong>{{parent.mobile_1}}</strong></p>
+                    <p><router-link
+                        class="btn btn-sm btn-success"
+                        :to="`/parents/${parent.id}/edit`"
+                      >
+                        <i class="fa fa-edit"></i> </router-link></p>
+                  </div>
+              </div>
+              <div class="col-sm-2 border-right text-center">
+                <p>Liên hệ lần cuối</p>
+                <p><strong>2021-08-18 10:20:00</strong></p>  
+              </div> 
+              <div class="col-sm-2 border-right text-center">
+                <p>Tương tác</p>
+                <strong>4</strong>
+              </div> 
+              <div class="col-sm-2 border-right text-center">
+                <p>Trạng thái</p>
+                <p><select class="form-control">
+                  <option>Chọn trạng thái</option>
+                </select></p>  
+              </div>
+              <div class="col-sm-2 text-center">
+                <p>Người phụ trách</p>
+                <p><select class="form-control">
+                  <option>Chọn trạng thái</option>
+                </select></p>  
+              </div>
+                  
+            </div>
           </div>
           <div class="card-body">
-            <form action method="post">
               <div class="row">
-                <div class="col-sm-6">
-                  <div class="row no-margin">
-                    <div class="form-group col-sm-4">
-                      <label for="nf-email">Danh xưng <span class="text-danger"> (*)</span></label>
-                      <select class="form-control" v-model="parent.gender">
-                        <option value="M">Ông</option>
-                        <option value="F">Bà</option>
-                      </select>
-                    </div>
-                    <div class="form-group col-sm-8">
-                      <label for="nf-email">Họ tên <span class="text-danger"> (*)</span></label>
-                      <input
-                        class="form-control"
-                        type="text"
-                        name="title"
-                        v-model="parent.name"
-                      />
-                    </div>
-                    <div class="form-group col-sm-6">
-                      <label for="nf-email" >Điện thoại <span class="text-danger"> (*)</span></label>
-                      <input
-                        class="form-control"
-                        type="text"
-                        name="title"
-                        v-model="parent.mobile_1"
-                      />
-                    </div>
-                    <div class="form-group col-sm-6">
-                      <label for="nf-email">Email</label>
-                      <input
-                        class="form-control"
-                        type="text"
-                        name="title"
-                        v-model="parent.email"
-                      />
-                    </div>
-                    <div class="form-group  col-sm-6">
-                      <label for="nf-email">Ngày sinh </label>
-                      <datepicker
-                        class="form-control calendar"
-                        v-model="parent.birthday"
-                        placeholder="Chọn ngày sinh nhật"
-                        lang="lang"
-                        @change="selectDate"
-                      />
-                    </div>
-                    <div class="form-group col-sm-6">
-                      <label for="nf-email">Nghề nghiệp</label>
-                      <vue-select
-                            label="title"
-                            placeholder="Chọn nghề nghiệp"
-                            :options="html.jobs.list"
-                            v-model="parent.job"
-                            :searchable="true"
-                            language="tv-VN"
-                            :onChange="saveJob"
-                        ></vue-select>
-                    </div>
-                    <div class="form-group col-sm-12">
-                      <label for="nf-email">Ghi chú</label>
-                      <editor
-                        :api-key="tinymce.key"
-                        :init="tinymce.init"
-                        id="input_tinymce"
-                        :value="parent.note"
-                      />
-                    </div>
-                  </div>
+                <div class="col-sm-3 border-right" >
+                  <p><i class="fa fa-info-circle"></i> <strong>Thông tin khách hàng</strong></p>
+                  <p>Họ tên: <span class="fl-right">{{parent.name}}</span></p>
+                  <p>SĐT: <span class="fl-right">{{parent.mobile_1}}</span></p>
+                  <p>Email: <span class="fl-right">{{parent.email}}</span></p>
+                  <p>Ngày sinh: <span class="fl-right">{{parent.birthday}}</span></p>
+                  <p>Nghề nghiệp: <span class="fl-right">{{parent.job_name}}</span></p>
+                  <p>Địa chỉ: <span class="fl-right">{{parent.address}}</span></p>
+                  <p>Tỉnh/Thành phố: <span class="fl-right">{{parent.province_name}}</span></p>
+                  <p>Quận huyện: <span class="fl-right">{{parent.district_name}}</span></p>
+                  <p>Nguồn: <span class="fl-right">{{parent.source_name}}</span></p>
+                  <p>Ngày tạo: <span class="fl-right">{{parent.source_name}}</span></p>
+                  <p>Người tạo: <span class="fl-right">{{parent.source_name}}</span></p>
                 </div>
-                <div class="col-sm-6">
-                  <div class="row no-margin">
-                    <div class="form-group col-sm-6">
-                      <label for="nf-email">Tỉnh Thành Phố</label>
-                      <vue-select
-                        label="name"
-                        placeholder="Chọn Tỉnh/Thành Phố"
-                        :options="html.province.list"
-                        v-model="parent.province"
-                        :searchable="true"
-                        language="tv-VN"
-                        :onChange="getDistrict"
-                      ></vue-select>
-                    </div>
-                    <div class="form-group col-sm-6">
-                      <label for="nf-email">Quận huyện</label>
-                      <vue-select
-                            label="name"
-                            placeholder="Chọn Quận/Huyện/Thị Xã"
-                            :options="html.district.list"
-                            v-model="parent.district"
-                            :searchable="true"
-                            language="tv-VN"
-                            :onChange="saveDistrict"
-                        ></vue-select>
-                    </div>
-                    <div class="form-group col-sm-12">
-                      <label for="nf-email">Địa chỉ</label>
-                      <input
-                        class="form-control"
-                        type="text"
-                        name="title"
-                        v-model="parent.address"
-                      />
-                    </div>
-                    <div class="form-group col-sm-6">
-                      <label for="nf-email">Nguồn</label>
-                      <vue-select
-                            label="name"
-                            placeholder="Chọn nguồn"
-                            :options="html.source.list"
-                            v-model="parent.source"
-                            :searchable="true"
-                            language="tv-VN"
-                            :onChange="saveSource"
-                        ></vue-select>
-                    </div>
-                  </div>
+                <div class="col-sm-9">
+                  <ul class="nav nav-tabs" id="myTab1" role="tablist">
+<li class="nav-item"><a class="nav-link active" id="home-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Chăm sóc</a></li>
+ <li class="nav-item"><a class="nav-link" id="profile-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Học sinh</a></li>
+<li class="nav-item"><a class="nav-link" id="contact-tab" data-toggle="tab" href="#contact" role="tab" aria-controls="contact" aria-selected="false">Lịch sử cập nhật</a></li>
+</ul>
+<div class="tab-content" id="myTab1Content">
+<div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+Raw denim you probably haven't heard of them jean shorts Austin. Nesciunt tofu stumptown aliqua, retro
+synth master cleanse. Mustache cliche tempor, williamsburg carles vegan helvetica. Reprehenderit butcher
+retro keffiyeh dreamcatcher synth. Cosby sweater eu banh mi, qui irure terry richardson ex squid. Aliquip
+placeat salvia cillum iphone. Seitan aliquip quis cardigan american apparel, butcher voluptate nisi qui.
+</div>
+<div class="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="profile-tab">
+Food truck fixie locavore, accusamus mcsweeney's marfa nulla single-origin coffee squid. Exercitation +1
+labore velit, blog sartorial PBR leggings next level wes anderson artisan four loko farm-to-table craft
+beer twee. Qui photo booth letterpress, commodo enim craft beer mlkshk aliquip jean shorts ullamco ad
+vinyl cillum PBR. Homo nostrud organic, assumenda labore aesthetic magna delectus mollit. Keytar helvetica
+VHS salvia yr, vero magna velit sapiente labore stumptown. Vegan fanny pack odio cillum wes anderson
+8-bit, sustainable jean shorts beard ut DIY ethical culpa terry richardson biodiesel. Art party scenester
+stumptown, tumblr butcher vero sint qui sapiente accusamus tattooed echo park.
+</div>
+<div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
+Etsy mixtape wayfarers, ethical wes anderson tofu before they sold out mcsweeney's organic lomo retro
+fanny pack lo-fi farm-to-table readymade. Messenger bag gentrify pitchfork tattooed craft beer, iphone
+skateboard locavore carles etsy salvia banksy hoodie helvetica. DIY synth PBR banksy irony. Leggings
+gentrify squid 8-bit cred pitchfork. Williamsburg banh mi whatever gluten-free, carles pitchfork biodiesel
+fixie etsy retro mlkshk vice blog. Scenester cred you probably haven't heard of them, vinyl craft beer
+blog stumptown. Pitchfork sustainable tofu synth chambray yr.
+</div>
+</div>
                 </div>
               </div>
-            </form>
           </div>
           <div class="card-footer">
             <router-link class="btn btn-danger" :to="`/parents`">
@@ -388,3 +350,14 @@ export default {
   },
 };
 </script>
+<style>
+p{
+  margin-bottom: 3px;
+}
+.fl-right{
+  float: right;
+}
+.border-right{
+  border-right: 1px solid #ccc;
+}
+</style>
