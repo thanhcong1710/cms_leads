@@ -56,8 +56,8 @@
                   <p>Tỉnh/Thành phố: <span class="fl-right">{{parent.province_name}}</span></p>
                   <p>Quận huyện: <span class="fl-right">{{parent.district_name}}</span></p>
                   <p>Nguồn: <span class="fl-right">{{parent.source_name}}</span></p>
-                  <p>Ngày tạo: <span class="fl-right">{{parent.source_name}}</span></p>
-                  <p>Người tạo: <span class="fl-right">{{parent.source_name}}</span></p>
+                  <p>Ngày tạo: <span class="fl-right">{{parent.created_at}}</span></p>
+                  <p>Người tạo: <span class="fl-right">{{parent.creator_name}}</span></p>
                 </div>
                 <div class="col-sm-9">
                   <ul class="nav nav-tabs nav-justified">
@@ -72,7 +72,58 @@
                     </li>
                   </ul>
                   <div class="tab-content py-3" id="myTabContent">
-                    <div class="tab-pane fade" :class="{ 'active show': isActive('customer_care') }" id="customer_care">Home content</div>
+                    <div class="tab-pane fade" :class="{ 'active show': isActive('customer_care') }" id="customer_care">
+                      <div class="padding-bottom-10">
+                        <button class="btn btn-success" @click="showModalCare"><i class="fa fa-plus"></i> Thêm mới</button>
+                      </div>
+                      <table class="table table-responsive-sm">
+                        <thead>
+                          <tr>
+                            <th>STT</th>
+                            <th>Tên khách hàng</th>
+                            <th>Số điện thoại</th>
+                            <th>Email</th>
+                            <th>Nguồn</th>
+                            <th>Người phụ trách</th>
+                            <th>Lần cuối liên hệ</th>
+                            <th>Trạng thái</th>
+                            <th>Thao tác</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="(item, index) in parents" :key="index">
+                            <td>
+                              {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
+                            </td>
+                            <td><router-link :to="`/parents/${item.id}/detail`"><a>{{ item.name }}</a></router-link></td>
+                            <td>{{ item.mobile_1 }}</td>
+                            <td>{{ item.email }}</td>
+                            <td>{{ item.source_name }}</td>
+                            <td>{{ item.owner_name }}</td>
+                            <td>{{  }}</td>
+                            <td>{{ item.status | getStatusName }}</td>
+                            <td>
+                              <router-link
+                                class="btn btn-sm btn-success"
+                                :to="`/parents/${item.id}/edit`"
+                              >
+                                <i class="fa fa-edit"></i> </router-link>
+                              <button
+                                class="btn btn-sm btn-danger"
+                                type="button"
+                                @click="deleteItem(item.id)"
+                              >
+                                <i class="fas fa-times"></i></button>
+                              <router-link
+                                class="btn btn-sm  btn-info"
+                                :to="`/parents/${item.id}/detail`"
+                              >
+                                <i class="fa fa-eye"></i></router-link>  
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                     <div class="tab-pane fade" :class="{ 'active show': isActive('students') }" id="students">Profile content</div>
                     <div class="tab-pane fade" :class="{ 'active show': isActive('logs') }" id="logs">Contact content</div>
                   </div>
@@ -82,18 +133,50 @@
         </div>
       </div>
     </div>
-    <CModal
-      :title="modal.title"
-      :show.sync="modal.show"
-      :color="modal.color"
-      :closeOnBackdrop="modal.closeOnBackdrop"
+     <CModal
+      :title="modal_care.title"
+      :show.sync="modal_care.show"
+      :color="modal_care.color"
+      :closeOnBackdrop="modal_care.closeOnBackdrop"
+      :size="modal_care.size"
     >
-      <div v-html="modal.body"></div>
+      <div>
+        <div class="form-in-list">
+          <form action method="post">
+            <div class="row">
+              <div class="form-group col-sm-6">
+                <label for="nf-email" >Thời gian</label>
+                <input class="form-control" type="datetime-local" id="published_date">
+              </div>
+              <div class="form-group col-sm-6">
+                <label for="nf-email">Phương thức</label>
+                <input
+                  class="form-control"
+                  type="text"
+                  name="title"
+                  v-model="parent.email"
+                />
+              </div>
+              <div class="form-group col-sm-12">
+                <label for="nf-email">Ghi chú</label>
+                <editor
+                  :api-key="tinymce.key"
+                  :init="tinymce.init"
+                  id="input_tinymce"
+                />
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
       <template #header>
-        <h5 class="modal-title">{{ modal.title }}</h5>
+        <h5 class="modal-title">{{ modal_care.title }}</h5>
       </template>
       <template #footer>
-        <CButton :color="'btn btn-' + modal.color" @click="exit" type="button"
+        <CButton :color="'btn btn-success'" @click="exit" type="button"
+          >Lưu</CButton
+        >
+        <CButton :color="'btn btn-secondary'" @click="exit('care')" type="button"
           >Đóng</CButton
         >
       </template>
@@ -145,13 +228,13 @@ export default {
         text: "Đang tải dữ liệu...",
         processing: false,
       },
-      modal: {
-        title: "THÔNG BÁO",
+      modal_care: {
+        title: "THÊM MỚI CHĂM SÓC",
         show: false,
-        color: "success",
-        body: "Thêm mới lớp học thành công",
+        color: "info",
         closeOnBackdrop: false,
-        action_exit: "exit",
+        size:"lg"
+        //'sm', 'lg', 'xl'
       },
       html:{
         province: {
@@ -194,7 +277,7 @@ export default {
   },
   created() {
     this.loading.processing = true;
-    u.g(`/api/parents/detail/${this.$route.params.id}`)
+    u.g(`/api/parents/show/${this.$route.params.id}`)
       .then(response => {
       this.loading.processing = false;
       this.parent = response.data
@@ -211,13 +294,18 @@ export default {
     setActive (menuItem) {
       this.activeItem = menuItem
     },
-    exit() {
-      if (this.modal.action_exit == "exit") {
-        this.$router.push({ path: "/parents" });
-      } else {
-        this.modal.show = false;
+    exit(item) {
+      if(item=='care'){
+        this.modal_care.show = false;
       }
     },
+    showModalCare(){
+      document.getElementById('published_date').value=""
+      this.modal_care.show = true
+    },
+    addCare(){
+      published_date: document.getElementById('published_date').value
+    }
   },
 };
 </script>
@@ -230,5 +318,8 @@ p{
 }
 .border-right{
   border-right: 1px solid #ccc;
+}
+.padding-bottom-10{
+  padding-bottom: 10px; 
 }
 </style>

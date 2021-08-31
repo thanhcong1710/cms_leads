@@ -21,11 +21,11 @@ class SystemInfoController extends Controller
     }
     public function getAllJobs()
     {
-        $data = u::query("SELECT * FROM jobs WHERE status=1");
+        $data = u::query("SELECT * FROM cms_jobs WHERE status=1");
         return response()->json($data);
     }
     public function getAllSources(){
-        $data = u::query("SELECT * FROM sources WHERE status=1");
+        $data = u::query("SELECT * FROM cms_sources WHERE status=1");
         return response()->json($data);
     }
 }

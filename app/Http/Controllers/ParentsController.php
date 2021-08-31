@@ -35,7 +35,7 @@ class ParentsController extends Controller
             $cond .= " AND (p.name LIKE '%$keyword%' OR p.mobile_1 LIKE '%$keyword%' OR p.mobile_2 LIKE '%$keyword%') ";
         }
         $total = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond ");
-        $list = u::query("SELECT p.*, (SELECT name FROM sources WHERE id=p.source_id) AS source_name,
+        $list = u::query("SELECT p.*, (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
                 (SELECT name FROM users WHERE id=p.owner_id) AS owner_name 
             FROM cms_parents AS p WHERE $cond ORDER BY p.id DESC $limitation");
         $data = u::makingPagination($list, $total->total, $page, $limit);
@@ -82,6 +82,16 @@ class ParentsController extends Controller
             'updated_at' => date('Y-m-d H:i:s'),
             'updator_id' => Auth::user()->id,
         ), array('id' => $parent_id), 'cms_parents');
+        return response()->json($data);
+    }
+    public function show($parent_id)
+    {
+        $data = u::first("SELECT p.*,(SELECT name FROM users WHERE id=p.creator_id) AS creator_name,
+                (SELECT name FROM cms_districts WHERE id=p.district_id) AS district_name,
+                (SELECT name FROM cms_provinces WHERE id=p.province_id) AS province_name,
+                (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
+                (SELECT title FROM cms_jobs WHERE id=p.job_id) AS job_name
+            FROM cms_parents AS p WHERE id=$parent_id");
         return response()->json($data);
     }
     public function delete($parent_id)
