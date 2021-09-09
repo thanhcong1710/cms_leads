@@ -42,7 +42,7 @@
                 </button>
               </div>
             </div>
-            <table class="table table-responsive-sm">
+            <table class="table table-striped table-hover">
               <thead>
                 <tr>
                   <th>STT</th>

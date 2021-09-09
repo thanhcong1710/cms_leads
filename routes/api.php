@@ -76,6 +76,12 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('/provinces/{province_id}/districts', 'SystemInfoController@getDistrictsByProvice');
         Route::get('/jobs', 'SystemInfoController@getAllJobs');
         Route::get('/sources', 'SystemInfoController@getAllSources');
+        Route::get('/methods', 'SystemInfoController@getAllMethods');
+        Route::get('get/{province_id}/{district_id}/{school_level}/schools', 'SystemInfoController@getSchools');
+        Route::post('/care/add', 'ParentCareController@add');
+        Route::get('/care/get_all_data/{parent_id}', 'ParentCareController@getAllDataByParent');
+        Route::post('/students/add', 'StudentsController@add');
+        Route::get('/students/get_all_data/{parent_id}', 'StudentsController@getAllDataByParent');
     });
 });
 

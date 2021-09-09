@@ -76,55 +76,46 @@
                       <div class="padding-bottom-10">
                         <button class="btn btn-success" @click="showModalCare"><i class="fa fa-plus"></i> Thêm mới</button>
                       </div>
-                      <table class="table table-responsive-sm">
+                      <table class="table table-striped table-hover">
                         <thead>
                           <tr>
-                            <th>STT</th>
-                            <th>Tên khách hàng</th>
-                            <th>Số điện thoại</th>
-                            <th>Email</th>
-                            <th>Nguồn</th>
-                            <th>Người phụ trách</th>
-                            <th>Lần cuối liên hệ</th>
-                            <th>Trạng thái</th>
-                            <th>Thao tác</th>
+                            <th>Thời gian</th>
+                            <th>Người chăm sóc</th>
+                            <th>Phương thức</th>
+                            <th>Chi tiết</th>
                           </tr>
                         </thead>
                         <tbody>
-                          <tr v-for="(item, index) in parents" :key="index">
-                            <td>
-                              {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
-                            </td>
-                            <td><router-link :to="`/parents/${item.id}/detail`"><a>{{ item.name }}</a></router-link></td>
-                            <td>{{ item.mobile_1 }}</td>
-                            <td>{{ item.email }}</td>
-                            <td>{{ item.source_name }}</td>
-                            <td>{{ item.owner_name }}</td>
-                            <td>{{  }}</td>
-                            <td>{{ item.status | getStatusName }}</td>
-                            <td>
-                              <router-link
-                                class="btn btn-sm btn-success"
-                                :to="`/parents/${item.id}/edit`"
-                              >
-                                <i class="fa fa-edit"></i> </router-link>
-                              <button
-                                class="btn btn-sm btn-danger"
-                                type="button"
-                                @click="deleteItem(item.id)"
-                              >
-                                <i class="fas fa-times"></i></button>
-                              <router-link
-                                class="btn btn-sm  btn-info"
-                                :to="`/parents/${item.id}/detail`"
-                              >
-                                <i class="fa fa-eye"></i></router-link>  
-                            </td>
+                          <tr v-for="(item, index) in cares" :key="index">
+                            <td>{{ item.care_date }}</td>
+                            <td>{{ item.creator_name }}</td>
+                            <td>{{ item.method_name }}</td>
+                            <td v-html="item.note"></td>
                           </tr>
                         </tbody>
                       </table>
                     </div>
-                    <div class="tab-pane fade" :class="{ 'active show': isActive('students') }" id="students">Profile content</div>
+                    <div class="tab-pane fade" :class="{ 'active show': isActive('students') }" id="students">
+                      <div class="padding-bottom-10">
+                        <button class="btn btn-success" @click="showModalStudent"><i class="fa fa-plus"></i> Thêm mới học sinh</button>
+                      </div>
+                      <div class="row">
+                        <div class="col-sm-6" v-for="(item, index) in students" :key="index">
+                          <div class="card card-accent-info" >
+                            <div class="card-header"><strong>{{ item.name }}</strong></div>
+                            <div class="card-body">
+                              <p>Ngày sinh: {{ item.birthday }}</p>
+                              <p>Giới tính: {{ item.gender | genTextGender}}</p>
+                              <p>Trường: {{ item.school}}</p>
+                              <p>Ghi chú: {{ item.note}}</p>
+                              <p>Ngày tạo: {{ item.created_at}}</p>
+                              <p>Người tạo: {{ item.creator_name}}</p>
+                              <p>Trạng thái: <b>Mới tạo</b></p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                     <div class="tab-pane fade" :class="{ 'active show': isActive('logs') }" id="logs">Contact content</div>
                   </div>
                 </div>
@@ -133,7 +124,7 @@
         </div>
       </div>
     </div>
-     <CModal
+    <CModal
       :title="modal_care.title"
       :show.sync="modal_care.show"
       :color="modal_care.color"
@@ -150,12 +141,14 @@
               </div>
               <div class="form-group col-sm-6">
                 <label for="nf-email">Phương thức</label>
-                <input
-                  class="form-control"
-                  type="text"
-                  name="title"
-                  v-model="parent.email"
-                />
+                <select class="form-control" v-model="care.method_id">
+                  <option value="">Chọn phương thức</option>
+                  <option
+                    :value="method.id"
+                    v-for="(method, index) in methods"
+                    :key="index"
+                  >{{method.name}}</option>
+                </select>
               </div>
               <div class="form-group col-sm-12">
                 <label for="nf-email">Ghi chú</label>
@@ -167,16 +160,95 @@
               </div>
             </div>
           </form>
+          <p style="color:red" v-html="modal_care.error_message"></p>
         </div>
       </div>
       <template #header>
         <h5 class="modal-title">{{ modal_care.title }}</h5>
       </template>
       <template #footer>
-        <CButton :color="'btn btn-success'" @click="exit" type="button"
+        <CButton :color="'btn btn-success'" @click="addCare" type="button"
           >Lưu</CButton
         >
         <CButton :color="'btn btn-secondary'" @click="exit('care')" type="button"
+          >Đóng</CButton
+        >
+      </template>
+    </CModal>
+    <CModal
+      :title="modal_student.title"
+      :show.sync="modal_student.show"
+      :color="modal_student.color"
+      :closeOnBackdrop="modal_student.closeOnBackdrop"
+      :size="modal_student.size"
+    >
+      <div>
+        <div class="form-in-list">
+          <form action method="post">
+            <div class="row">
+              <div class="form-group col-sm-6">
+                <label for="nf-email" >Họ tên học sinh</label>
+                <input class="form-control" type="text" v-model="student.name">
+              </div>
+              <div class="form-group col-sm-6">
+                <label for="nf-email">Ngày sinh</label>
+                <datepicker
+                  class="form-control calendar"
+                  v-model="student.birthday"
+                  placeholder="Chọn ngày sinh nhật"
+                  lang="lang"
+                  @change="selectDate"
+                />
+              </div>
+              <div class="form-group col-sm-6">
+                <label for="nf-email">Giới tính</label>
+                <select class="form-control" v-model="student.gender">
+                  <option value="M">Nam</option>
+                  <option value="F">Nữ</option>
+                </select>
+              </div>
+              <div class="form-group col-sm-6">
+                <label for="nf-email">Cấp trường</label>
+                <select class="form-control" id="" v-model="student.school_level" name="school_level"  @change="getSchools()" :disabled="parent.district_id == ''">
+                  <option value="" disabled>Chọn cấp trường</option>
+                  <option value="Mẫu giáo">Mẫu giáo</option>
+                  <option value="Tiểu học">Tiểu học</option>
+                </select>
+              </div>
+              <div class="form-group col-sm-6">
+                <label for="nf-email">Trường học</label>
+                <select class="form-control" id="" v-model="student.select_school" name="select_school"  data-vv-rules="required" @change="selectSchool" :disabled="parent.district_id == '' || student.school_level==''">
+                    <option :value="school.name" v-for="(school, index) in html.schools.list" :key="index">{{ school.name }}</option>
+                    <option value="Other">Khác...</option>
+                </select>
+                <input
+                    v-show="(student.select_school == 'Other' || (Array.isArray(html.schools.list) && html.schools.list.length == 0)) && (parent.district_id != '' && student.school_level!='')"
+                    class="form-control input-top"
+                    type="text"
+                    v-model="student.school"
+                    placeholder="Nhập tên trường học"
+                    maxlength="200"
+                      :disabled="parent.district_id == ''"
+                      @input="validShoolName"
+                >
+              </div>
+              <div class="form-group col-sm-12">
+                <label for="nf-email">Ghi chú</label>
+                <textarea class="form-control" v-model="student.note"></textarea>
+              </div>
+            </div>
+          </form>
+          <p style="color:red" v-html="modal_student.error_message"></p>
+        </div>
+      </div>
+      <template #header>
+        <h5 class="modal-title">{{ modal_student.title }}</h5>
+      </template>
+      <template #footer>
+        <CButton :color="'btn btn-success'" @click="addStudent" type="button"
+          >Lưu</CButton
+        >
+        <CButton :color="'btn btn-secondary'" @click="exit('student')" type="button"
           >Đóng</CButton
         >
       </template>
@@ -228,33 +300,31 @@ export default {
         text: "Đang tải dữ liệu...",
         processing: false,
       },
+      html:{
+        schools: {
+          item: '',
+          list: []
+        },
+      },
       modal_care: {
         title: "THÊM MỚI CHĂM SÓC",
         show: false,
         color: "info",
         closeOnBackdrop: false,
-        size:"lg"
+        size:"lg",
+        error_message:""
         //'sm', 'lg', 'xl'
       },
-      html:{
-        province: {
-          item: '',
-          list: []
-        },
-        district: {
-          item: '',
-          list: []
-        },
-        jobs: {
-          item: '',
-          list: []
-        },
-        source: {
-          item: '',
-          list: []
-        },
+      modal_student: {
+        title: "THÊM MỚI HỌC SINH",
+        show: false,
+        color: "info",
+        closeOnBackdrop: false,
+        size:"lg",
+        error_message:""
       },
       parent: {
+        id:"",
         gender: "",
         name: "",
         birthday: "",
@@ -272,7 +342,25 @@ export default {
         district:"",
         address:""
       },
-      activeItem: 'customer_care'
+      activeItem: 'customer_care',
+      methods:[],
+      cares:[],
+      care:{
+        method_id:"",
+        care_date:"",
+        note:"",
+        parent_id:"",
+      },
+      students:[],
+      student:{
+        parent_id:"",
+        name:"",
+        gender:"",
+        school_level:"",
+        birthday:"",
+        select_school:"",
+        note:"",
+      }
     };
   },
   created() {
@@ -281,32 +369,167 @@ export default {
       .then(response => {
       this.loading.processing = false;
       this.parent = response.data
-      this.parent.job = this.html.jobs.list.filter(item => item.id == this.parent.job_id)[0]
-      this.parent.source = this.html.source.list.filter(item => item.id == this.parent.source_id)[0]
-      this.parent.province = this.html.province.list.filter(item => item.id == this.parent.province_id)[0]
-      this.tmp_district_id = this.parent.district_id
     })
+    u.g(`/api/methods`)
+      .then(response => {
+      this.methods = response.data
+    })
+    this.loadCares(this.$route.params.id);
   },
   methods: {
     isActive (menuItem) {
       return this.activeItem === menuItem
     },
     setActive (menuItem) {
+      if(menuItem=="students"){
+        this.loadStudents(this.$route.params.id)
+      }
       this.activeItem = menuItem
     },
     exit(item) {
       if(item=='care'){
         this.modal_care.show = false;
+      }else if(item=='student'){
+        this.modal_student.show = false;
       }
     },
     showModalCare(){
       document.getElementById('published_date').value=""
       this.modal_care.show = true
+      this.modal_care.error_message=""
+    },
+    loadCares(parent_id){
+      this.loading.processing = true;
+        u.g(`/api/care/get_all_data/${parent_id}`)
+        .then((response) => {
+          this.loading.processing = false;
+          this.cares=response.data;
+        })
+        .catch((e) => {
+        });
     },
     addCare(){
-      published_date: document.getElementById('published_date').value
-    }
+      this.care.care_date = document.getElementById('published_date').value
+      this.care.note = tinymce.get("input_tinymce").getContent();
+      this.care.parent_id = this.parent.id
+      let mess = "";
+      let resp = true;
+      if (this.care.care_date == "") {
+        mess += " - Thời gian chăm sóc không được để trống<br/>";
+        resp = false;
+      }
+      if (this.care.method_id == "") {
+        mess += " - Phương thức chăm sóc không được để trống<br/>";
+        resp = false;
+      }
+      if (this.care.note == "") {
+        mess += " - Nội dung chăm sóc không được để trống<br/>";
+        resp = false;
+      }
+      if(resp){
+        this.loading.processing = true;
+        u.p(`/api/care/add`,this.care)
+        .then((response) => {
+          this.loading.processing = false;
+          this.loadCares(this.parent.id);
+          this.exit("care");
+        })
+        .catch((e) => {
+        });
+      }else{
+        this.modal_care.error_message = mess;
+      }
+    },
+    showModalStudent(){
+      this.modal_student.show = true
+      this.modal_student.error_message=""
+    },
+    selectDate(date) {
+      if (date) {
+        this.student.birthday = moment(date).format("YYYY-MM-DD");
+      }
+    },
+    getSchools(e){
+      const school_level = this.student.school_level ? this.student.school_level : e.target.value ? e.target.value : 'Tiểu học'
+      const district_id = parseInt(this.parent.district_id, 10)
+      const province_id = parseInt(this.parent.province_id, 10)
+      if (school_level && district_id > 0 && province_id > 0) {        
+        u.g(`/api/get/${province_id}/${district_id}/${school_level}/schools`).then(response => {
+          this.html.schools.list = response.data
+          this.student.school = ""
+        })        
+      }
+    },
+    selectSchool () {
+      if (this.student.select_school != 'Other') {
+        this.student.school = this.student.select_school
+      } else {
+        this.student.school = ''
+      }
+    },
+    validShoolName() {
+      this.student.school = this.student.school.replace(/[~`!@#$%^&*()=+{}[,\]./<>?;'\\:"|]/gi, '');
+    },
+    addStudent(){
+      this.student.parent_id = this.parent.id
+      let mess = "";
+      let resp = true;
+      if (this.student.name == "") {
+        mess += " - Tên học sinh không được để trống<br/>";
+        resp = false;
+      }
+      if (this.student.birthday == "") {
+        mess += " - Ngày sinh không được để trống<br/>";
+        resp = false;
+      }
+      if (this.student.gender == "") {
+        mess += " - Giới tính không được để trống<br/>";
+        resp = false;
+      }
+      if (this.student.school_level == "") {
+        mess += " - Cấp trường không được để trống<br/>";
+        resp = false;
+      }
+      if (this.student.school == "") {
+        mess += " - Trường học không được để trống<br/>";
+        resp = false;
+      }
+      if(resp){
+        this.loading.processing = true;
+        u.p(`/api/students/add`,this.student)
+        .then((response) => {
+          this.loading.processing = false;
+          this.loadStudents(this.parent.id);
+          this.exit("student");
+        })
+        .catch((e) => {
+        });
+      }else{
+        this.modal_student.error_message = mess;
+      }
+    },
+    loadStudents(parent_id){
+      this.loading.processing = true;
+        u.g(`/api/students/get_all_data/${parent_id}`)
+        .then((response) => {
+          this.loading.processing = false;
+          this.students=response.data;
+        })
+        .catch((e) => {
+        });
+    },
   },
+  filters: {
+    genTextGender(item){
+      let resp = ''
+      if(item== 'M'){
+        resp = 'Nam'
+      }else{
+        resp = 'Nữ'
+      }
+      return resp
+    }
+  }
 };
 </script>
 <style>
