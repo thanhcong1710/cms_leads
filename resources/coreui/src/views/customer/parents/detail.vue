@@ -22,11 +22,11 @@
               </div>
               <div class="col-sm-2 border-right text-center">
                 <p>Liên hệ lần cuối</p>
-                <p><strong>2021-08-18 10:20:00</strong></p>  
+                <p><strong>{{parent.last_care}}</strong></p>  
               </div> 
               <div class="col-sm-2 border-right text-center">
                 <p>Tương tác</p>
-                <strong>4</strong>
+                <strong>{{parent.num_care}}</strong>
               </div> 
               <div class="col-sm-2 border-right text-center">
                 <p>Trạng thái</p>
@@ -116,7 +116,24 @@
                         </div>
                       </div>
                     </div>
-                    <div class="tab-pane fade" :class="{ 'active show': isActive('logs') }" id="logs">Contact content</div>
+                    <div class="tab-pane fade" :class="{ 'active show': isActive('logs') }" id="logs">
+                      <table class="table table-striped table-hover">
+                        <thead>
+                          <tr>
+                            <th>Thời gian</th>
+                            <th>Nội dung</th>
+                            <th>Người thực hiện</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr v-for="(item, index) in logs" :key="index">
+                            <td>{{ item.created_at }}</td>
+                            <td>{{ item.content }}</td>
+                            <td>{{ item.creator_name }}</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -360,7 +377,8 @@ export default {
         birthday:"",
         select_school:"",
         note:"",
-      }
+      },
+      logs:[],
     };
   },
   created() {
@@ -383,6 +401,8 @@ export default {
     setActive (menuItem) {
       if(menuItem=="students"){
         this.loadStudents(this.$route.params.id)
+      }else if(menuItem=="logs"){
+        this.loadLogs(this.$route.params.id)
       }
       this.activeItem = menuItem
     },
@@ -514,6 +534,16 @@ export default {
         .then((response) => {
           this.loading.processing = false;
           this.students=response.data;
+        })
+        .catch((e) => {
+        });
+    },
+    loadLogs(parent_id){
+      this.loading.processing = true;
+        u.g(`/api/parents/get_logs/${parent_id}`)
+        .then((response) => {
+          this.loading.processing = false;
+          this.logs=response.data;
         })
         .catch((e) => {
         });

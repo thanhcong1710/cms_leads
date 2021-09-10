@@ -72,6 +72,7 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::post('/parents/update/{parent_id}', 'ParentsController@update');
         Route::get('/parents/detail/{parent_id}', 'ParentsController@detail');
         Route::get('/parents/show/{parent_id}', 'ParentsController@show');
+        Route::get('/parents/get_logs/{parent_id}', 'ParentsController@getLogs');
         Route::get('/provinces', 'SystemInfoController@getAllProvices');
         Route::get('/provinces/{province_id}/districts', 'SystemInfoController@getDistrictsByProvice');
         Route::get('/jobs', 'SystemInfoController@getAllJobs');

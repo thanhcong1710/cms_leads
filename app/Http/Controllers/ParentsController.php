@@ -90,13 +90,20 @@ class ParentsController extends Controller
                 (SELECT name FROM cms_districts WHERE id=p.district_id) AS district_name,
                 (SELECT name FROM cms_provinces WHERE id=p.province_id) AS province_name,
                 (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
-                (SELECT title FROM cms_jobs WHERE id=p.job_id) AS job_name
+                (SELECT title FROM cms_jobs WHERE id=p.job_id) AS job_name,
+                (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id) AS num_care,
+                (SELECT DATE_FORMAT(care_date,'%Y-%m-%d') FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_care
             FROM cms_parents AS p WHERE id=$parent_id");
         return response()->json($data);
     }
     public function delete($parent_id)
     {
         $data = u::query("DELETE FROM cms_parents WHERE id=$parent_id");
+        return response()->json($data);
+    }
+    public function getLogs($parent_id){
+        $data = u::query("SELECT l.*,(SELECT name FROM users WHERE id=l.creator_id) AS creator_name
+            FROM cms_parent_logs AS l WHERE l.parent_id=$parent_id ORDER BY l.id DESC");
         return response()->json($data);
     }
 }
