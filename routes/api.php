@@ -83,6 +83,8 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('/care/get_all_data/{parent_id}', 'ParentCareController@getAllDataByParent');
         Route::post('/students/add', 'StudentsController@add');
         Route::get('/students/get_all_data/{parent_id}', 'StudentsController@getAllDataByParent');
+        Route::post('/imports/list', 'ImportsController@list');
+        Route::post('/imports/upload', 'ImportsController@upload');
     });
 });
 

@@ -21,7 +21,7 @@ class RenderFromDatabaseData{
     }
 
     private function addLink($data){
-        if($data['parent_id'] === NULL){
+        if($data['parent_id'] === NULL  || $data['parent_id'] ==0){
             $this->mb->addLink($data['id'], $data['name'], $data['href'], $data['icon']);
         }
     }
@@ -58,7 +58,7 @@ class RenderFromDatabaseData{
                     $this->addLink($this->data[$i]);
                 break;
                 case 'dropdown':
-                    if($this->data[$i]['parent_id'] == null){
+                    if($this->data[$i]['parent_id'] == null ){
                         $this->addDropdown($this->data[$i]);
                     }
                 break;
