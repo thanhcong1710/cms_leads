@@ -6,7 +6,8 @@ const mix = require('laravel-mix');
 mix.webpackConfig({
    resolve: {
       alias: {
-         "@": ".."
+         "@": "..",
+         'static': path.resolve(__dirname, 'resources/static/'),
       }
    }
 });

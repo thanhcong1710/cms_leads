@@ -251,4 +251,15 @@ class UtilityServiceProvider extends ServiceProvider
         }
         return false;
     }
+    public static function phoneNew($number = '') {
+        $resp = false;
+        if ($number) {
+            $resp = trim(str_replace(array('-', '.', ' '), '', (string)$number)); 
+            // $resp = !preg_match('/(84|0[3|5|7|8|9])+([0-9]{8})\b/', $number) ? false : $resp;
+            $resp = !preg_match('/(84|0[0-9])+([0-9]{8})\b/', $number) ? false : $resp;
+            $resp = strlen($resp) != 10 ? false : $resp; 
+        }
+        return $resp;
+    }
+
 }

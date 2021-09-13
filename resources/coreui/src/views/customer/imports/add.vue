@@ -9,32 +9,39 @@
             <div class="row bs-wizard" style="border-bottom:0;">
                 
                 <div class="col-sm-3 bs-wizard-step complete">
-                  <div class="text-center bs-wizard-stepnum">Step 1</div>
+                  <div class="text-center bs-wizard-stepnum">Chọn tập tin</div>
                   <div class="progress"><div class="progress-bar"></div></div>
                   <a class="bs-wizard-dot"></a>
+                  <div class="bs-wizard-info text-center"></div>
                 </div>
                 
                 <div class="col-sm-3 bs-wizard-step complete"><!-- complete -->
-                  <div class="text-center bs-wizard-stepnum">Step 2</div>
+                  <div class="text-center bs-wizard-stepnum">Kiểm tra dữ liệu</div>
                   <div class="progress"><div class="progress-bar"></div></div>
                   <a class="bs-wizard-dot"></a>
+                  <div class="bs-wizard-info text-center"></div>
                 </div>
                 
                 <div class="col-sm-3 bs-wizard-step active"><!-- complete -->
-                  <div class="text-center bs-wizard-stepnum">Step 3</div>
+                  <div class="text-center bs-wizard-stepnum">Phân chia dữ liệu</div>
                   <div class="progress"><div class="progress-bar"></div></div>
                   <a class="bs-wizard-dot"></a>
+                  <div class="bs-wizard-info text-center"></div>
                 </div>
                 
                 <div class="col-sm-3 bs-wizard-step disabled"><!-- active -->
-                  <div class="text-center bs-wizard-stepnum">Step 4</div>
+                  <div class="text-center bs-wizard-stepnum">Kết quả</div>
                   <div class="progress"><div class="progress-bar"></div></div>
                   <a class="bs-wizard-dot"></a>
+                  <div class="bs-wizard-info text-center"></div>
                 </div>
             </div>
           </div>
           <div class="card-body">
             <div class="row">
+              <div class="col-12">
+                <p><a href="static/template/import_khach_hang.xlsx" target="blank"><i class="fas fa-download"></i> Tải danh sách khách hàng mẫu</a></p>
+              </div>
               <div class="col-8">
                   <input
                     type="file"
@@ -44,7 +51,7 @@
                   >
               </div>
               <div class="col-2">
-                <button class="btn btn-info" @click="btnUpload">Import</button>
+                <button class="btn btn-info" @click="btnUpload"> <i class="fas fa-upload"></i> Import</button>
               </div>
             </div>
           </div>
