@@ -8,28 +8,28 @@
         
             <div class="row bs-wizard" style="border-bottom:0;">
                 
-                <div class="col-sm-3 bs-wizard-step complete">
+                <div :class="curr_step == 1 ?'col-sm-3 bs-wizard-step active': 'col-sm-3 bs-wizard-step complete'">
                   <div class="text-center bs-wizard-stepnum">Chọn tập tin</div>
                   <div class="progress"><div class="progress-bar"></div></div>
                   <a class="bs-wizard-dot"></a>
                   <div class="bs-wizard-info text-center"></div>
                 </div>
                 
-                <div class="col-sm-3 bs-wizard-step complete"><!-- complete -->
+                <div :class="curr_step == 2 ?'col-sm-3 bs-wizard-step active': (curr_step < 2 ? 'col-sm-3 bs-wizard-step disabled':'col-sm-3 bs-wizard-step complete')" ><!-- complete -->
                   <div class="text-center bs-wizard-stepnum">Kiểm tra dữ liệu</div>
                   <div class="progress"><div class="progress-bar"></div></div>
                   <a class="bs-wizard-dot"></a>
                   <div class="bs-wizard-info text-center"></div>
                 </div>
                 
-                <div class="col-sm-3 bs-wizard-step active"><!-- complete -->
+                <div :class="curr_step == 3 ?'col-sm-3 bs-wizard-step active': (curr_step < 3 ? 'col-sm-3 bs-wizard-step disabled':'col-sm-3 bs-wizard-step complete')"><!-- complete -->
                   <div class="text-center bs-wizard-stepnum">Phân chia dữ liệu</div>
                   <div class="progress"><div class="progress-bar"></div></div>
                   <a class="bs-wizard-dot"></a>
                   <div class="bs-wizard-info text-center"></div>
                 </div>
                 
-                <div class="col-sm-3 bs-wizard-step disabled"><!-- active -->
+                <div :class="curr_step == 4 ?'col-sm-3 bs-wizard-step active': (curr_step < 4 ? 'col-sm-3 bs-wizard-step disabled':'col-sm-3 bs-wizard-step complete')"><!-- active -->
                   <div class="text-center bs-wizard-stepnum">Kết quả</div>
                   <div class="progress"><div class="progress-bar"></div></div>
                   <a class="bs-wizard-dot"></a>
@@ -37,7 +37,7 @@
                 </div>
             </div>
           </div>
-          <div class="card-body">
+          <div class="card-body" v-if="curr_step==1">
             <div class="row">
               <div class="col-12">
                 <p><a href="static/template/import_khach_hang.xlsx" target="blank"><i class="fas fa-download"></i> Tải danh sách khách hàng mẫu</a></p>
@@ -55,7 +55,36 @@
               </div>
             </div>
           </div>
-          <div class="card-footer">
+          <div class="card-body" v-if="curr_step==2">
+            <div class="row">
+              <div class="col-12">
+                <p><strong>DỮ LIỆU ĐÃ KIỂM TRA</strong></p>
+                <table class="table table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th>STT</th>
+                      <th>Tên khách hàng</th>
+                      <th>Số điện thoại</th>
+                      <th>Trạng thái</th>
+                      <th>Thông tin lỗi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(item, index) in list_data_check" :key="index">
+                      <td>
+                        {{ index + 1 }}
+                      </td>
+                      <td>{{item.name}}</td>
+                      <td>{{ item.gud_mobile1 }}</td>
+                      <td>{{ item.status }}</td>
+                      <td>{{ item.error_message }}</td>
+                      <td></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              
+            </div>
           </div>
         </div>
       </div>
@@ -133,6 +162,8 @@ export default {
       },
       attached_file:"",
       file_name:"",
+      curr_step:1,
+      list_data_check:[],
     };
   },
   created() {
@@ -158,6 +189,14 @@ export default {
         u.p(`api/imports/upload`, dataUpload)
           .then(response => {
             this.loading.processing = false
+            console.log(response.data)
+            if(response.data.error){
+              alert(response.data.message);
+              location.reload();
+            }else{
+              this.list_data_check = response.data.data
+              this.curr_step=2
+            }
           })
           .catch(e => console.log(e))
       }

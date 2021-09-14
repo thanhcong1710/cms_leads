@@ -69,9 +69,10 @@ class ImportsController extends Controller
             'creator_id'=>(int)$request->user()->id,
         ),'cms_imports');
         $this->addItemDataImport($dataXslx,$import_id,(int)$request->user()->id);
-        // self::processCheckDuplicateData();
-        // self::processInsertData();
+        $this->processCheckDuplicateData($import_id);
+        $data = u::query("SELECT * FROM cms_import_parents WHERE import_id =$import_id");
         
+        $data_mes->data = $data;
         $data_mes->message = 'Import file thành công!';
         $data_mes->error = false;
         return response()->json($data_mes);
@@ -80,15 +81,15 @@ class ImportsController extends Controller
     public function addItemDataImport($list,$import_id,$creator_id) {
         if ($list) {
             $created_at = date('Y-m-d H:i:s');
-            $query = "INSERT INTO cms_import_parents (import_id,`name`,email,gud_mobile1,note,created_at,creator_id,`status`,error_message) VALUES ";
+            $query = "INSERT INTO cms_import_parents (import_id,`name`,email,gud_mobile1,`address`,note,created_at,creator_id,`status`,error_message) VALUES ";
             if (count($list) > 10000) {
                 for($i = 1; $i < 10000; $i++) {
                     $item = $this->convertData($list[$i]);
                     $validate = $this->validateData($item);
-                    $status = $validate->has_error ? 2 : 0;
+                    $status = $validate->has_error ? 2 : 1;
                     $error_message = $validate->message;
-                    $gud_mobile1 = $item->gud_mobile1 ? $item->gud_mobile1 : $list[$i]->gud_mobile1;
-                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->noe','$created_at','$creator_id',$status,$error_message),";
+                    $gud_mobile1 = $item->gud_mobile1 ? $item->gud_mobile1 : $list[$i][1];
+                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message'),";
                     
                 }
                 $query = substr($query, 0, -1);
@@ -98,10 +99,10 @@ class ImportsController extends Controller
                 foreach($list as $i=>$item) {
                     $item = $this->convertData($item);
                     $validate = $this->validateData($item);
-                    $status = $validate->has_error ? 2 : 0;
+                    $status = $validate->has_error ? 2 : 1;
                     $error_message = $validate->message;
-                    $gud_mobile1 = $item->gud_mobile1 ? $item->gud_mobile1 : $list[$i]->gud_mobile1;
-                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->noe','$created_at','$creator_id',$status,$error_message),";
+                    $gud_mobile1 = $item->gud_mobile1 ? $item->gud_mobile1 : $list[$i][1];
+                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message'),";
                 }
                 $query = substr($query, 0, -1);
                 u::query($query);
@@ -131,5 +132,34 @@ class ImportsController extends Controller
             $result->message = "Số điện thoại không hợp lệ";
         }
         return $result;
+    }
+    public function processCheckDuplicateData($import_id){
+        // check duplicate cms_import_parents
+        $list = u::query("SELECT p.id FROM cms_import_parents AS p 
+            WHERE p.import_id = $import_id AND 
+                (SELECT count(id) FROM cms_import_parents  WHERE import_id = $import_id AND gud_mobile1 = p.gud_mobile1 AND id<p.id)>0");
+        if(!empty($list)){
+            $sql_update = "INSERT INTO cms_import_parents (id,`status`,error_message) VALUES ";
+            foreach($list AS $row){
+                $sql_update.="($row->id,3,'Trùng lặp dữ liệu trong file import'),";
+            }
+            $sql_update = substr($sql_update, 0, -1);
+            $sql_update.=" ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `status` = VALUES(`status`), `error_message` = VALUES(`error_message`)";
+            u::query($sql_update);
+        }
+        // check duplicate cms_parents
+        $list = u::query("SELECT p.id, u.name, u.hrm_id,u.branch_name FROM cms_import_parents AS p 
+                LEFT JOIN cms_parents AS ps ON ps.mobile_1=p.gud_mobile1
+                LEFT JOIN users AS u ON ps.owner_id = u.id
+            WHERE p.import_id = $import_id AND ps.id IS NOT NULL");
+        if(!empty($list)){
+            $sql_update = "INSERT INTO cms_import_parents (id,`status`,error_message) VALUES ";
+            foreach($list AS $row){
+                $sql_update.="($row->id,4,'SĐT đang thuộc quyền quản lý của nhân viên $row->name - $row->hrm_id $row->branch_name'),";
+            }
+            $sql_update = substr($sql_update, 0, -1);
+            $sql_update.=" ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `status` = VALUES(`status`), `error_message` = VALUES(`error_message`)";
+            u::query($sql_update);
+        }
     }
 }
