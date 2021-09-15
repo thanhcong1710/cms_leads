@@ -71,8 +71,12 @@ class ImportsController extends Controller
         $this->addItemDataImport($dataXslx,$import_id,(int)$request->user()->id);
         $this->processCheckDuplicateData($import_id);
         $data = u::query("SELECT * FROM cms_import_parents WHERE import_id =$import_id");
+        $total_error = u::first("SELECT count(id) AS total FROM cms_import_parents WHERE import_id =$import_id AND status IN (2,3,4)");
+        $total_validate = u::first("SELECT count(id) AS total FROM cms_import_parents WHERE import_id =$import_id AND status IN (1)");
         
         $data_mes->data = $data;
+        $data_mes->total_error = $total_error->total;
+        $data_mes->total_validate = $total_validate->total;
         $data_mes->message = 'Import file thành công!';
         $data_mes->error = false;
         return response()->json($data_mes);

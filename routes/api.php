@@ -85,6 +85,8 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('/students/get_all_data/{parent_id}', 'StudentsController@getAllDataByParent');
         Route::post('/imports/list', 'ImportsController@list');
         Route::post('/imports/upload', 'ImportsController@upload');
+        Route::get('/user/get-user-assgin', 'UsersController@getUserAssgin');
+        
     });
 });
 

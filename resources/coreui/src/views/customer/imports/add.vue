@@ -30,7 +30,7 @@
                 </div>
                 
                 <div :class="curr_step == 4 ?'col-sm-3 bs-wizard-step active': (curr_step < 4 ? 'col-sm-3 bs-wizard-step disabled':'col-sm-3 bs-wizard-step complete')"><!-- active -->
-                  <div class="text-center bs-wizard-stepnum">Kết quả</div>
+                  <div class="text-center bs-wizard-stepnum">Hoàn thành</div>
                   <div class="progress"><div class="progress-bar"></div></div>
                   <a class="bs-wizard-dot"></a>
                   <div class="bs-wizard-info text-center"></div>
@@ -57,8 +57,14 @@
           </div>
           <div class="card-body" v-if="curr_step==2">
             <div class="row">
-              <div class="col-12">
+              <div class="col-12" style="margin-bottom: 10px;">
                 <p><strong>DỮ LIỆU ĐÃ KIỂM TRA</strong></p>
+                <input type="checkbox" id="checkbox" v-model="error_checked" v-if="total_error>0">
+                <label for="checkbox" v-if="total_error>0">Bỏ qua không nhập dữ liệu lỗi</label>
+                <button class="btn btn-secondary fl-right" @click="location.reload()"> Hủy</button>
+                <button class="btn btn-success fl-right" :disabled="!(total_error==0 || error_checked)" @click="showStep3()"> Tiếp theo</button>
+              </div>  
+              <div class="col-12">
                 <table class="table table-striped table-hover">
                   <thead>
                     <tr>
@@ -86,88 +92,123 @@
               
             </div>
           </div>
+          <div class="card-body" v-if="curr_step==3">
+            <div class="row">
+              <div class="col-12">
+                <p><strong>THÔNG TIN DỮ LIỆU</strong></p>
+                <table class="table table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th>Thông số</th>
+                      <th>Số lượng</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Số khách hàng hợp lệ</td>
+                      <td>{{ total_validate }}</td>
+                    </tr>
+                    <tr>
+                      <td>Số khách hàng không hợp lệ</td>
+                      <td>{{ total_error }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="col-12">
+                <p><strong>PHÂN CHIA DỮ LIỆU</strong></p>
+                <div class="row no-margin">
+                  <div class="form-group col-sm-6">
+                    <label for="nf-email">Chọn người phụ trách</label>
+                    <multiselect
+                      placeholder="Chọn người phụ trách"
+                      select-label="Chọn một người phụ trách"
+                      v-model="data_assign.owners"
+                      :options="list_owner"
+                      label="name"
+                      :close-on-select="false"
+                      :hide-selected="true"
+                      :multiple="true"
+                      :searchable="true"
+                      track-by="id"
+                      @select="onSelectOwner"
+                    >
+                      <span slot="noResult">Không tìm thấy dữ liệu</span>
+                    </multiselect>
+                  </div>
+                  <div class="form-group col-sm-6">
+                    <label for="nf-email">Chọn nguồn</label>
+                    <vue-select
+                        label="name"
+                        placeholder="Chọn nguồn"
+                        :options="list_source"
+                        v-model="data_assign.source"
+                        :searchable="true"
+                        language="tv-VN"
+                        :onChange="selectSource"
+                    ></vue-select>
+                  </div>
+                  <div class="form-group col-sm-12">
+                    <button class="btn btn-secondary fl-right" @click="location.reload()"> Hủy</button>
+                    <button class="btn btn-success fl-right" :disabled="!(total_error==0 || error_checked)" @click="showStep3()"> Tiếp theo</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <CModal
-      :title="modal.title"
-      :show.sync="modal.show"
-      :color="modal.color"
-      :closeOnBackdrop="modal.closeOnBackdrop"
-    >
-      <div v-html="modal.body"></div>
-      <template #header>
-        <h5 class="modal-title">{{ modal.title }}</h5>
-      </template>
-      <template #footer>
-        <CButton :color="'btn btn-' + modal.color" @click="exit" type="button"
-          >Đóng</CButton
-        >
-      </template>
-    </CModal>
+    
   </div>
 </template>
 
 <script>
-import axios from "axios";
 import u from "../../../utilities/utility";
 import loader from "../../../components/Loading";
-import Editor from "@tinymce/tinymce-vue";
 import datepicker from "vue2-datepicker";
-import moment from 'moment';
+import Multiselect from "vue-multiselect";
 import select from 'vue-select'
 
 export default {
   components: {
     loader: loader,
-    editor: Editor,
     datepicker,
-    "vue-select": select
+    "vue-select": select,
+    Multiselect
   },
   name: "Add-Product",
   data() {
     return {
-      tinymce: {
-        key: "68xdyo8hz3oyr5p47zv3jyvj3h6xg0hc0khthuj123tnskcx",
-        init: {
-          entity_encoding: "raw",
-          height: 240,
-          menubar: true,
-          plugins: [
-            "advlist autolink lists link image charmap print preview anchor",
-            "searchreplace visualblocks code fullscreen",
-            "insertdatetime media table paste code help wordcount",
-          ],
-          toolbar:
-            "undo redo | bold italic backcolor | image| media |\
-           alignleft aligncenter alignright alignjustify | \
-           bullist numlist outdent indent | removeformat | help",
-          images_upload_url:
-            "/api/upload/upload_file?token=" +
-            localStorage.getItem("api_token"),
-          images_upload_base_path: "",
-        },
-      },
       loading: {
         text: "Đang tải dữ liệu...",
         processing: false,
       },
-      modal: {
-        title: "THÔNG BÁO",
-        show: false,
-        color: "success",
-        body: "Thêm mới lớp học thành công",
-        closeOnBackdrop: false,
-        action_exit: "exit",
-      },
       attached_file:"",
       file_name:"",
-      curr_step:1,
+      curr_step:3,
       list_data_check:[],
+      error_checked:false,
+      total_error:0,
+      total_validate:0,
+      list_owner:[],
+      list_source:[],
+      data_assign:{
+        owners:"",
+        import_id:"",
+        source:"",
+      }
     };
   },
   created() {
-    
+     u.g(`/api/user/get-user-assgin`)
+      .then(response => {
+      this.list_owner = response.data
+    })
+    u.g(`/api/sources`)
+      .then(response => {
+      this.list_source = response.data
+    })
   },
   methods: {
     fileChanged(e) {
@@ -196,11 +237,29 @@ export default {
             }else{
               this.list_data_check = response.data.data
               this.curr_step=2
+              this.total_error = response.data.total_error
+              this.total_validate = respose.data.total_validate
             }
           })
           .catch(e => console.log(e))
       }
     },
+    showStep3(){
+      this.curr_step=3;
+    },
+    onSelectOwner(){
+
+    },
+    selectSource(){
+      if (data && typeof data === 'object') {
+        const source_id = data.id
+        this.parent.source = data
+        this.parent.source_id = source_id
+      }else{
+        this.parent.source = ""
+        this.parent.source_id = ""
+      }
+    }
   },
 };
 </script>
@@ -223,4 +282,8 @@ export default {
 .bs-wizard > .bs-wizard-step:first-child  > .progress {left: 50%; width: 50%;}
 .bs-wizard > .bs-wizard-step:last-child  > .progress {width: 50%;}
 .bs-wizard > .bs-wizard-step.disabled a.bs-wizard-dot{ pointer-events: none; }
+.fl-right{
+  float: right;
+  margin-left:10px;
+}
 </style>

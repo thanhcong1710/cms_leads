@@ -119,4 +119,8 @@ class UsersController extends Controller
         }
         return response()->json( ['status' => 'success'] );
     }
+    public function getUserAssgin(Request $request){
+        $data = u::query("SELECT * FROM users ");
+        return response()->json($data);
+    }
 }

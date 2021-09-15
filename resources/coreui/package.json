@@ -60,7 +60,8 @@
     "vue2-datepicker": "^2.11.2",
     "vue2-timepicker": "^1.1.6",
     "moment": "^2.22.2",
-    "vue-select": "2.4.0"
+    "vue-select": "2.4.0",
+    "vue-multiselect": "^2.1.6"
   },
   "browserslist": [
     "> 1%",

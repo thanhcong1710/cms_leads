@@ -57,7 +57,7 @@
                   <td>
                     {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
                   </td>
-                  <td>item.file_name</td>
+                  <td><a :href="item.file_link" target="blank">{{ item.file_name }}</a></td>
                   <td>{{ item.created_at }}</td>
                   <td>{{ item.creator_name }}</td>
                   <td>{{  }}</td>
