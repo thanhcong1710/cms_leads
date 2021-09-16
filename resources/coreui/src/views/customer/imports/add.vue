@@ -131,7 +131,6 @@
                       :multiple="true"
                       :searchable="true"
                       track-by="id"
-                      @select="onSelectOwner"
                     >
                       <span slot="noResult">Không tìm thấy dữ liệu</span>
                     </multiselect>
@@ -149,8 +148,9 @@
                     ></vue-select>
                   </div>
                   <div class="form-group col-sm-12">
+                    <p style="color:red" v-html="data_assign.error_message"></p>
                     <button class="btn btn-secondary fl-right" @click="location.reload()"> Hủy</button>
-                    <button class="btn btn-success fl-right" :disabled="!(total_error==0 || error_checked)" @click="showStep3()"> Tiếp theo</button>
+                    <button class="btn btn-success fl-right" @click="assginContact"> Tiếp theo</button>
                   </div>
                 </div>
               </div>
@@ -197,6 +197,9 @@ export default {
         owners:"",
         import_id:"",
         source:"",
+        source_id:"",
+        owners_id:"",
+        error_message:"",
       }
     };
   },
@@ -239,6 +242,7 @@ export default {
               this.curr_step=2
               this.total_error = response.data.total_error
               this.total_validate = respose.data.total_validate
+              this.data_assign.import_id = respose.data.import_id
             }
           })
           .catch(e => console.log(e))
@@ -247,17 +251,46 @@ export default {
     showStep3(){
       this.curr_step=3;
     },
-    onSelectOwner(){
-
-    },
-    selectSource(){
+    selectSource(data = null){
       if (data && typeof data === 'object') {
         const source_id = data.id
-        this.parent.source = data
-        this.parent.source_id = source_id
+        this.data_assign.source = data
+        this.data_assign.source_id = source_id
       }else{
-        this.parent.source = ""
-        this.parent.source_id = ""
+        this.data_assign.source = ""
+        this.data_assign.source_id = ""
+      }
+    },
+    assginContact(){
+      const ids = []
+      this.data_assign.owners = u.is.obj(this.data_assign.owners) ? [this.data_assign.owners] : this.data_assign.owners
+      if (this.data_assign.owners.length) {
+        this.data_assign.owners.map(item => {
+          ids.push(item.id)
+        })
+      }
+      this.data_assign.owners_id = ids
+      let mess = "";
+      let resp = true;
+      if (this.data_assign.source == "") {
+        mess += " - Nguồn dữ liệu không được để trống<br/>";
+        resp = false;
+      }
+      if (!this.data_assign.owners_id.length) {
+        mess += " - Người phụ trách không được để trống<br/>";
+        resp = false;
+      } 
+      if(resp){
+        this.data_assign.error_message = "";
+        this.loading.processing = true;
+        u.p(`/api/imports/assign`,this.data_assign)
+        .then((response) => {
+          this.loading.processing = false;
+        })
+        .catch((e) => {
+        });
+      }else{
+        this.data_assign.error_message = mess;
       }
     }
   },

@@ -178,11 +178,19 @@ function fmc (input) {
   }
   return resp
 }
+const is = {
+  in: (obj, key) => obj && Array.isArray(obj) && key ? parseInt(obj.indexOf(key), 10) > -1 : false,
+  obj: obj => typeof obj === 'object' && !Array.isArray(obj),
+  arr: obj => Array.isArray(obj),
+  has: (obj, key) => typeof obj === 'object' && !Array.isArray(obj) ? Object.hasOwnProperty.call(obj, key) : false,
+  for: obj => Object.keys(obj)
+}
 export default {
     processAuthen,
     shuffle,
     vld,
     fmc,
     g,
-    p
+    p,
+    is
 }

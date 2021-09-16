@@ -78,6 +78,7 @@ class ImportsController extends Controller
         $data_mes->total_error = $total_error->total;
         $data_mes->total_validate = $total_validate->total;
         $data_mes->message = 'Import file thành công!';
+        $data_mes->import_id = $import_id;
         $data_mes->error = false;
         return response()->json($data_mes);
        
@@ -87,7 +88,7 @@ class ImportsController extends Controller
             $created_at = date('Y-m-d H:i:s');
             $query = "INSERT INTO cms_import_parents (import_id,`name`,email,gud_mobile1,`address`,note,created_at,creator_id,`status`,error_message) VALUES ";
             if (count($list) > 10000) {
-                for($i = 1; $i < 10000; $i++) {
+                for($i = 0; $i < 10000; $i++) {
                     $item = $this->convertData($list[$i]);
                     $validate = $this->validateData($item);
                     $status = $validate->has_error ? 2 : 1;
@@ -164,6 +165,40 @@ class ImportsController extends Controller
             $sql_update = substr($sql_update, 0, -1);
             $sql_update.=" ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `status` = VALUES(`status`), `error_message` = VALUES(`error_message`)";
             u::query($sql_update);
+        }
+    }
+    public function assign(Request $request){
+        $source_id = $request->source_id;
+        $arr_owner = $request->owners_id;
+        $import_id = $request->import_id;
+        $import_id=24;
+        $arr_owner= [1,2];
+        $list_data = u::query("SELECT * FROM cms_import_parents WHERE import_id=$import_id AND status=1");
+        $this->addItemDataParent($list_data,$arr_owner,$source_id,$request->user()->id);
+    }
+    public function addItemDataParent($list,$arr_owner,$source_id,$creator_id) {
+        if ($list) {
+            $created_at = date('Y-m-d H:i:s');
+            $query = "INSERT INTO cms_parents (`name`,email,mobile_1,`address`,note,created_at,creator_id,`status`,source_id,owner_id) VALUES ";
+            if (count($list) > 10000) {
+                for($i = 0; $i < 10000; $i++) {
+                    $item = (object)$list[$i];
+                    $owner_id = $arr_owner[$i%count($arr_owner)];
+                    $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$owner_id'),";
+                    
+                }
+                $query = substr($query, 0, -1);
+                u::query($query);
+                $this->addItemDataImport(array_slice($list, 10000),$arr_owner,$source_id,$creator_id);
+            } else {
+                foreach($list as $i=>$item) {
+                    $item = (object)$item;
+                    $owner_id = $arr_owner[$i%count($arr_owner)];
+                    $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$owner_id'),";
+                }
+                $query = substr($query, 0, -1);
+                u::query($query);
+            }
         }
     }
 }
