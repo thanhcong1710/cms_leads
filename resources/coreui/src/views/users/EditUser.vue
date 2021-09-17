@@ -17,6 +17,15 @@
             <CInput type="text" label="Name" placeholder="Name" v-model="name"></CInput>
             <CInput type="text" label="Email" placeholder="Email" v-model="email"></CInput>
             <CInput type="text" label="Password (Reset)" placeholder="Password" v-model="password"></CInput>
+            <CInput type="text" label="Mã Nhân Viên" placeholder="Mã Nhân Viên" v-model="hrm_id"></CInput>
+            <CInput type="text" label="Mã Quản lý" placeholder="Mã Quản Lý" v-model="manager_hrm_id"></CInput>
+            <div class="form-row form-group">
+              <label> Trạng thái </label>
+              <select class="form-control" v-model="status">
+                <option value="0">Không kích hoạt</option>
+                <option value="1">Kích hoạt</option>
+              </select>
+            </div>
             <div class="form-row form-group">
               <label class="col-form-label col-sm-3"> Roles </label>
               <div class="col-sm-9" >
@@ -50,12 +59,15 @@ export default {
         roles: [],
         name: '',
         email: '',
+        hrm_id:'',
+        manager_hrm_id:'',
         password: '',
         showMessage: false,
         message: '',
         dismissSecs: 7,
         dismissCountDown: 0,
-        showDismissibleAlert: false
+        showDismissibleAlert: false,
+        status:0,
     }
   },
   methods: {
@@ -72,6 +84,9 @@ export default {
             email: self.email,
             password: self.password,
             roles:self.roles,
+            status: self.status,
+            hrm_id: self.hrm_id,
+            manager_hrm_id : self.manager_hrm_id, 
         })
         .then(function (response) {
             self.message = 'Successfully updated user.';
@@ -104,6 +119,9 @@ export default {
     .then(function (response) {
         self.name = response.data.name;
         self.email = response.data.email;
+        self.status = response.data.status;
+        self.hrm_id = response.data.hrm_id;
+        self.manager_hrm_id = response.data.manager_hrm_id; 
         let arr_role = response.data.roles.split(",");
         self.roles.map(item => {
           if (arr_role.indexOf(item.name) != -1) {

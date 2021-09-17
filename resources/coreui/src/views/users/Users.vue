@@ -5,6 +5,9 @@
       <CCard>
         <CCardHeader>
             Users
+            <router-link class="btn btn-sm btn-success" style="float:right" :to="'/users/add'">
+              <i class="fa fa-plus"></i> Thêm mới
+            </router-link>
         </CCardHeader>
         <CCardBody>
           <CAlert
@@ -24,7 +27,7 @@
           >
           <template #status="{item}">
             <td>
-              <CBadge :color="getBadge(item.status)">{{ item.status }}</CBadge>
+              <CBadge :color="getBadge(item.status)">{{ getTitleStatus(item.status) }}</CBadge>
             </td>
           </template>
           <template #actions="{item}">
@@ -45,7 +48,6 @@
 
 <script>
 import axios from 'axios'
-import u from "../../utilities/utility";
 
 export default {
   name: 'Users',
@@ -72,10 +74,10 @@ export default {
   },
   methods: {
     getBadge (status) {
-      return status === 'Active' ? 'success'
-        : status === 'Inactive' ? 'secondary'
-          : status === 'Pending' ? 'warning'
-            : status === 'Banned' ? 'danger' : 'primary'
+      return status === 1 ? 'success' : 'danger'
+    },
+    getTitleStatus(status){
+      return status === 1 ? 'Kích hoạt' : 'Không kích hoạt'
     },
     userLink (id) {
       return `users/${id.toString()}`
@@ -114,7 +116,7 @@ export default {
     },
     getUsers (){
       let self = this;
-      u.g('/api/users')
+      axios.get(  '/api/users?token=' + localStorage.getItem("api_token"))
       .then(function (response) {
         self.items = response.data.users;
         self.you = response.data.you;

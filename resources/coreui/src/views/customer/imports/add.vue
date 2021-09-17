@@ -156,6 +156,34 @@
               </div>
             </div>
           </div>
+          <div class="card-body" v-if="curr_step==4">
+            <div class="row">
+              <div class="col-12">
+                <p><strong>KẾT QUẢ TẢI LÊN</strong></p>
+                <table class="table table-striped table-hover">
+                  <thead>
+                    <tr>
+                      <th>Thông số</th>
+                      <th>Số lượng</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Số khách hàng mới được tải lên</td>
+                      <td>{{ result_total_success }}</td>
+                    </tr>
+                    <tr>
+                      <td>Số khách hàng bị bỏ qua</td>
+                      <td>{{ result_total_error }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="form-group col-sm-12">
+                <button class="btn btn-success fl-right" @click="location.reload()"> Quay lại trang import</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -186,7 +214,7 @@ export default {
       },
       attached_file:"",
       file_name:"",
-      curr_step:3,
+      curr_step:1,
       list_data_check:[],
       error_checked:false,
       total_error:0,
@@ -200,7 +228,9 @@ export default {
         source_id:"",
         owners_id:"",
         error_message:"",
-      }
+      },
+      result_total_success:0,
+      result_total_error:0,
     };
   },
   created() {
@@ -286,6 +316,10 @@ export default {
         u.p(`/api/imports/assign`,this.data_assign)
         .then((response) => {
           this.loading.processing = false;
+          console.log(response.data);
+          this.result_total_success = response.data.total_success
+          this.result_total_error = response.data.total_error
+          this.curr_step = 4
         })
         .catch((e) => {
         });

@@ -18,7 +18,7 @@ class ImportsController extends Controller
     public function list(Request $request)
     {
         $status = isset($request->status) ? $request->status : '';
-        $keyword = isset($request->keyword) ? $request->keyword : '';
+        // $keyword = isset($request->keyword) ? $request->keyword : '';
         
         $pagination = (object)$request->pagination;
         $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
@@ -26,8 +26,13 @@ class ImportsController extends Controller
         $offset = $page == 1 ? 0 : $limit * ($page-1);
         $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
         $cond = " 1 ";
+        if($status!==''){
+            $cond .= " AND status=$status";
+        }
         $total = u::first("SELECT count(id) AS total FROM cms_imports AS i WHERE $cond ");
-        $list = u::query("SELECT i.*, (SELECT name FROM users WHERE id=i.creator_id) AS creator_name 
+        $list = u::query("SELECT i.*, (SELECT name FROM users WHERE id=i.creator_id) AS creator_name ,
+                (SELECT count(id) FROM cms_import_parents WHERE import_id=i.id AND status=6) AS count_success,
+                (SELECT count(id) FROM cms_import_parents WHERE import_id=i.id AND status!=6) AS count_error
             FROM cms_imports AS i WHERE $cond ORDER BY i.id DESC $limitation");
         $data = u::makingPagination($list, $total->total, $page, $limit);
         return response()->json($data);
@@ -175,6 +180,11 @@ class ImportsController extends Controller
         $arr_owner= [1,2];
         $list_data = u::query("SELECT * FROM cms_import_parents WHERE import_id=$import_id AND status=1");
         $this->addItemDataParent($list_data,$arr_owner,$source_id,$request->user()->id);
+        u::query("UPDATE cms_import_parents SET status=6 WHERE import_id=$import_id AND status=1");
+        u::query("UPDATE cms_import_parents SET status=1 WHERE import_id=$import_id ");
+        $data = u::first("SELECT (SELECT count(id) FROM cms_import_parents WHERE import_id=$import_id AND status=6) AS total_success,
+            (SELECT count(id) FROM cms_import_parents WHERE import_id=$import_id AND status!=6) AS total_error");
+        return response()->json($data);
     }
     public function addItemDataParent($list,$arr_owner,$source_id,$creator_id) {
         if ($list) {

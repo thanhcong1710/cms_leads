@@ -44,7 +44,7 @@ class UsersController extends Controller
     public function show($id)
     {
         $user = DB::table('users')
-        ->select('users.id', 'users.name', 'users.email', 'users.menuroles as roles', 'users.status', 'users.email_verified_at as registered')
+        ->select('users.id', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status', 'users.email_verified_at as registered')
         ->where('users.id', '=', $id)
         ->first();
         return response()->json( $user );
@@ -59,7 +59,7 @@ class UsersController extends Controller
     public function edit($id)
     {
         $user = DB::table('users')
-        ->select('users.id', 'users.name', 'users.email', 'users.menuroles as roles', 'users.status')
+        ->select('users.id', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status')
         ->where('users.id', '=', $id)
         ->first();
         return response()->json( $user );
@@ -81,6 +81,8 @@ class UsersController extends Controller
         $user = User::find($id);
         $user->name       = $request->input('name');
         $user->email      = $request->input('email');
+        $user->hrm_id      = $request->input('hrm_id');
+        $user->manager_hrm_id      = $request->input('manager_hrm_id');
         if($request->password){
             $user->password = bcrypt($request->password);
         }
@@ -100,6 +102,7 @@ class UsersController extends Controller
         }
         $user->menuroles = $menuroles;
         $user->save();
+        u::query("UPDATE users AS u LEFT JOIN users AS m ON m.hrm_id=u.manager_hrm_id SET u.manager_id=m.id WHERE m.id IS NOT NULL");
         
         //$request->session()->flash('message', 'Successfully updated user');
         return response()->json( ['status' => 'success'] );
@@ -117,6 +120,37 @@ class UsersController extends Controller
         if($user){
             $user->delete();
         }
+        return response()->json( ['status' => 'success'] );
+    }
+    public function add(Request $request)
+    {
+        $user =new User();
+        $user->name       = $request->input('name');
+        $user->email      = $request->input('email');
+        $user->password = bcrypt($request->password);
+        $user->status      = $request->input('status');
+        $user->hrm_id      = $request->input('hrm_id');
+        $user->manager_hrm_id      = $request->input('manager_hrm_id');
+        $user->email_verified_at = date('Y-m-d H:i:s');
+        $user->save();
+        $roles = $request->roles;
+        $menuroles = "";
+        foreach($roles AS $role){
+            $role = (object) $role;
+            if(isset($role->checked) && $role->checked==true){
+                $menuroles .= $menuroles == "" ? $role->name : ','.$role->name;
+                $model_has_roles = u::getObject(array('role_id'=>$role->id,'model_id'=>$user->id),'model_has_roles');
+                if(!$model_has_roles){
+                    u::insertSimpleRow(array('role_id'=>$role->id,'model_id'=>$user->id,'model_type'=>'App\User'),'model_has_roles');
+                }
+            }else{
+                u::query("DELETE FROM model_has_roles WHERE role_id = $role->id AND model_id=$user->id");
+            }
+        }
+        $user->menuroles = $menuroles;
+        $user->save();
+        u::query("UPDATE users AS u LEFT JOIN users AS m ON m.hrm_id=u.manager_hrm_id SET u.manager_id=m.id WHERE m.id IS NOT NULL");
+        //$request->session()->flash('message', 'Successfully updated user');
         return response()->json( ['status' => 'success'] );
     }
     public function getUserAssgin(Request $request){

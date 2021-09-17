@@ -10,20 +10,11 @@
           <div class="card-body">
             <div class="row">
               <div class="form-group col-sm-3">
-                <label for="name">Từ khóa</label>
-                <input
-                  class="form-control"
-                  v-model="searchData.keyword"
-                  type="text"
-                  placeholder="Tên khách hàng, số điện thoại"
-                />
-              </div>
-              <div class="form-group col-sm-3">
                 <label for="ccmonth">Trạng thái</label>
                 <select class="form-control" v-model="searchData.status">
                   <option value>Chọn trạng thái</option>
-                  <option value="0">Ngừng hoạt động</option>
-                  <option value="1">Hoạt động</option>
+                  <option value="0">Lỗi</option>
+                  <option value="1">Hoàn thành</option>
                 </select>
               </div>
               <div class="form-group col-sm-12">
@@ -49,6 +40,8 @@
                   <th>Tên File</th>
                   <th>Thời gian import</th>
                   <th>Người thực hiện</th>
+                  <th>Thành công</th>
+                  <th>Lỗi</th>
                   <th>Trạng thái</th>
                 </tr>
               </thead>
@@ -60,7 +53,9 @@
                   <td><a :href="item.file_link" target="blank">{{ item.file_name }}</a></td>
                   <td>{{ item.created_at }}</td>
                   <td>{{ item.creator_name }}</td>
-                  <td>{{  }}</td>
+                  <td>{{ item.count_success }}</td>
+                  <td>{{ item.count_error }}</td>
+                  <td>{{ item.status | getStatusName}}</td>
                   <td></td>
                 </tr>
               </tbody>
@@ -216,7 +211,7 @@ export default {
   },
   filters: {
     getStatusName(value) {
-      return value == 1 ? "Hoạt động" : "Ngừng hoạt động";
+      return value == 1 ? "Hoàn thành" : "Lỗi";
     },
   },
 };
