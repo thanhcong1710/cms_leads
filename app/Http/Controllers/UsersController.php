@@ -29,7 +29,7 @@ class UsersController extends Controller
     {
         $you = auth()->user()->id;
         $users = DB::table('users')
-        ->select('users.id', 'users.name', 'users.email', 'users.menuroles as roles', 'users.status', 'users.email_verified_at as registered')
+        ->select('users.id','users.branch_name AS branch', 'users.name', 'users.email', 'users.menuroles as roles', 'users.status', 'users.email_verified_at as registered')
         ->whereNull('deleted_at')
         ->get();
         return response()->json( compact('users', 'you') );
@@ -44,7 +44,7 @@ class UsersController extends Controller
     public function show($id)
     {
         $user = DB::table('users')
-        ->select('users.id', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status', 'users.email_verified_at as registered')
+        ->select('users.id','users.branch_name AS branch', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status', 'users.email_verified_at as registered')
         ->where('users.id', '=', $id)
         ->first();
         return response()->json( $user );
@@ -59,7 +59,7 @@ class UsersController extends Controller
     public function edit($id)
     {
         $user = DB::table('users')
-        ->select('users.id', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status')
+        ->select('users.id','users.branch_name', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status')
         ->where('users.id', '=', $id)
         ->first();
         return response()->json( $user );
@@ -83,6 +83,7 @@ class UsersController extends Controller
         $user->email      = $request->input('email');
         $user->hrm_id      = $request->input('hrm_id');
         $user->manager_hrm_id      = $request->input('manager_hrm_id');
+        $user->branch_name      = $request->input('branch_name');
         if($request->password){
             $user->password = bcrypt($request->password);
         }
@@ -132,6 +133,7 @@ class UsersController extends Controller
         $user->hrm_id      = $request->input('hrm_id');
         $user->manager_hrm_id      = $request->input('manager_hrm_id');
         $user->email_verified_at = date('Y-m-d H:i:s');
+        $user->branch_name      = $request->input('branch_name');
         $user->save();
         $roles = $request->roles;
         $menuroles = "";
@@ -154,7 +156,8 @@ class UsersController extends Controller
         return response()->json( ['status' => 'success'] );
     }
     public function getUserAssgin(Request $request){
-        $data = u::query("SELECT * FROM users ");
+        $data = u::query("SELECT * FROM users WHERE status=1 AND id IN (".$request->user_info->users_manager.")");
         return response()->json($data);
     }
+    
 }

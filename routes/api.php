@@ -72,6 +72,7 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::post('/parents/add', 'ParentsController@add');
         Route::post('/parents/update/{parent_id}', 'ParentsController@update');
         Route::get('/parents/detail/{parent_id}', 'ParentsController@detail');
+        Route::post('/parents/assign', 'ParentsController@assign');
         Route::get('/parents/show/{parent_id}', 'ParentsController@show');
         Route::get('/parents/get_logs/{parent_id}', 'ParentsController@getLogs');
         Route::get('/provinces', 'SystemInfoController@getAllProvices');
@@ -87,7 +88,7 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::post('/imports/list', 'ImportsController@list');
         Route::post('/imports/upload', 'ImportsController@upload');
         Route::post('/imports/assign', 'ImportsController@assign');
-        Route::get('/user/get-user-assgin', 'UsersController@getUserAssgin');
+        Route::get('/user/get-users-manager', 'UsersController@getUserAssgin');
         
     });
 });

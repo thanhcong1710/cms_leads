@@ -26,6 +26,13 @@
                   <option value="1">Hoạt động</option>
                 </select>
               </div>
+              <div class="form-group col-sm-3">
+                <label for="ccmonth">Người phụ trách</label>
+                <p><select class="form-control" v-model="searchData.owner_id">
+                  <option value="">Chọn người phụ trách</option>
+                  <option :value ="item.id" v-for="(item, index) in users_manager" :key="index">{{item.name}} - {{item.hrm_id}}</option>
+                </select></p>  
+              </div>
               <div class="form-group col-sm-12">
                 <router-link class="btn btn-success" :to="'/parents/add'">
                   <i class="fa fa-plus"></i> Thêm mới
@@ -66,7 +73,7 @@
                   <td>{{ item.email }}</td>
                   <td>{{ item.source_name }}</td>
                   <td>{{ item.owner_name }}</td>
-                  <td>{{  }}</td>
+                  <td>{{ item.last_care }}</td>
                   <td>{{ item.status | getStatusName }}</td>
                   <td>
                     <router-link
@@ -152,8 +159,10 @@ export default {
       searchData: {
         keyword: "",
         status: "",
+        owner_id: "",
         pagination: this.pagination
       },
+      users_manager:[],
       parents: [],
       pagination: {
         url: "/api/parents/list",
@@ -180,6 +189,10 @@ export default {
     };
   },
   created() {
+    u.g(`/api/user/get-users-manager`)
+      .then(response => {
+      this.users_manager = response.data
+    })
     this.search();
   },
   methods: {
@@ -190,6 +203,7 @@ export default {
       const data = {
         keyword: this.searchData.keyword,
         status: this.searchData.status,
+        owner_id: this.searchData.owner_id,
       };
       const link = "/api/parents/list";
 

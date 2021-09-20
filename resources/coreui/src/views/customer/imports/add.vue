@@ -234,7 +234,7 @@ export default {
     };
   },
   created() {
-     u.g(`/api/user/get-user-assgin`)
+     u.g(`/api/user/get-users-manager`)
       .then(response => {
       this.list_owner = response.data
     })

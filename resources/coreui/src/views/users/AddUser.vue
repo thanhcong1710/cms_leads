@@ -19,6 +19,7 @@
             <CInput type="text" label="Password" placeholder="Password" v-model="password"></CInput>
             <CInput type="text" label="Mã Nhân Viên" placeholder="Mã Nhân Viên" v-model="hrm_id"></CInput>
             <CInput type="text" label="Mã Quản lý" placeholder="Mã Quản Lý" v-model="manager_hrm_id"></CInput>
+            <CInput type="text" label="Trung Tâm" placeholder="Trung Tâm" v-model="branch_name"></CInput>
             <div class="form-row form-group">
               <label> Trạng thái </label>
               <select class="form-control" v-model="status">
@@ -68,6 +69,7 @@ export default {
         dismissCountDown: 0,
         showDismissibleAlert: false,
         status:0,
+        branch_name:''
     }
   },
   methods: {
@@ -86,6 +88,7 @@ export default {
             status: self.status,
             hrm_id: self.hrm_id,
             manager_hrm_id : self.manager_hrm_id,
+            branch_name:self.branch_name
         })
         .then(function (response) {
             self.message = 'Successfully updated user.';

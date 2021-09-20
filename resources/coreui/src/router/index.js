@@ -105,7 +105,10 @@ function configRoutes () {
         {
           path: 'dashboard',
           name: 'Dashboard',
-          component: Dashboard
+          component: Dashboard,
+          meta:{
+            requiresAdmin: true
+          }
         },
         {
           path: 'menu',

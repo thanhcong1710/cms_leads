@@ -113,6 +113,12 @@
                         v-model="parent.address"
                       />
                     </div>
+                    <div class="form-group col-sm-12">
+                      <label for="nf-email">Người phụ trách <span class="text-danger"> (*)</span></label>
+                      <select class="form-control" v-model="parent.owner_id">
+                        <option :value="item.id" v-for="(item, index) in users_manager" :key="index">{{item.name}} - {{item.hrm_id}}</option>
+                      </select>
+                    </div>
                     <div class="form-group col-sm-6">
                       <label for="nf-email">Nguồn</label>
                       <vue-select
@@ -246,11 +252,17 @@ export default {
         job:"",
         province:"",
         district:"",
-        address:""
+        address:"",
+        owner_id:"",
       },
+      users_manager:[],
     };
   },
   created() {
+    u.g(`/api/user/get-users-manager`)
+      .then(response => {
+      this.users_manager = response.data
+    })
     u.g(`/api/provinces`)
       .then(response => {
       this.html.province.list = response.data
@@ -287,6 +299,10 @@ export default {
       }
       if (this.parent.mobile_1 != "" && !u.vld.phone(this.parent.mobile_1)) {
         mess += " - Số điện thoại không đúng định dạng<br/>";
+        resp = false;
+      }
+      if (this.parent.owner_id == "") {
+        mess += " - Người phụ trách không được để trống<br/>";
         resp = false;
       }
       if (!resp) {

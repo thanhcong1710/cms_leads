@@ -6,7 +6,7 @@
           <loader :active="loading.processing" :text="loading.text" />
           <div class="card-header">
             <div class="row">
-              <div class="col-sm-4 border-right">
+              <div class="col-sm-3 border-right">
                   <div style="float: left; width: 90px;">
                     <img class="c-avatar-img" src="img/avatars/1.jpg" >
                   </div>
@@ -34,10 +34,10 @@
                   <option>Chọn trạng thái</option>
                 </select></p>  
               </div>
-              <div class="col-sm-2 text-center">
+              <div class="col-sm-3 text-center">
                 <p>Người phụ trách</p>
-                <p><select class="form-control">
-                  <option>Chọn trạng thái</option>
+                <p><select class="form-control" @change="showModalAssgin" v-model="tmp_owner_id">
+                  <option :value="item.id" v-for="(item, index) in users_manager" :key="index">{{item.name}} - {{item.hrm_id}}</option>
                 </select></p>  
               </div>
                   
@@ -270,6 +270,30 @@
         >
       </template>
     </CModal>
+    <CModal
+      :title="modal_assign.title"
+      :show.sync="modal_assign.show"
+      :color="modal_assign.color"
+      :closeOnBackdrop="modal_assign.closeOnBackdrop"
+      :size="modal_assign.size"
+    >
+      <div>
+        <div class="form-in-list">
+          <p>Bạn chắc chắn muốn thay đổi người phụ trách ?</p>
+        </div>
+      </div>
+      <template #header>
+        <h5 class="modal-title">{{ modal_assign.title }}</h5>
+      </template>
+      <template #footer>
+        <CButton :color="'btn btn-success'" @click="assignCustomer" type="button"
+          >Bàn giao</CButton
+        >
+        <CButton :color="'btn btn-secondary'" @click="exit('assign')" type="button"
+          >Hủy</CButton
+        >
+      </template>
+    </CModal>
   </div>
 </template>
 
@@ -340,6 +364,14 @@ export default {
         size:"lg",
         error_message:""
       },
+      modal_assign: {
+        title: "BÀN GIAO KHÁCH HÀNG",
+        show: false,
+        color: "info",
+        closeOnBackdrop: false,
+        size:"lg",
+        error_message:""
+      },
       parent: {
         id:"",
         gender: "",
@@ -379,22 +411,32 @@ export default {
         note:"",
       },
       logs:[],
+      users_manager:[],
+      tmp_owner_id:"",
     };
   },
   created() {
-    this.loading.processing = true;
-    u.g(`/api/parents/show/${this.$route.params.id}`)
+    u.g(`/api/user/get-users-manager`)
       .then(response => {
-      this.loading.processing = false;
-      this.parent = response.data
+      this.users_manager = response.data
     })
     u.g(`/api/methods`)
       .then(response => {
       this.methods = response.data
     })
     this.loadCares(this.$route.params.id);
+    this.loadDetail();
   },
   methods: {
+    loadDetail(){
+      this.loading.processing = true;
+      u.g(`/api/parents/show/${this.$route.params.id}`)
+        .then(response => {
+        this.loading.processing = false;
+        this.parent = response.data
+        this.tmp_owner_id = response.data.owner_id
+      })
+    },
     isActive (menuItem) {
       return this.activeItem === menuItem
     },
@@ -411,6 +453,9 @@ export default {
         this.modal_care.show = false;
       }else if(item=='student'){
         this.modal_student.show = false;
+      }else if(item=='assign'){
+        this.modal_assign.show = false;
+        this.tmp_owner_id = this.parent.owner_id
       }
     },
     showModalCare(){
@@ -548,6 +593,24 @@ export default {
         .catch((e) => {
         });
     },
+    showModalAssgin(){
+      this.modal_assign.show =true
+    },
+    assignCustomer(){
+      const data = {
+        parent_id: this.parent.id,
+        owner_id: this.tmp_owner_id,
+      };
+      this.loading.processing = true;
+        u.p(`/api/parents/assign`,data)
+        .then((response) => {
+          this.modal_assign.show =false
+          this.loading.processing = false;
+          this.loadDetail();
+        })
+        .catch((e) => {
+        });
+    }
   },
   filters: {
     genTextGender(item){
