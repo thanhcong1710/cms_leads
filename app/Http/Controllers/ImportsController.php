@@ -176,12 +176,10 @@ class ImportsController extends Controller
         $source_id = $request->source_id;
         $arr_owner = $request->owners_id;
         $import_id = $request->import_id;
-        $import_id=24;
-        $arr_owner= [1,2];
         $list_data = u::query("SELECT * FROM cms_import_parents WHERE import_id=$import_id AND status=1");
         $this->addItemDataParent($list_data,$arr_owner,$source_id,$request->user()->id);
         u::query("UPDATE cms_import_parents SET status=6 WHERE import_id=$import_id AND status=1");
-        u::query("UPDATE cms_import_parents SET status=1 WHERE import_id=$import_id ");
+        u::query("UPDATE cms_imports SET status=1 WHERE id=$import_id ");
         $data = u::first("SELECT (SELECT count(id) FROM cms_import_parents WHERE import_id=$import_id AND status=6) AS total_success,
             (SELECT count(id) FROM cms_import_parents WHERE import_id=$import_id AND status!=6) AS total_error");
         return response()->json($data);

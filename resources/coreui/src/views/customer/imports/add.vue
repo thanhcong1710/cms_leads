@@ -61,7 +61,7 @@
                 <p><strong>DỮ LIỆU ĐÃ KIỂM TRA</strong></p>
                 <input type="checkbox" id="checkbox" v-model="error_checked" v-if="total_error>0">
                 <label for="checkbox" v-if="total_error>0">Bỏ qua không nhập dữ liệu lỗi</label>
-                <button class="btn btn-secondary fl-right" @click="location.reload()"> Hủy</button>
+                <button class="btn btn-secondary fl-right" @click=" reloadPage()"> Hủy</button>
                 <button class="btn btn-success fl-right" :disabled="!(total_error==0 || error_checked)" @click="showStep3()"> Tiếp theo</button>
               </div>  
               <div class="col-12">
@@ -82,7 +82,8 @@
                       </td>
                       <td>{{item.name}}</td>
                       <td>{{ item.gud_mobile1 }}</td>
-                      <td>{{ item.status }}</td>
+                      <td> <i v-if="item.status ==1" class="fas fa-check" style="color:rgb(18 152 23);font-size: 20px;"></i>
+                        <i v-else class="fas fa-times" style="color:rgb(177 8 8); font-size: 20px"></i></td>
                       <td>{{ item.error_message }}</td>
                       <td></td>
                     </tr>
@@ -149,7 +150,7 @@
                   </div>
                   <div class="form-group col-sm-12">
                     <p style="color:red" v-html="data_assign.error_message"></p>
-                    <button class="btn btn-secondary fl-right" @click="location.reload()"> Hủy</button>
+                    <button class="btn btn-secondary fl-right" @click="reloadPage()"> Hủy</button>
                     <button class="btn btn-success fl-right" @click="assginContact"> Tiếp theo</button>
                   </div>
                 </div>
@@ -180,7 +181,7 @@
                 </table>
               </div>
               <div class="form-group col-sm-12">
-                <button class="btn btn-success fl-right" @click="location.reload()"> Quay lại trang import</button>
+                <button class="btn btn-success fl-right" @click="reloadPage()"> Quay lại trang import</button>
               </div>
             </div>
           </div>
@@ -266,17 +267,20 @@ export default {
             console.log(response.data)
             if(response.data.error){
               alert(response.data.message);
-              location.reload();
+              this.reloadPage();
             }else{
               this.list_data_check = response.data.data
               this.curr_step=2
               this.total_error = response.data.total_error
-              this.total_validate = respose.data.total_validate
-              this.data_assign.import_id = respose.data.import_id
+              this.total_validate = response.data.total_validate
+              this.data_assign.import_id = response.data.import_id
             }
           })
           .catch(e => console.log(e))
       }
+    },
+    reloadPage(){
+      location.reload();
     },
     showStep3(){
       this.curr_step=3;
