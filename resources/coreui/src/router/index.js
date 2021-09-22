@@ -61,7 +61,8 @@ router.beforeEach((to, from, next) => {
     roles = roles.split(',')
   }
   if(to.matched.some(record => record.meta.requiresAdmin)) {
-    if(roles != null && roles.indexOf('admin') >= 0 ){
+    // if(roles != null && roles.indexOf('admin') >= 0 ){
+    if(roles != null ){  
       next()
     }else{
       next({
@@ -70,7 +71,8 @@ router.beforeEach((to, from, next) => {
       })
     }
   }else if(to.matched.some(record => record.meta.requiresUser)) {
-    if(roles != null && roles.indexOf('user') >= 0 ){
+    // if(roles != null && roles.indexOf('user') >= 0 ){
+    if(roles != null ){  
       next()
     }else{
       next({
