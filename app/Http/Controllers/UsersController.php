@@ -59,7 +59,7 @@ class UsersController extends Controller
     public function edit($id)
     {
         $user = DB::table('users')
-        ->select('users.id','users.branch_name', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status')
+        ->select('users.id','users.branch_name','users.phone', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status')
         ->where('users.id', '=', $id)
         ->first();
         return response()->json( $user );
@@ -80,10 +80,12 @@ class UsersController extends Controller
         ]);
         $user = User::find($id);
         $user->name       = $request->input('name');
+        $user->phone      = $request->input('phone');
         $user->email      = $request->input('email');
         $user->hrm_id      = $request->input('hrm_id');
         $user->manager_hrm_id      = $request->input('manager_hrm_id');
         $user->branch_name      = $request->input('branch_name');
+        $user->status      = $request->input('status');
         if($request->password){
             $user->password = bcrypt($request->password);
         }
@@ -128,6 +130,7 @@ class UsersController extends Controller
         $user =new User();
         $user->name       = $request->input('name');
         $user->email      = $request->input('email');
+        $user->phone      = $request->input('phone');
         $user->password = bcrypt($request->password);
         $user->status      = $request->input('status');
         $user->hrm_id      = $request->input('hrm_id');
@@ -159,5 +162,31 @@ class UsersController extends Controller
         $data = u::query("SELECT * FROM users WHERE status=1 AND id IN (".$request->user_info->users_manager.")");
         return response()->json($data);
     }
-    
+    public function list(Request $request)
+    {
+        $status = isset($request->status) ? $request->status : '';
+        $keyword = isset($request->keyword) ? $request->keyword : '';
+        $role_id = isset($request->role_id) ? $request->role_id : '';
+        
+        $pagination = (object)$request->pagination;
+        $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
+        $limit = isset($pagination->limit) ? (int) $pagination->limit : 20;
+        $offset = $page == 1 ? 0 : $limit * ($page-1);
+        $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
+        $cond = " 1 ";
+        if($role_id!==''){
+            $cond .= " AND (SELECT count(role_id) FROM model_has_roles WHERE model_id=u.id AND role_id=$role_id)>0";
+        }
+        if($status!==''){
+            $cond .= " AND u.status=$status";
+        }
+        if($keyword!==''){
+            $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%' ) ";
+        }
+        $total = u::first("SELECT count(id) AS total FROM users AS u WHERE $cond ");
+        $list = u::query("SELECT u.*, (SELECT name FROM users WHERE id=u.manager_id) AS manager_name 
+            FROM users AS u WHERE $cond ORDER BY u.id DESC $limitation");
+        $data = u::makingPagination($list, $total->total, $page, $limit);
+        return response()->json($data);
+    }
 }

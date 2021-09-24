@@ -16,7 +16,7 @@ class Admin
     public function handle($request, Closure $next)
     {
         $user = auth()->user();
-        if(empty($user) || !$user->hasRole('admin')){
+        if(empty($user)){
             return response()->json(['message' => 'Unauthenticated. Admin role required'], 401);
         }
         $list_users = u::query("SELECT id,manager_id FROM users WHERE status=1");

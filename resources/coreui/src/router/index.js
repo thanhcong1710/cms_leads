@@ -18,10 +18,10 @@ const Login = () => import('@/views/pages/Login')
 const Register = () => import('@/views/pages/Register')
 
 // Users
-const Users = () => import('@/views/users/Users')
-const User = () => import('@/views/users/User')
-const EditUser = () => import('@/views/users/EditUser')
-const AddUser = () => import('@/views/users/AddUser')
+const Users = () => import('@/views/users/list')
+const User = () => import('@/views/users/detail')
+const EditUser = () => import('@/views/users/edit')
+const AddUser = () => import('@/views/users/add')
 
 //Roles
 const Roles = () => import('@/views/roles/Roles')
@@ -209,7 +209,7 @@ function configRoutes () {
         },
         {
           path: 'users',
-          meta: { label: 'Users'},
+          meta: { label: 'Nhân viên'},
           component: {
             render (c) { return c('router-view') }
           },
@@ -223,7 +223,7 @@ function configRoutes () {
             },
             {
               path: 'add',
-              meta: { label: 'Add User' },
+              meta: { label: 'Thêm mới nhân viên' },
               name: 'Add User',
               component: AddUser,
               meta:{
@@ -232,7 +232,7 @@ function configRoutes () {
             },
             {
               path: ':id',
-              meta: { label: 'User Details'},
+              meta: { label: 'Chi tiết nhân viên'},
               name: 'User',
               component: User,
               meta:{
@@ -241,7 +241,7 @@ function configRoutes () {
             },
             {
               path: ':id/edit',
-              meta: { label: 'Edit User' },
+              meta: { label: 'Cập nhật nhân viên' },
               name: 'Edit User',
               component: EditUser,
               meta:{

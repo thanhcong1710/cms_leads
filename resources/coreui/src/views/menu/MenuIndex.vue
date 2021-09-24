@@ -7,7 +7,7 @@
             <h4>
               Menus {{ $t('passwords.reset') }}
             </h4>
-              <CButton color="primary" @click="addMenu()" class="mb-3">Add Menu</CButton>
+              <!-- <CButton color="primary" @click="addMenu()" class="mb-3">Add Menu</CButton> -->
               <CDataTable
                 hover
                 :items="items"

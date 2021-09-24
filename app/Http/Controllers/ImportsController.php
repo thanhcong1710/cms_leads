@@ -29,6 +29,9 @@ class ImportsController extends Controller
         if($status!==''){
             $cond .= " AND status=$status";
         }
+        if(!$request->user()->hasRole('admin')){
+            $cond .= " AND i.creator_id IN (".$request->user_info->users_manager.")";
+        }
         $total = u::first("SELECT count(id) AS total FROM cms_imports AS i WHERE $cond ");
         $list = u::query("SELECT i.*, (SELECT name FROM users WHERE id=i.creator_id) AS creator_name ,
                 (SELECT count(id) FROM cms_import_parents WHERE import_id=i.id AND status=6) AS count_success,

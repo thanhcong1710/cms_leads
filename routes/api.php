@@ -24,6 +24,8 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::group(['middleware' => 'admin'], function ($router) {
         Route::resource('users', 'UsersController')->except( ['create', 'store'] );
         Route::post('/users/add', 'UsersController@add');
+        Route::post('/users/list', 'UsersController@list');
+        Route::post('/users/update/{id}', 'UsersController@update');
 
         Route::prefix('menu/menu')->group(function () { 
             Route::get('/',         'MenuEditController@index')->name('menu.menu.index');
