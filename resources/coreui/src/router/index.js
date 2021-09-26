@@ -15,6 +15,8 @@ const Dashboard = () => import('@/views/Dashboard')
 const Page404 = () => import('@/views/pages/Page404')
 const Page500 = () => import('@/views/pages/Page500')
 const Login = () => import('@/views/pages/Login')
+const SingleSignOn = () => import('@/views/pages/SingleSignOn')
+const SwitchSystem = () => import('@/views/pages/SwitchSystem')
 const Register = () => import('@/views/pages/Register')
 
 // Users
@@ -339,6 +341,16 @@ function configRoutes () {
       path: '*',
       name: '404',
       component: Page404
+    },
+    {
+      path: '/single-sign-on/:hrm_id/:token',
+      name: 'Single Sign On',
+      component: SingleSignOn
+    },
+    {
+      path: '/switch-system',
+      name: 'Swith System',
+      component: SwitchSystem
     },
   ]
 }

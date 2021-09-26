@@ -20,6 +20,8 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::post('logout', 'AuthController@logout');
     Route::post('refresh', 'AuthController@refresh');
     Route::post('register', 'AuthController@register'); 
+    Route::post('single-sign-on', 'AuthController@singleSignOn');
+    Route::get('switch-system', 'AuthController@switchSystem');
 
     Route::group(['middleware' => 'admin'], function ($router) {
         Route::resource('users', 'UsersController')->except( ['create', 'store'] );

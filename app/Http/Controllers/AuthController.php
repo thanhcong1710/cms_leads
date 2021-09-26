@@ -6,7 +6,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
-
+use App\Providers\UtilityServiceProvider as u;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Providers\CurlServiceProvider as curl;
 class AuthController extends Controller
 { 
     /**
@@ -16,7 +18,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register','singleSignOn']]);
     }
   
     /**
@@ -69,6 +71,7 @@ class AuthController extends Controller
     public function logout()
     {
         auth()->logout();
+        
 
         return response()->json(['message' => 'Successfully logged out']);
     }
@@ -100,5 +103,33 @@ class AuthController extends Controller
             'expires_in' => auth()->factory()->getTTL() * 60,
             'roles' => $user->roles,
         ]);
+    }
+    public function singleSignOn(Request $request){
+        $hrm_id = $request->hrm_id;
+        $token = $request->token;
+        $key ="CMS@abcd1234";
+        if($token == md5($key.$hrm_id)){
+            $user_info = u::first("SELECT id FROM users WHERE hrm_id='$hrm_id' AND status=1");
+            if($user_info){
+                $user = User::find( $user_info->id);
+                $token = JWTAuth::fromUser($user);
+                return $this->respondWithToken($token, $user->email);
+            }else{
+                return response()->json(['error' => 'Unauthorized'], 401);
+            }
+        }else{
+            return response()->json(['error' => 'Unauthorized'], 401);
+        }
+    }
+    public function switchSystem(Request $request){
+        $key ="CMS@abcd1234";
+        return response()->json(['link_redirect' => "http://account.cltechpro.com/#/single-sign-on/".$request->user()->hrm_id."/".md5($key.$request->user()->hrm_id)]);
+    }
+    protected function logoutSingleSignOn(Request $request){
+        $key ="CMS@abcd1234";
+        $method = "GET";
+        $url = "http://account.cltechpro.com/api/logout-single-sign-on?hrm_id=".$request->user()->hrm_id."/".md5($key.$request->user()->hrm_id);
+        $res = curl::curl($url, $method);
+        return $res;
     }
 }
