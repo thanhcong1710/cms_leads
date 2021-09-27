@@ -180,31 +180,32 @@ export default {
     axios.get(  '/api/roles?token=' + localStorage.getItem("api_token") )
     .then(function (response) {
       self.roles = response.data;
+      axios.get(  '/api/users/' + self.$route.params.id + '/edit?token=' + localStorage.getItem("api_token"))
+      .then(function (response) {
+          self.name = response.data.name;
+          self.email = response.data.email;
+          self.phone = response.data.phone;
+          self.status = response.data.status;
+          self.hrm_id = response.data.hrm_id;
+          self.manager_hrm_id = response.data.manager_hrm_id; 
+          self.branch_name = response.data.branch_name; 
+          let arr_role = response.data.roles.split(",");
+          self.roles.map(item => {
+            if (arr_role.indexOf(item.name) != -1) {
+              item.checked= true
+            }else{
+              item.checked= false
+            }
+            return item
+          })
+      }).catch(function (error) {
+          console.log(error);
+          // self.$router.push({ path: '/login' });
+      });
     }).catch(function (error) {
       // self.$router.push({ path: '/login' });
     });
-     axios.get(  '/api/users/' + self.$route.params.id + '/edit?token=' + localStorage.getItem("api_token"))
-    .then(function (response) {
-        self.name = response.data.name;
-        self.email = response.data.email;
-        self.phone = response.data.phone;
-        self.status = response.data.status;
-        self.hrm_id = response.data.hrm_id;
-        self.manager_hrm_id = response.data.manager_hrm_id; 
-        self.branch_name = response.data.branch_name; 
-        let arr_role = response.data.roles.split(",");
-        self.roles.map(item => {
-          if (arr_role.indexOf(item.name) != -1) {
-            item.checked= true
-          }else{
-            item.checked= false
-          }
-          return item
-        })
-    }).catch(function (error) {
-        console.log(error);
-        // self.$router.push({ path: '/login' });
-    });
+     
   },
   methods: {
     selectDate(date) {

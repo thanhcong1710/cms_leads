@@ -93,7 +93,7 @@ class UsersController extends Controller
         $menuroles = "";
         foreach($roles AS $role){
             $role = (object) $role;
-            if($role->checked==true){
+            if(isset($role->checked) && $role->checked==true){
                 $menuroles .= $menuroles == "" ? $role->name : ','.$role->name;
                 $model_has_roles = u::getObject(array('role_id'=>$role->id,'model_id'=>$user->id),'model_has_roles');
                 if(!$model_has_roles){
