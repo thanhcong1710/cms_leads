@@ -68,13 +68,11 @@
                       />
                     </div>
                     <div class="form-group col-sm-12">
-                      <label for="nf-email">Trung Tâm <span class="text-danger"> (*)</span></label>
-                      <input
-                        class="form-control"
-                        type="text"
-                        name="title"
-                        v-model="branch_name"
-                      />
+                      <label for="nf-email">Trung Tâm </label>
+                      <select class="form-control" v-model="branch_id">
+                        <option value="0">Chọn trung tâm</option>
+                        <option :value="item.id" v-for="(item, index) in branches" :key="index">{{item.name}}</option>
+                      </select>
                     </div>
                     <div class="col-sm-12 form-group">
                       <label> Trạng thái </label>
@@ -160,6 +158,7 @@ export default {
           closeOnBackdrop: false,
           action_exit: "exit",
         },
+        branches:[],
         roles: [],
         name: '',
         email: '',
@@ -173,7 +172,7 @@ export default {
         dismissCountDown: 0,
         showDismissibleAlert: false,
         status:1,
-        branch_name:''
+        branch_id:0
     }
   },
   created() {
@@ -184,6 +183,10 @@ export default {
     }).catch(function (error) {
       // self.$router.push({ path: '/login' });
     });
+    u.g(`/api/branches`)
+      .then(response => {
+      this.branches = response.data
+    })
   },
   methods: {
     selectDate(date) {
@@ -214,10 +217,6 @@ export default {
         mess += " - Mã nhân viên không được để trống<br/>";
         resp = false;
       }
-      if (this.hrm_id == "") {
-        mess += " - Trung tâm không được để trống<br/>";
-        resp = false;
-      }
       const new_list = []
       this.roles.map(item => {
           if (item.checked) {
@@ -246,7 +245,7 @@ export default {
         status: this.status,
         hrm_id: this.hrm_id,
         manager_hrm_id : this.manager_hrm_id,
-        branch_name:this.branch_name
+        branch_id:this.branch_id
       })
         .then((response) => {
           this.loading.processing = false;

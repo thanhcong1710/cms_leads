@@ -44,7 +44,7 @@ class UsersController extends Controller
     public function show($id)
     {
         $user = DB::table('users')
-        ->select('users.id','users.branch_name AS branch', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status', 'users.email_verified_at as registered')
+        ->select('users.id','users.branch_id AS branch_id', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status', 'users.email_verified_at as registered')
         ->where('users.id', '=', $id)
         ->first();
         return response()->json( $user );
@@ -59,7 +59,7 @@ class UsersController extends Controller
     public function edit($id)
     {
         $user = DB::table('users')
-        ->select('users.id','users.branch_name','users.phone', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status')
+        ->select('users.id','users.branch_id','users.phone', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status')
         ->where('users.id', '=', $id)
         ->first();
         return response()->json( $user );
@@ -84,7 +84,7 @@ class UsersController extends Controller
         $user->email      = $request->input('email');
         $user->hrm_id      = $request->input('hrm_id');
         $user->manager_hrm_id      = $request->input('manager_hrm_id');
-        $user->branch_name      = $request->input('branch_name');
+        $user->branch_id      = $request->input('branch_id');
         $user->status      = $request->input('status');
         if($request->password){
             $user->password = bcrypt($request->password);
@@ -106,7 +106,7 @@ class UsersController extends Controller
         $user->menuroles = $menuroles;
         $user->save();
         u::query("UPDATE users AS u LEFT JOIN users AS m ON m.hrm_id=u.manager_hrm_id SET u.manager_id=m.id WHERE m.id IS NOT NULL");
-        
+        u::query("UPDATE users AS u LEFT JOIN cms_branches AS b ON b.id=u.branch_id SET u.branch_name=b.name WHERE u.id = $user->id");
         //$request->session()->flash('message', 'Successfully updated user');
         return response()->json( ['status' => 'success'] );
     }
@@ -136,7 +136,7 @@ class UsersController extends Controller
         $user->hrm_id      = $request->input('hrm_id');
         $user->manager_hrm_id      = $request->input('manager_hrm_id');
         $user->email_verified_at = date('Y-m-d H:i:s');
-        $user->branch_name      = $request->input('branch_name');
+        $user->branch_id      = $request->input('branch_id');
         $user->save();
         $roles = $request->roles;
         $menuroles = "";
@@ -155,6 +155,7 @@ class UsersController extends Controller
         $user->menuroles = $menuroles;
         $user->save();
         u::query("UPDATE users AS u LEFT JOIN users AS m ON m.hrm_id=u.manager_hrm_id SET u.manager_id=m.id WHERE m.id IS NOT NULL");
+        u::query("UPDATE users AS u LEFT JOIN cms_branches AS b ON b.id=u.branch_id SET u.branch_name=b.name WHERE u.id = $user->id");
         //$request->session()->flash('message', 'Successfully updated user');
         return response()->json( ['status' => 'success'] );
     }
