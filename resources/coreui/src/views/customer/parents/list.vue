@@ -22,8 +22,13 @@
                 <label for="ccmonth">Trạng thái</label>
                 <select class="form-control" v-model="searchData.status">
                   <option value>Chọn trạng thái</option>
-                  <option value="0">Ngừng hoạt động</option>
-                  <option value="1">Hoạt động</option>
+                  <option value="1">Data</option>
+                  <option value="2">Enquiry</option>
+                  <option value="3">S1</option>
+                  <option value="4">S2</option>
+                  <option value="5">Checkin</option>
+                  <option value="6">New</option>
+                  <option value="7">Renew</option>
                 </select>
               </div>
               <div class="form-group col-sm-3">
@@ -254,7 +259,34 @@ export default {
   },
   filters: {
     getStatusName(value) {
-      return value == 1 ? "Hoạt động" : "Ngừng hoạt động";
+      let resp = ''
+      switch (Number(value)) {
+          case 1:
+              resp = 'Data'
+              break
+          case 2:
+              resp = 'Enquiry'
+              break
+          case 3:
+              resp = 'S1'
+              break
+          case 4:
+              resp = 'S2'
+              break
+          case 5:
+              resp = 'Checkin'
+              break
+          case 6:
+              resp = 'Enroll'
+              break
+          case 7:
+              resp = 'Renew'
+              break
+          default:
+              resp = 'Data'
+              break
+      }
+      return resp
     },
   },
 };

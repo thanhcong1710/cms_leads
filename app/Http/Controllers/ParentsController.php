@@ -63,6 +63,7 @@ class ParentsController extends Controller
             'created_at' => date('Y-m-d H:i:s'),
             'creator_id' => Auth::user()->id,
             'owner_id'=>$request->owner_id,
+            'status'=>$request->status,
         ), 'cms_parents');
         return response()->json($data);
     }
@@ -88,6 +89,7 @@ class ParentsController extends Controller
             'updated_at' => date('Y-m-d H:i:s'),
             'updator_id' => Auth::user()->id,
             'owner_id'=>$request->owner_id,
+            'status'=>$request->status,
         ), array('id' => $parent_id), 'cms_parents');
         return response()->json($data);
     }
@@ -97,6 +99,15 @@ class ParentsController extends Controller
             'updated_at' => date('Y-m-d H:i:s'),
             'updator_id' => Auth::user()->id,
             'owner_id'=>$request->owner_id,
+        ), array('id' => $request->parent_id), 'cms_parents');
+        return response()->json($data);
+    }
+    public function changeStaus(Request $request)
+    {
+        $data = u::updateSimpleRow(array(
+            'updated_at' => date('Y-m-d H:i:s'),
+            'updator_id' => Auth::user()->id,
+            'status'=>$request->status,
         ), array('id' => $request->parent_id), 'cms_parents');
         return response()->json($data);
     }
@@ -121,5 +132,51 @@ class ParentsController extends Controller
         $data = u::query("SELECT l.*,(SELECT name FROM users WHERE id=l.creator_id) AS creator_name
             FROM cms_parent_logs AS l WHERE l.parent_id=$parent_id ORDER BY l.id DESC");
         return response()->json($data);
+    }
+    public function validatePhone(Request $request){
+        $parent_id = isset($request->parent_id) ? $request->parent_id : '';
+        $phone = isset($request->phone) ? $request->phone : '';
+        $result =(object)array(
+            'status'=>1,
+            'message'=>''
+        );
+        if($parent_id){
+            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  WHERE p.mobile_1='$phone' AND p.id!='$parent_id'");
+            if($duplicate_info){
+                $result->status = 0;
+                $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name";
+            }
+        }else{
+            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  WHERE p.mobile_1='$phone' ");
+            if($duplicate_info){
+                if($duplicate_info->is_lock==0){
+                    $result->status = 2;
+                    $result->message = "Khách hàng có SĐT: $phone đã tồn tại trên hệ thống, bạn có muốn chăm sóc?";
+                }else{
+                    $result->status = 0;
+                    $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name";
+                }
+            }
+        }
+        return response()->json($result);
+    }
+    public function overwrite(Request $request){
+        $phone = isset($request->phone) ? $request->phone : '';
+        $parent_info = u::first("SELECT * FROM cms_parents WHERE mobile_1='$phone'");
+        if($parent_info){
+            u::updateSimpleRow(array(
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updator_id' => Auth::user()->id,
+                'owner_id'=>Auth::user()->id,
+            ), array('id' => $parent_info->id), 'cms_parents');
+            u::insertSimpleRow(array(
+                'parent_id'=>$parent_info->id,
+                'last_owner_id'=>$parent_info->owner_id,
+                'owner_id'=>Auth::user()->id,
+                'created_at'=>date('Y-m-d H:i:s'),
+                'creator_id'=>Auth::user()->id,
+            ), 'cms_parent_overwrite');
+        }
+        return "ok";
     }
 }

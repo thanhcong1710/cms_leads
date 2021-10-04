@@ -35,6 +35,7 @@
                         type="text"
                         name="title"
                         v-model="parent.mobile_1"
+                        @change="validatePhone"
                       />
                     </div>
                     <div class="form-group col-sm-6">
@@ -131,6 +132,18 @@
                             :onChange="saveSource"
                         ></vue-select>
                     </div>
+                    <div class="form-group col-sm-6">
+                      <label for="nf-email">Trạng thái</label>
+                      <select class="form-control" v-model="parent.status">
+                        <option value="1">Data</option>
+                        <option value="2">Enquiry</option>
+                        <option value="3">S1</option>
+                        <option value="4">S2</option>
+                        <option value="5">Checkin</option>
+                        <option value="6">New</option>
+                        <option value="7">Renew</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -160,6 +173,30 @@
       <template #footer>
         <CButton :color="'btn btn-' + modal.color" @click="exit" type="button"
           >Đóng</CButton
+        >
+      </template>
+    </CModal>
+    <CModal
+      :title="modal_overwrite.title"
+      :show.sync="modal_overwrite.show"
+      :color="modal_overwrite.color"
+      :closeOnBackdrop="modal_overwrite.closeOnBackdrop"
+      :size="modal_overwrite.size"
+    >
+      <div>
+        <div class="form-in-list">
+          <p v-html="modal_overwrite.message"></p>
+        </div>
+      </div>
+      <template #header>
+        <h5 class="modal-title">{{ modal_overwrite.title }}</h5>
+      </template>
+      <template #footer>
+        <CButton :color="'btn btn-success'" @click="overwrite" type="button"
+          >Ghi Đè</CButton
+        >
+        <CButton :color="'btn btn-secondary'" @click="exit_overwrite" type="button"
+          >Hủy</CButton
         >
       </template>
     </CModal>
@@ -217,6 +254,14 @@ export default {
         body: "Thêm mới lớp học thành công",
         closeOnBackdrop: false,
         action_exit: "exit",
+      },
+      modal_overwrite: {
+        title: "GHI ĐÈ QUYỀN CHĂM SÓC KHÁCH HÀNG",
+        show: false,
+        color: "info",
+        closeOnBackdrop: false,
+        size:"lg",
+        message:"",
       },
       html:{
         province: {
@@ -384,6 +429,46 @@ export default {
         this.parent.source = ""
         this.parent.source_id = ""
       }
+    },
+    validatePhone(){
+      const data = {
+        phone: this.parent.mobile_1,
+      };
+      this.loading.processing = true
+      u.p(`/api/parents/validate_phone`,data).then(response => {
+        this.loading.processing = false
+        if(response.data.status==0){
+          this.parent.mobile_1 ="";
+          this.modal.color = "warning";
+          this.modal.body = response.data.message;
+          this.modal.show = true;
+          this.modal.action_exit = "close";
+        }else if(response.data.status==2){
+          this.modal_overwrite.show = true;
+          this.modal_overwrite.message = response.data.message;
+        }
+      })
+    },
+    exit_overwrite(){
+      this.modal_overwrite.show = false;
+      this.parent.mobile_1 ="";
+    },
+    overwrite(){
+      const data = {
+        phone: this.parent.mobile_1,
+      };
+      this.loading.processing = true
+      this.modal_overwrite.show = false;
+      u.p(`/api/parents/overwrite`,data).then(response => {
+        this.loading.processing = false
+        if(response.status==200){
+          this.parent.mobile_1 ="";
+          this.modal.color = "success";
+          this.modal.body = "Ghi đè quyền chăm sóc thành công!";
+          this.modal.show = true;
+          this.modal.action_exit = "exit";
+        }
+      })
     }
   },
 };

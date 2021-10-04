@@ -249,11 +249,16 @@ export default {
       })
         .then((response) => {
           this.loading.processing = false;
-          if (response.status == 200) {
+          if (response.data.status == 'success') {
             this.modal.color = "success";
             this.modal.body = "Thêm mới nhân viên thành công";
             this.modal.show = true;
             this.modal.action_exit = "exit";
+          }else{
+            this.modal.color = "warning";
+            this.modal.body = response.data.message;
+            this.modal.show = true;
+            this.modal.action_exit = "close";
           }
         })
         .catch((e) => {

@@ -74,41 +74,46 @@ class UsersController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $validatedData = $request->validate([
-            'name'       => 'required|min:1|max:256',
-            'email'      => 'required|email|max:256'
-        ]);
-        $user = User::find($id);
-        $user->name       = $request->input('name');
-        $user->phone      = $request->input('phone');
-        $user->email      = $request->input('email');
-        $user->hrm_id      = $request->input('hrm_id');
-        $user->manager_hrm_id      = $request->input('manager_hrm_id');
-        $user->branch_id      = $request->input('branch_id');
-        $user->status      = $request->input('status');
-        if($request->password){
-            $user->password = bcrypt($request->password);
-        }
-        $roles = $request->roles;
-        $menuroles = "";
-        foreach($roles AS $role){
-            $role = (object) $role;
-            if(isset($role->checked) && $role->checked==true){
-                $menuroles .= $menuroles == "" ? $role->name : ','.$role->name;
-                $model_has_roles = u::getObject(array('role_id'=>$role->id,'model_id'=>$user->id),'model_has_roles');
-                if(!$model_has_roles){
-                    u::insertSimpleRow(array('role_id'=>$role->id,'model_id'=>$user->id,'model_type'=>'App\User'),'model_has_roles');
-                }
-            }else{
-                u::query("DELETE FROM model_has_roles WHERE role_id = $role->id AND model_id=$user->id");
+        $err_message = $this->checkInfoUser($request,$id);
+        if($err_message){
+            return response()->json( ['status' => 'error','message'=>$err_message] );
+        }else{
+            $validatedData = $request->validate([
+                'name'       => 'required|min:1|max:256',
+                'email'      => 'required|email|max:256'
+            ]);
+            $user = User::find($id);
+            $user->name       = $request->input('name');
+            $user->phone      = $request->input('phone');
+            $user->email      = $request->input('email');
+            $user->hrm_id      = $request->input('hrm_id');
+            $user->manager_hrm_id      = $request->input('manager_hrm_id');
+            $user->branch_id      = $request->input('branch_id');
+            $user->status      = $request->input('status');
+            if($request->password){
+                $user->password = bcrypt($request->password);
             }
+            $roles = $request->roles;
+            $menuroles = "";
+            foreach($roles AS $role){
+                $role = (object) $role;
+                if(isset($role->checked) && $role->checked==true){
+                    $menuroles .= $menuroles == "" ? $role->name : ','.$role->name;
+                    $model_has_roles = u::getObject(array('role_id'=>$role->id,'model_id'=>$user->id),'model_has_roles');
+                    if(!$model_has_roles){
+                        u::insertSimpleRow(array('role_id'=>$role->id,'model_id'=>$user->id,'model_type'=>'App\User'),'model_has_roles');
+                    }
+                }else{
+                    u::query("DELETE FROM model_has_roles WHERE role_id = $role->id AND model_id=$user->id");
+                }
+            }
+            $user->menuroles = $menuroles;
+            $user->save();
+            u::query("UPDATE users AS u LEFT JOIN users AS m ON m.hrm_id=u.manager_hrm_id SET u.manager_id=m.id WHERE m.id IS NOT NULL");
+            u::query("UPDATE users AS u LEFT JOIN cms_branches AS b ON b.id=u.branch_id SET u.branch_name=b.name WHERE u.id = $user->id");
+            //$request->session()->flash('message', 'Successfully updated user');
+            return response()->json( ['status' => 'success'] );
         }
-        $user->menuroles = $menuroles;
-        $user->save();
-        u::query("UPDATE users AS u LEFT JOIN users AS m ON m.hrm_id=u.manager_hrm_id SET u.manager_id=m.id WHERE m.id IS NOT NULL");
-        u::query("UPDATE users AS u LEFT JOIN cms_branches AS b ON b.id=u.branch_id SET u.branch_name=b.name WHERE u.id = $user->id");
-        //$request->session()->flash('message', 'Successfully updated user');
-        return response()->json( ['status' => 'success'] );
     }
 
     /**
@@ -127,37 +132,42 @@ class UsersController extends Controller
     }
     public function add(Request $request)
     {
-        $user =new User();
-        $user->name       = $request->input('name');
-        $user->email      = $request->input('email');
-        $user->phone      = $request->input('phone');
-        $user->password = bcrypt($request->password);
-        $user->status      = $request->input('status');
-        $user->hrm_id      = $request->input('hrm_id');
-        $user->manager_hrm_id      = $request->input('manager_hrm_id');
-        $user->email_verified_at = date('Y-m-d H:i:s');
-        $user->branch_id      = $request->input('branch_id');
-        $user->save();
-        $roles = $request->roles;
-        $menuroles = "";
-        foreach($roles AS $role){
-            $role = (object) $role;
-            if(isset($role->checked) && $role->checked==true){
-                $menuroles .= $menuroles == "" ? $role->name : ','.$role->name;
-                $model_has_roles = u::getObject(array('role_id'=>$role->id,'model_id'=>$user->id),'model_has_roles');
-                if(!$model_has_roles){
-                    u::insertSimpleRow(array('role_id'=>$role->id,'model_id'=>$user->id,'model_type'=>'App\User'),'model_has_roles');
+        $err_message = $this->checkInfoUser($request);
+        if($err_message){
+            return response()->json( ['status' => 'error','message'=>$err_message] );
+        }else{
+            $user =new User();
+            $user->name       = $request->input('name');
+            $user->email      = $request->input('email');
+            $user->phone      = $request->input('phone');
+            $user->password = bcrypt($request->password);
+            $user->status      = $request->input('status');
+            $user->hrm_id      = $request->input('hrm_id');
+            $user->manager_hrm_id      = $request->input('manager_hrm_id');
+            $user->email_verified_at = date('Y-m-d H:i:s');
+            $user->branch_id      = $request->input('branch_id');
+            $user->save();
+            $roles = $request->roles;
+            $menuroles = "";
+            foreach($roles AS $role){
+                $role = (object) $role;
+                if(isset($role->checked) && $role->checked==true){
+                    $menuroles .= $menuroles == "" ? $role->name : ','.$role->name;
+                    $model_has_roles = u::getObject(array('role_id'=>$role->id,'model_id'=>$user->id),'model_has_roles');
+                    if(!$model_has_roles){
+                        u::insertSimpleRow(array('role_id'=>$role->id,'model_id'=>$user->id,'model_type'=>'App\User'),'model_has_roles');
+                    }
+                }else{
+                    u::query("DELETE FROM model_has_roles WHERE role_id = $role->id AND model_id=$user->id");
                 }
-            }else{
-                u::query("DELETE FROM model_has_roles WHERE role_id = $role->id AND model_id=$user->id");
             }
+            $user->menuroles = $menuroles;
+            $user->save();
+            u::query("UPDATE users AS u LEFT JOIN users AS m ON m.hrm_id=u.manager_hrm_id SET u.manager_id=m.id WHERE m.id IS NOT NULL");
+            u::query("UPDATE users AS u LEFT JOIN cms_branches AS b ON b.id=u.branch_id SET u.branch_name=b.name WHERE u.id = $user->id");
+            //$request->session()->flash('message', 'Successfully updated user');
+            return response()->json( ['status' => 'success'] );
         }
-        $user->menuroles = $menuroles;
-        $user->save();
-        u::query("UPDATE users AS u LEFT JOIN users AS m ON m.hrm_id=u.manager_hrm_id SET u.manager_id=m.id WHERE m.id IS NOT NULL");
-        u::query("UPDATE users AS u LEFT JOIN cms_branches AS b ON b.id=u.branch_id SET u.branch_name=b.name WHERE u.id = $user->id");
-        //$request->session()->flash('message', 'Successfully updated user');
-        return response()->json( ['status' => 'success'] );
     }
     public function getUserAssgin(Request $request){
         $data = u::query("SELECT * FROM users WHERE status=1 AND id IN (".$request->user_info->users_manager.")");
@@ -189,5 +199,21 @@ class UsersController extends Controller
             FROM users AS u WHERE $cond ORDER BY u.id DESC $limitation");
         $data = u::makingPagination($list, $total->total, $page, $limit);
         return response()->json($data);
+    }
+    public function checkInfoUser($data,$user_id = 0){
+        $has_error="";
+        if(isset($data->email)){
+            $user_info = u::first("SELECT id FROM users WHERE email ='$data->email' AND status=1 AND id!=$user_id");
+            $has_error.=$user_info ? "Email đang kích hoạt trên hệ thống.<br>" : "";
+        }
+        if(isset($data->phone)){
+            $user_info = u::first("SELECT id FROM users WHERE phone ='$data->phone' AND status=1 AND id!=$user_id");
+            $has_error.=$user_info ? "Số điện thoại đang kích hoạt trên hệ thống.<br>" : "";
+        }
+        if(isset($data->hrm_id)){
+            $user_info = u::first("SELECT id FROM users WHERE hrm_id ='$data->hrm_id' AND id!=$user_id");
+            $has_error.=$user_info ? "Mã nhân viên đã tồn tại trên hệ thống.<br>" : "";
+        }
+        return $has_error;
     }
 }

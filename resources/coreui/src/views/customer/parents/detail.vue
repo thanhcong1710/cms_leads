@@ -30,9 +30,17 @@
               </div> 
               <div class="col-sm-2 border-right text-center">
                 <p>Trạng thái</p>
-                <p><select class="form-control">
-                  <option>Chọn trạng thái</option>
-                </select></p>  
+                <p> 
+                  <select class="form-control" @change="showModalChangeStatus" v-model="tmp_status" >
+                    <option value="1">Data</option>
+                    <option value="2">Enquiry</option>
+                    <option value="3">S1</option>
+                    <option value="4">S2</option>
+                    <option value="5">Checkin</option>
+                    <option value="6">New</option>
+                    <option value="7">Renew</option>
+                  </select>
+                </p>  
               </div>
               <div class="col-sm-3 text-center">
                 <p>Người phụ trách</p>
@@ -294,6 +302,30 @@
         >
       </template>
     </CModal>
+    <CModal
+      :title="modal_status.title"
+      :show.sync="modal_status.show"
+      :color="modal_status.color"
+      :closeOnBackdrop="modal_status.closeOnBackdrop"
+      :size="modal_status.size"
+    >
+      <div>
+        <div class="form-in-list">
+          <p>Bạn chắc chắn muốn cập nhật trạng thái của khách hàng ?</p>
+        </div>
+      </div>
+      <template #header>
+        <h5 class="modal-title">{{ modal_status.title }}</h5>
+      </template>
+      <template #footer>
+        <CButton :color="'btn btn-success'" @click="changeStatus" type="button"
+          >Cập nhật</CButton
+        >
+        <CButton :color="'btn btn-secondary'" @click="exit('status')" type="button"
+          >Hủy</CButton
+        >
+      </template>
+    </CModal>
   </div>
 </template>
 
@@ -372,6 +404,14 @@ export default {
         size:"lg",
         error_message:""
       },
+      modal_status: {
+        title: "CẬP NHÂT TRẠNG THÁI KHÁCH HÀNG",
+        show: false,
+        color: "info",
+        closeOnBackdrop: false,
+        size:"lg",
+        error_message:""
+      },
       parent: {
         id:"",
         gender: "",
@@ -413,6 +453,7 @@ export default {
       logs:[],
       users_manager:[],
       tmp_owner_id:"",
+      tmp_status:"",
     };
   },
   created() {
@@ -435,6 +476,7 @@ export default {
         this.loading.processing = false;
         this.parent = response.data
         this.tmp_owner_id = response.data.owner_id
+        this.tmp_status = response.data.status
       })
     },
     isActive (menuItem) {
@@ -456,6 +498,9 @@ export default {
       }else if(item=='assign'){
         this.modal_assign.show = false;
         this.tmp_owner_id = this.parent.owner_id
+      }else if(item=='status'){
+        this.modal_status.show = false;
+        this.tmp_status = this.parent.status
       }
     },
     showModalCare(){
@@ -493,11 +538,11 @@ export default {
       }
       if(resp){
         this.loading.processing = true;
+        this.exit("care");
         u.p(`/api/care/add`,this.care)
         .then((response) => {
           this.loading.processing = false;
           this.loadCares(this.parent.id);
-          this.exit("care");
         })
         .catch((e) => {
         });
@@ -561,11 +606,11 @@ export default {
       }
       if(resp){
         this.loading.processing = true;
+        this.exit("student");
         u.p(`/api/students/add`,this.student)
         .then((response) => {
           this.loading.processing = false;
           this.loadStudents(this.parent.id);
-          this.exit("student");
         })
         .catch((e) => {
         });
@@ -596,15 +641,33 @@ export default {
     showModalAssgin(){
       this.modal_assign.show =true
     },
+    showModalChangeStatus(){
+      this.modal_status.show =true
+    },
     assignCustomer(){
       const data = {
         parent_id: this.parent.id,
         owner_id: this.tmp_owner_id,
       };
+      this.modal_assign.show =false
       this.loading.processing = true;
         u.p(`/api/parents/assign`,data)
         .then((response) => {
-          this.modal_assign.show =false
+          this.loading.processing = false;
+          this.loadDetail();
+        })
+        .catch((e) => {
+        });
+    },
+    changeStatus(){
+      const data = {
+        parent_id: this.parent.id,
+        status: this.tmp_status,
+      };
+      this.modal_status.show =false
+      this.loading.processing = true;
+        u.p(`/api/parents/change_status`,data)
+        .then((response) => {
           this.loading.processing = false;
           this.loadDetail();
         })

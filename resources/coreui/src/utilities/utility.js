@@ -186,11 +186,11 @@ const is = {
   for: obj => Object.keys(obj)
 }
 export default {
-    processAuthen,
-    shuffle,
-    vld,
-    fmc,
-    g,
-    p,
-    is
+  processAuthen,
+  shuffle,
+  vld,
+  fmc,
+  g,
+  p,
+  is
 }
