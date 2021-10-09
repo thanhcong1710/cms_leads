@@ -17,11 +17,12 @@ class VoipController extends Controller
      */
     public function webhook(Request $request)
     {
-        $meta_data = json_encode($request->all(), JSON_UNESCAPED_UNICODE);
+        $request_json = json_decode(file_get_contents('php://input'), true);
+        $request_server = json_encode($request_json, true);
         $created_at = date('Y-m-d H:i:s');
         u::insertSimpleRow( array(
             'type'=>'webhook',
-            'response'=>$meta_data,
+            'response'=>$request_server,
             'created_at'=>$created_at
         ),'voip24h_respose');
         return response()->json("ok");

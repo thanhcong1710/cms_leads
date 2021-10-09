@@ -22,7 +22,7 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::post('register', 'AuthController@register'); 
     Route::post('single-sign-on', 'AuthController@singleSignOn');
     Route::get('switch-system', 'AuthController@switchSystem');
-    Route::post('webhook/voip24h', 'VoipController@webhook');
+    Route::get('webhook/voip24h', 'VoipController@webhook');
 
     Route::group(['middleware' => 'admin'], function ($router) {
         Route::resource('users', 'UsersController')->except( ['create', 'store'] );
