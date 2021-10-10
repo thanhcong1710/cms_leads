@@ -95,13 +95,13 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token, $email)
     {
-        $user = User::select('menuroles as roles')->where('email', '=', $email)->first();
-
+        $user = User::select('menuroles as roles')->select('id')->where('email', '=', $email)->first();
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
             'roles' => $user->roles,
+            'user_id'=>$user->id,
         ]);
     }
     public function singleSignOn(Request $request){

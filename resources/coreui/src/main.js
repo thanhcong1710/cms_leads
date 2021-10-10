@@ -7,7 +7,22 @@ import { iconsSet as icons } from './assets/icons/icons.js'
 import store from './store'
 import VueInternationalization from 'vue-i18n';
 import Locale from '../../js/vue-i18n-locales.generated.js';
- 
+import VueSocketIO from 'vue-3-socket.io'
+import SocketIO from 'socket.io-client'
+
+const options = {transports: ['websocket', 'polling', 'flashsocket']} ; //Options object to pass into SocketIO
+
+Vue.use(new VueSocketIO({
+    debug: true,
+    connection: SocketIO('http://35.187.235.207:3000', options), //options object is Optional
+    vuex: {
+      store,
+      actionPrefix: "SOCKET_",
+      mutationPrefix: "SOCKET_"
+    }
+  })
+);
+
 Vue.use(VueInternationalization);
 const i18n = new VueInternationalization({
     locale: document.head.querySelector('meta[name="locale"]').content,

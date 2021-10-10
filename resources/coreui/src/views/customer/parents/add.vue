@@ -71,11 +71,7 @@
                     </div>
                     <div class="form-group col-sm-12">
                       <label for="nf-email">Ghi chú</label>
-                      <editor
-                        :api-key="tinymce.key"
-                        :init="tinymce.init"
-                        id="input_tinymce"
-                      />
+                      <textarea class="form-control" v-model="parent.note"></textarea>
                     </div>
                   </div>
                 </div>
@@ -207,7 +203,6 @@
 import axios from "axios";
 import u from "../../../utilities/utility";
 import loader from "../../../components/Loading";
-import Editor from "@tinymce/tinymce-vue";
 import datepicker from "vue2-datepicker";
 import moment from 'moment';
 import select from 'vue-select'
@@ -215,34 +210,12 @@ import select from 'vue-select'
 export default {
   components: {
     loader: loader,
-    editor: Editor,
     datepicker,
     "vue-select": select
   },
   name: "Add-Product",
   data() {
     return {
-      tinymce: {
-        key: "68xdyo8hz3oyr5p47zv3jyvj3h6xg0hc0khthuj123tnskcx",
-        init: {
-          entity_encoding: "raw",
-          height: 240,
-          menubar: true,
-          plugins: [
-            "advlist autolink lists link image charmap print preview anchor",
-            "searchreplace visualblocks code fullscreen",
-            "insertdatetime media table paste code help wordcount",
-          ],
-          toolbar:
-            "undo redo | bold italic backcolor | image| media |\
-           alignleft aligncenter alignright alignjustify | \
-           bullist numlist outdent indent | removeformat | help",
-          images_upload_url:
-            "/api/upload/upload_file?token=" +
-            localStorage.getItem("api_token"),
-          images_upload_base_path: "",
-        },
-      },
       loading: {
         text: "Đang tải dữ liệu...",
         processing: false,
@@ -357,7 +330,6 @@ export default {
         this.modal.action_exit = "close";
         return false;
       }
-      this.parent.note = tinymce.get("input_tinymce").getContent();
       this.loading.processing = true;
       u.p("/api/parents/add",this.parent)
         .then((response) => {

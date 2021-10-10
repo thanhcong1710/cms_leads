@@ -85,12 +85,36 @@
     <CSubheader class="px-3">
       <CBreadcrumbRouter class="border-0 mb-0"/>
     </CSubheader>
+    <CModal
+      :title="modal_inbound.title"
+      :show.sync="modal_inbound.show"
+      :color="modal_inbound.color"
+      :closeOnBackdrop="modal_inbound.closeOnBackdrop"
+    >
+      <div>
+        <div class="form-in-list" style="text-align:center">
+          <h3>{{modal_inbound.phone}}</h3>
+          <h2>{{modal_inbound.name}}</h2>
+        </div>
+      </div>
+      <template #header>
+        <h5 class="modal-title"> <i class="fa fa-phone" style="margin-right:10px"></i> {{ modal_inbound.title }}</h5>
+      </template>
+      <template #footer>
+        <CButton :color="'btn btn-info'"  type="button" @click="viewDetail"
+          >Xem thông tin</CButton
+        >
+        <CButton :color="'btn btn-secondary'"  type="button"  @click="modal_inbound.show=false"
+          >Đóng</CButton
+        >
+      </template>
+    </CModal>
   </CHeader>
 </template>
-
 <script>
 import CMenu from './Menu'
 import TheHeaderDropdownAccnt from './TheHeaderDropdownAccnt'
+import u from "../utilities/utility";
 
 export default {
   name: 'TheHeader',
@@ -100,15 +124,48 @@ export default {
   },
   data() {
       return {
-          language: this.$i18n.locale
+          language: this.$i18n.locale,
+          modal_inbound: {
+            title: "CUỘC GỌI ĐẾN TỪ KHÁCH HÀNG",
+            show: false,
+            color: "success",
+            closeOnBackdrop: true,
+            error_message:"",
+            parent_id:'',
+            name:'',
+            phone:'',
+          },
       };
+  },
+  created(){
+    this.$socket.emit('userConnected', localStorage.getItem("user_id"));
   },
   methods: {
     changeLanguage() {
         localStorage.setItem('language', this.language);
         this.$i18n.locale = this.language;
         fetch(`api/language/${this.language}?token=` + localStorage.getItem("api_token"));
+    },
+    showModalInbound(data){
+      u.g(`/api/parents/get_info_by_phone/${data.phone}`)
+        .then((response) => {
+          this.modal_inbound.show = true;
+          this.modal_inbound.name = response.data.name
+          this.modal_inbound.phone = response.data.mobile_1
+          this.modal_inbound.parent_id = response.data.id
+        })
+        .catch((e) => {
+        });
+    },
+    viewDetail(){
+      this.modal_inbound.show = false;
+       this.$router.push({ path: `/parents/${this.modal_inbound.parent_id}/detail` });
     }
-  }
+  },
+  sockets: {
+    inbound: function (data) { 
+      this.showModalInbound(data)
+    },
+  },
 }
 </script>

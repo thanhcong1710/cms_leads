@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sms;
 use App\Providers\UtilityServiceProvider as u;
 
 use Illuminate\Http\Request;
@@ -119,7 +120,7 @@ class ParentsController extends Controller
                 (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
                 (SELECT title FROM cms_jobs WHERE id=p.job_id) AS job_name,
                 (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id) AS num_care,
-                (SELECT DATE_FORMAT(care_date,'%Y-%m-%d') FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_care
+                (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_care
             FROM cms_parents AS p WHERE id=$parent_id");
         return response()->json($data);
     }
@@ -176,6 +177,34 @@ class ParentsController extends Controller
                 'created_at'=>date('Y-m-d H:i:s'),
                 'creator_id'=>Auth::user()->id,
             ), 'cms_parent_overwrite');
+        }
+        return "ok";
+    }
+    public function makeToCall(Request $request,$parent_id){
+        $parent_info = u::first("SELECT * FROM cms_parents WHERE id='$parent_id'");
+        if($parent_info){
+            $voip = new VoipController();
+            $voip->makeToCall($parent_info->mobile_1,$request->user()->sip_id);
+        }
+        return "ok";
+    }
+    public function getInfoByPhone($phone){
+        $parent_info = u::first("SELECT name,id,mobile_1 FROM cms_parents WHERE mobile_1='$phone'");
+        return response()->json($parent_info);
+    }
+    public function sendSms(Request $request){
+        $parent_info = u::first("SELECT id,mobile_1 FROM cms_parents WHERE id='$request->parent_id'");
+        if($parent_info){
+            u::insertSimpleRow( array(
+                'parent_id'=>$parent_info->id,
+                'note'=>$request->content,
+                'created_at'=>date('Y-m-d H:i:s'),
+                'creator_id'=>$request->user()->id,
+                'method_id'=>4,
+                'care_date'=>date('Y-m-d H:i:s')
+            ),'cms_customer_care');
+            $sms = new Sms();
+            $sms->sendSms($parent_info->mobile_1,$request->content,$request->user()->id);
         }
         return "ok";
     }

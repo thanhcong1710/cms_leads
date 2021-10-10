@@ -6,7 +6,7 @@
           <loader :active="loading.processing" :text="loading.text" />
           <div class="card-header">
             <div class="row">
-              <div class="col-sm-3 border-right">
+              <div class="col-sm-5 border-right">
                   <div style="float: left; width: 90px;">
                     <img class="c-avatar-img" src="img/avatars/1.jpg" >
                   </div>
@@ -14,19 +14,20 @@
                     <h5 style="margin-bottom:0px">{{parent.name}} </h5>
                     <p><strong>{{parent.mobile_1}}</strong></p>
                     <p><router-link
-                        class="btn btn-sm btn-success"
+                        class="btn btn-sm btn-light"
                         :to="`/parents/${parent.id}/edit`"
                       >
-                        <i class="fa fa-edit"></i> </router-link></p>
+                        <i class="fa fa-edit"></i> </router-link>
+                      <button class="btn btn-sm btn-light" @click="callPhone"><i class="fa fa-phone"></i> </button>
+                      <button class="btn btn-sm btn-light" @click="showSendSms"><i class="fa fa-sms"></i> </button>
+                      </p>
                   </div>
               </div>
               <div class="col-sm-2 border-right text-center">
                 <p>Liên hệ lần cuối</p>
-                <p><strong>{{parent.last_care}}</strong></p>  
-              </div> 
-              <div class="col-sm-2 border-right text-center">
-                <p>Tương tác</p>
-                <strong>{{parent.num_care}}</strong>
+                <p>{{parent.last_care}}</p> 
+                <hr> 
+                <p>Tương tác: {{parent.num_care}}</p>
               </div> 
               <div class="col-sm-2 border-right text-center">
                 <p>Trạng thái</p>
@@ -68,6 +69,30 @@
                   <p>Người tạo: <span class="fl-right">{{parent.creator_name}}</span></p>
                 </div>
                 <div class="col-sm-9">
+                  <div class="alert alert-secondary" role="alert" v-if="sms.show">
+                    <h5 class="alert-heading"> <i class="fa fa-sms" style="margin-right:10px"></i> Gửi tin nhắn SMS</h5>
+                    <hr>
+                      <textarea class="form-control" v-model="sms.content" placeholder="Nhập nội dung tin nhắn"></textarea>
+                      <div style="margin-top:5px;text-align:right">
+                        <button class="btn btn-success" @click="sendSms"> <i class="fa fa-paper-plane"></i> Gửi</button>
+                        <button class="btn btn-secondary" @click="sms.show=false"> <i class="fa fa-times"></i> Hủy</button>
+                      </div>
+                  </div>
+                  <div :class="phone.css_class" role="alert" v-if="phone.show">
+                    <h5 class="alert-heading"> <i class="fa fa-phone" style="margin-right:10px"></i> {{phone.title}}</h5>
+                    <hr>
+                    <div v-if="phone.status==1">
+                      <div v-html="phone.description"></div>
+                      <div v-if="phone.show_input_note">
+                        <textarea class="form-control" v-model="phone.note" placeholder="Thêm ghi chú cuộc gọi"></textarea>
+                        <div style="margin-top:5px;text-align:right"><button class="btn btn-success" @click="updateNotePhone"> <i class="fa fa-save"></i> Lưu</button></div>
+                      </div>
+                      <div v-else>
+                         <div style="margin-top:5px;text-align:right"><button class="btn btn-secondary" @click="phone.show=false"> <i class="fa fa-times"></i> Đóng</button></div>
+                      </div>
+                    </div>
+                    <div v-else><p>Nhập thông tin ghi chú sau khi cuộc kết thúc!</p></div>
+                  </div>
                   <ul class="nav nav-tabs nav-justified">
                     <li class="nav-item">
                       <a class="nav-link" @click.prevent="setActive('customer_care')" :class="{ active: isActive('customer_care') }" href="#customer_care">Chăm sóc</a>
@@ -90,6 +115,7 @@
                             <th>Thời gian</th>
                             <th>Người chăm sóc</th>
                             <th>Phương thức</th>
+                            <th>Trạng thái</th>
                             <th>Chi tiết</th>
                           </tr>
                         </thead>
@@ -98,6 +124,7 @@
                             <td>{{ item.care_date }}</td>
                             <td>{{ item.creator_name }}</td>
                             <td>{{ item.method_name }}</td>
+                            <td>{{ item.data_state }}</td>
                             <td v-html="item.note"></td>
                           </tr>
                         </tbody>
@@ -177,11 +204,7 @@
               </div>
               <div class="form-group col-sm-12">
                 <label for="nf-email">Ghi chú</label>
-                <editor
-                  :api-key="tinymce.key"
-                  :init="tinymce.init"
-                  id="input_tinymce"
-                />
+                <textarea class="form-control" v-model="care.note"></textarea>
               </div>
             </div>
           </form>
@@ -333,7 +356,6 @@
 import axios from "axios";
 import u from "../../../utilities/utility";
 import loader from "../../../components/Loading";
-import Editor from "@tinymce/tinymce-vue";
 import datepicker from "vue2-datepicker";
 import moment from 'moment';
 import select from 'vue-select'
@@ -341,34 +363,12 @@ import select from 'vue-select'
 export default {
   components: {
     loader: loader,
-    editor: Editor,
     datepicker,
     "vue-select": select
   },
   name: "Add-Product",
   data() {
     return {
-      tinymce: {
-        key: "68xdyo8hz3oyr5p47zv3jyvj3h6xg0hc0khthuj123tnskcx",
-        init: {
-          entity_encoding: "raw",
-          height: 240,
-          menubar: true,
-          plugins: [
-            "advlist autolink lists link image charmap print preview anchor",
-            "searchreplace visualblocks code fullscreen",
-            "insertdatetime media table paste code help wordcount",
-          ],
-          toolbar:
-            "undo redo | bold italic backcolor | image| media |\
-           alignleft aligncenter alignright alignjustify | \
-           bullist numlist outdent indent | removeformat | help",
-          images_upload_url:
-            "/api/upload/upload_file?token=" +
-            localStorage.getItem("api_token"),
-          images_upload_base_path: "",
-        },
-      },
       loading: {
         text: "Đang tải dữ liệu...",
         processing: false,
@@ -454,9 +454,24 @@ export default {
       users_manager:[],
       tmp_owner_id:"",
       tmp_status:"",
+      phone:{
+        css_class: 'alert alert-success',
+        show: false,
+        title:'Đang thực hiện cuộc gọi đi',
+        status:0,
+        description:'',
+        show_input_note:false,
+        care_id:'',
+        note:''
+      },
+      sms:{
+        content:'',
+        show:false,
+      }
     };
   },
   created() {
+    this.$socket.emit('userConnected', localStorage.getItem("user_id"));
     u.g(`/api/user/get-users-manager`)
       .then(response => {
       this.users_manager = response.data
@@ -520,7 +535,6 @@ export default {
     },
     addCare(){
       this.care.care_date = document.getElementById('published_date').value
-      this.care.note = tinymce.get("input_tinymce").getContent();
       this.care.parent_id = this.parent.id
       let mess = "";
       let resp = true;
@@ -673,6 +687,89 @@ export default {
         })
         .catch((e) => {
         });
+    },
+    callPhone(){
+      this.loading.processing = true;
+      u.g(`/api/parents/make_to_call/${this.$route.params.id}`)
+      .then((response) => {
+        this.loading.processing = false;
+        this.phone.show = true
+        this.phone.status = 0
+        this.phone.show_input_note = false
+        this.phone.css_class= 'alert alert-success'
+        this.phone.title = "Đang thực hiện cuộc gọi đi ..."
+        this.phone.care_id = ''
+        this.phone.note=''
+      })
+      .catch((e) => {
+      });
+    },
+    getInfoCall(data){
+      if(data.parent_id == this.$route.params.id){
+        this.loading.processing = true;
+        u.g(`/api/care/get_info_call/${data.care_id}`)
+        .then((response) => {
+          this.loading.processing = false;
+          this.phone.show = true
+          this.phone.status = 1
+          this.phone.care_id = data.care_id
+          if(response.data.data_state == "ANSWERED"){
+            this.phone.show_input_note = true
+            this.phone.css_class= 'alert alert-success'
+            this.phone.title = "Kết thúc cuộc gọi - "+response.data.data_state
+          }else{
+            this.phone.css_class= 'alert alert-danger'
+            this.phone.title = "Kết thúc cuộc gọi - "+response.data.data_state
+          }
+          this.phone.description ='<p>Cuộc gọi: '+response.data.type+'</p>'+
+            '<p>Số điện thoại: '+response.data.phone+'</p>'+
+            '<p>Số máy nhánh: '+response.data.sip_id+'</p>'+
+            '<p>Thời gian bắt đầu: '+response.data.start_time+'</p>'+
+            '<p>Thời gian bắt đầu: '+response.data.end_time+'</p>'+
+            '<p>Thời gian: '+response.data.duration+'s</p>'+
+            '<p>Trạng thái: <strong>'+response.data.data_state+'</strong></p>';
+        })
+        .catch((e) => {
+        });
+      }
+    },
+    updateNotePhone(){
+      if(this.phone.note){
+        const data = {
+          care_id: this.phone.care_id,
+          note: this.phone.note,
+        };
+        this.loading.processing = true;
+          u.p(`/api/care/udpate_note`,data)
+          .then((response) => {
+            this.loading.processing = false;
+            this.phone.show = false;
+            this.loadCares(this.$route.params.id);
+          })
+          .catch((e) => {
+          });
+      }
+    },
+    showSendSms(){
+      this.sms.show =true
+      this.sms.content = ''
+    },
+    sendSms(){
+      if(this.sms.content){
+        const data = {
+          parent_id: this.$route.params.id,
+          content: this.sms.content,
+        };
+        this.loading.processing = true;
+        u.p(`/api/parents/send_sms`,data)
+        .then((response) => {
+          this.loading.processing = false;
+          this.sms.show = false;
+          this.loadCares(this.$route.params.id);
+        })
+        .catch((e) => {
+        });
+      }
     }
   },
   filters: {
@@ -685,7 +782,15 @@ export default {
       }
       return resp
     }
-  }
+  },
+  sockets: {
+    connect: function () {
+      console.log('socket to notification channel connected')
+    },
+    call_end: function (data) { 
+      this.getInfoCall(data)
+    },
+  },
 };
 </script>
 <style>

@@ -27,4 +27,15 @@ class ParentCareController extends Controller
             FROM cms_customer_care AS c WHERE parent_id=$parent_id ORDER BY c.care_date DESC");
         return response()->json($data);
     }
+    public function getInfoCall($care_id){
+        $data = u::first("SELECT c.id AS care_id,c.data_state,v.* 
+            FROM cms_customer_care AS c 
+                LEFT JOIN voip24h_data AS v ON v.id=c.data_id
+            WHERE c.id=$care_id");
+        return response()->json($data);
+    }
+    public function updateNoteCare(Request $request){
+        u::updateSimpleRow(array('note'=>$request->note),array('id'=>$request->care_id),'cms_customer_care');
+        return "ok";
+    }
 }

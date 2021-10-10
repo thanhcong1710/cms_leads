@@ -23,6 +23,7 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::post('single-sign-on', 'AuthController@singleSignOn');
     Route::get('switch-system', 'AuthController@switchSystem');
     Route::get('webhook/voip24h', 'VoipController@webhook');
+    Route::get('socket_io/test', 'VoipController@socketIo');
 
     Route::group(['middleware' => 'admin'], function ($router) {
         Route::resource('users', 'UsersController')->except( ['create', 'store'] );
@@ -83,6 +84,11 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::post('/parents/overwrite', 'ParentsController@overwrite');
         Route::get('/parents/show/{parent_id}', 'ParentsController@show');
         Route::get('/parents/get_logs/{parent_id}', 'ParentsController@getLogs');
+        Route::get('/parents/make_to_call/{parent_id}', 'ParentsController@makeToCall');
+        Route::get('parents/get_info_by_phone/{phone}', 'ParentsController@getInfoByPhone');
+        Route::post('/parents/send_sms', 'ParentsController@sendSms');
+        
+
         Route::get('/provinces', 'SystemInfoController@getAllProvices');
         Route::get('/provinces/{province_id}/districts', 'SystemInfoController@getDistrictsByProvice');
         Route::get('/jobs', 'SystemInfoController@getAllJobs');
@@ -92,6 +98,8 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('get/{province_id}/{district_id}/{school_level}/schools', 'SystemInfoController@getSchools');
         Route::post('/care/add', 'ParentCareController@add');
         Route::get('/care/get_all_data/{parent_id}', 'ParentCareController@getAllDataByParent');
+        Route::get('/care/get_info_call/{care_id}', 'ParentCareController@getInfoCall');
+        Route::post('/care/udpate_note', 'ParentCareController@updateNoteCare');
         Route::post('/students/add', 'StudentsController@add');
         Route::get('/students/get_all_data/{parent_id}', 'StudentsController@getAllDataByParent');
         Route::post('/imports/list', 'ImportsController@list');

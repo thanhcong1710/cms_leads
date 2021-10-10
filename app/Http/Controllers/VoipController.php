@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SocketIO;
 use App\Providers\UtilityServiceProvider as u;
-use PhpOffice\PhpSpreadsheet\Reader\Xlsx as x;
-
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Providers\CurlServiceProvider as curl;
 
 class VoipController extends Controller
 {
@@ -15,16 +15,88 @@ class VoipController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    public function __construct()
+    {
+        $this->baseUri = "35.187.235.207";
+        $this->voip24 = "http://dial.voip24h.vn/dial";
+        $this->voip24_key = "b73bdbac5f096b8964a071381887490772d144da";
+        $this->voip24_secret = "bfb144dca5c842ef428216f71ab90eef";
+    }
     public function webhook(Request $request)
     {
-        $request_json = json_decode(file_get_contents('php://input'), true);
-        $request_server = json_encode($request_json, true);
-        $created_at = date('Y-m-d H:i:s');
+        $data = json_decode(file_get_contents('php://input'), true);
         u::insertSimpleRow( array(
             'type'=>'webhook',
-            'response'=>$request_server,
-            'created_at'=>$created_at
+            'response'=>json_encode($data, true),
+            'created_at'=>date('Y-m-d H:i:s'),
         ),'voip24h_respose');
+        $obj = (object)$data;
+        if($obj->state == 'Cdr'){
+            $cdr = (object)$obj->cdr;
+            $data_id = u::insertSimpleRow( array(
+                'callid'=>$obj->callid,
+                'phone'=>$cdr->source,
+                'type'=>$obj->type,
+                'sip_id'=>$obj->extend,
+                'start_time'=>$cdr->starttime ? $cdr->starttime : NULL,
+                'answer_time'=>$cdr->answertime ? $cdr->answertime : NULL,
+                'end_time'=>$cdr->endtime ? $cdr->endtime : NULL,
+                'duration'=>$cdr->duration,
+                'disposition'=>$cdr->disposition,
+                'created_at'=>date('Y-m-d H:i:s'),
+            ),'voip24h_data');
+            $parent_info = u::first("SELECT id FROM cms_parents WHERE mobile_1='$cdr->source'");
+            $user_info = u::first("SELECT id FROM users WHERE sip_id='".(int)$obj->extend."'");
+            if($data_id && $parent_info && $user_info){
+                $care_id = u::insertSimpleRow( array(
+                    'parent_id'=>$parent_info->id,
+                    'note'=>'',
+                    'created_at'=>date('Y-m-d H:i:s'),
+                    'creator_id'=>$user_info->id,
+                    'method_id'=>1,
+                    'care_date'=>$cdr->starttime ? $cdr->starttime : NULL,
+                    'data_id'=>$data_id,
+                    'data_state'=>$cdr->disposition,
+                ),'cms_customer_care');
+                $this->socketIo($user_info->id,'call_end',array('care_id'=>$care_id,'parent_id'=>$parent_info->id));
+            }
+        }elseif($obj->state == 'Ring' && $obj->type=="inbound"){
+            $user_info = u::first("SELECT id FROM users WHERE sip_id='".(int)$obj->extend."'");
+            $parent_info = u::first("SELECT id FROM cms_parents WHERE mobile_1='$obj->phone'");
+            if($user_info && $parent_info){ 
+                $this->socketIo($user_info->id,'inbound',array('phone'=>$obj->phone));
+            }
+        }
+        
         return response()->json("ok");
+    }
+    public function makeToCall($phone,$sip=651)
+    {
+        $method = "GET";
+        $http_data = array(
+            'voip' => $this->voip24_key,
+            'secret' => $this->voip24_secret,
+            'sip' => $sip ? $sip : '651',
+            'phone' =>$phone
+        );
+        $url = sprintf('%s?%s',$this->voip24, http_build_query($http_data));
+        $res = curl::curl($url, $method);
+        u::logRequest($url,$method,[],[],$res,'log_request_outbound');
+        return "ok";
+    }
+    public function socketIo($user_id,$event,$data){
+
+        $arr=[
+            'user_id'=>$user_id,
+            'event'=>$event,
+            'data'=>$data
+        ];
+        
+        $socketio = new SocketIO();
+        if ($socketio->send($this->baseUri, 3000, 'pushData', json_encode($arr))){
+            echo 'we sent the message and disconnected';
+        } else {
+            echo 'Sorry, we have a mistake :\'(';
+        }
     }
 }

@@ -93,6 +93,12 @@ import axios from "axios";
           message: '',
         }
       },
+      sockets: {
+        connect: function () {
+          console.log('socket to notification channel connected')
+        },
+      },
+      created() {},
       methods: {
         goRegister(){
           this.$router.push({ path: 'register' });
@@ -105,9 +111,11 @@ import axios from "axios";
           }).then(function (response) {
             self.email = '';
             self.password = '';
+            localStorage.setItem("user_id", response.data.user_id);
             localStorage.setItem("api_token", response.data.access_token);
             localStorage.setItem('roles', response.data.roles);
             self.$router.push({ path: '/dashboard' });
+            self.$socket.emit('userConnected', response.data.user_id);
           })
           .catch(function (error) {
             self.message = 'Incorrect E-mail or password';
