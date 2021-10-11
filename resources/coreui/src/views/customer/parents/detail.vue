@@ -85,7 +85,10 @@
                       <div v-html="phone.description"></div>
                       <div v-if="phone.show_input_note">
                         <textarea class="form-control" v-model="phone.note" placeholder="Thêm ghi chú cuộc gọi"></textarea>
-                        <div style="margin-top:5px;text-align:right"><button class="btn btn-success" @click="updateNotePhone"> <i class="fa fa-save"></i> Lưu</button></div>
+                        <div style="margin-top:5px;text-align:right">
+                          <button class="btn btn-success" @click="updateNotePhone"> <i class="fa fa-save"></i> Lưu</button>
+                          <button class="btn btn-secondary" @click="phone.show=false"> <i class="fa fa-times"></i> Đóng</button>
+                        </div>
                       </div>
                       <div v-else>
                          <div style="margin-top:5px;text-align:right"><button class="btn btn-secondary" @click="phone.show=false"> <i class="fa fa-times"></i> Đóng</button></div>
@@ -124,7 +127,7 @@
                             <td>{{ item.care_date }}</td>
                             <td>{{ item.creator_name }}</td>
                             <td>{{ item.method_name }}</td>
-                            <td>{{ item.data_state }}</td>
+                            <td>{{ genStateCall(item.data_state) }}</td>
                             <td v-html="item.note"></td>
                           </tr>
                         </tbody>
@@ -717,10 +720,10 @@ export default {
           if(response.data.data_state == "ANSWERED"){
             this.phone.show_input_note = true
             this.phone.css_class= 'alert alert-success'
-            this.phone.title = "Kết thúc cuộc gọi - "+response.data.data_state
+            this.phone.title = "Kết thúc cuộc gọi - "+this.genStateCall(response.data.data_state)
           }else{
             this.phone.css_class= 'alert alert-danger'
-            this.phone.title = "Kết thúc cuộc gọi - "+response.data.data_state
+            this.phone.title = "Kết thúc cuộc gọi - "+this.genStateCall(response.data.data_state)
           }
           this.phone.description ='<p>Cuộc gọi: '+response.data.type+'</p>'+
             '<p>Số điện thoại: '+response.data.phone+'</p>'+
@@ -728,7 +731,7 @@ export default {
             '<p>Thời gian bắt đầu: '+response.data.start_time+'</p>'+
             '<p>Thời gian bắt đầu: '+response.data.end_time+'</p>'+
             '<p>Thời gian: '+response.data.duration+'s</p>'+
-            '<p>Trạng thái: <strong>'+response.data.data_state+'</strong></p>';
+            '<p>Trạng thái: <strong>'+this.genStateCall(response.data.data_state)+'</strong></p>';
         })
         .catch((e) => {
         });
@@ -771,6 +774,24 @@ export default {
         .catch((e) => {
         });
       }
+    },
+    genStateCall(text){
+      let resp = ''
+      switch (text) {
+        case 'ANSWERED':
+          resp = 'Đã nghe máy'
+          break
+        case 'BUSY':
+          resp = 'Máy bận'
+          break
+        case 'NO ANSWER':
+          resp = 'Không nghe máy'
+          break
+        default:
+          resp = ''
+          break
+      }
+      return resp
     }
   },
   filters: {

@@ -33,16 +33,28 @@ class VoipController extends Controller
         $obj = (object)$data;
         if($obj->state == 'Cdr'){
             $cdr = (object)$obj->cdr;
+            if($obj->type =="inbound"){
+                $phone = $cdr->source;
+                $disposition = $cdr->disposition;
+            }else{
+                $phone = $obj->phone;
+                if($cdr->disposition=='ANSWERED' && $obj->phone != $cdr->destination){
+                    $disposition = 'NO ANSWER';
+                }else{
+                    $disposition = $cdr->disposition;
+                }
+            }
+            
             $data_id = u::insertSimpleRow( array(
                 'callid'=>$obj->callid,
-                'phone'=>$cdr->source,
+                'phone'=>$phone,
                 'type'=>$obj->type,
                 'sip_id'=>$obj->extend,
                 'start_time'=>$cdr->starttime ? $cdr->starttime : NULL,
                 'answer_time'=>$cdr->answertime ? $cdr->answertime : NULL,
                 'end_time'=>$cdr->endtime ? $cdr->endtime : NULL,
                 'duration'=>$cdr->duration,
-                'disposition'=>$cdr->disposition,
+                'disposition'=>$disposition,
                 'created_at'=>date('Y-m-d H:i:s'),
             ),'voip24h_data');
             $parent_info = u::first("SELECT id FROM cms_parents WHERE mobile_1='$cdr->source'");
@@ -56,7 +68,7 @@ class VoipController extends Controller
                     'method_id'=>1,
                     'care_date'=>$cdr->starttime ? $cdr->starttime : NULL,
                     'data_id'=>$data_id,
-                    'data_state'=>$cdr->disposition,
+                    'data_state'=>$disposition,
                 ),'cms_customer_care');
                 $this->socketIo($user_info->id,'call_end',array('care_id'=>$care_id,'parent_id'=>$parent_info->id));
             }
