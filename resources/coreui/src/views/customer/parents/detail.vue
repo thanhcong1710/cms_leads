@@ -713,6 +713,7 @@ export default {
           this.phone.show = true
           this.phone.status = 1
           this.phone.care_id = data.care_id
+          this.phone.note=''
           if(response.data.data_state == "ANSWERED"){
             this.phone.show_input_note = true
             this.phone.css_class= 'alert alert-success'
