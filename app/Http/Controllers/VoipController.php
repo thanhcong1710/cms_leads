@@ -28,6 +28,8 @@ class VoipController extends Controller
         u::insertSimpleRow( array(
             'type'=>'webhook',
             'response'=>json_encode($data, true),
+            'callid'=>$data['callid'],
+            'state'=>$data['state'],
             'created_at'=>date('Y-m-d H:i:s'),
         ),'voip24h_respose');
         $obj = (object)$data;
@@ -38,8 +40,9 @@ class VoipController extends Controller
                 $disposition = $cdr->disposition;
             }else{
                 $phone = $obj->phone;
-                if($cdr->disposition=='ANSWERED' && $obj->phone != $cdr->destination){
-                    $disposition = 'NO ANSWER';
+                if($cdr->disposition=='ANSWERED'){
+                    $check_info = u::first("SELECT count(id) AS total FROM voip24h_respose WHERE callid= '$obj->callid' AND state='Up'");
+                    $disposition = $check_info->total>0 ? 'ANSWERED' :'NO ANSWER';
                 }else{
                     $disposition = $cdr->disposition;
                 }

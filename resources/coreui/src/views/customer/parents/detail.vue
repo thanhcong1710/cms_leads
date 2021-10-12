@@ -81,20 +81,14 @@
                   <div :class="phone.css_class" role="alert" v-if="phone.show">
                     <h5 class="alert-heading"> <i class="fa fa-phone" style="margin-right:10px"></i> {{phone.title}}</h5>
                     <hr>
-                    <div v-if="phone.status==1">
-                      <div v-html="phone.description"></div>
-                      <div v-if="phone.show_input_note">
-                        <textarea class="form-control" v-model="phone.note" placeholder="Thêm ghi chú cuộc gọi"></textarea>
-                        <div style="margin-top:5px;text-align:right">
-                          <button class="btn btn-success" @click="updateNotePhone"> <i class="fa fa-save"></i> Lưu</button>
-                          <button class="btn btn-secondary" @click="phone.show=false"> <i class="fa fa-times"></i> Đóng</button>
-                        </div>
-                      </div>
-                      <div v-else>
-                         <div style="margin-top:5px;text-align:right"><button class="btn btn-secondary" @click="phone.show=false"> <i class="fa fa-times"></i> Đóng</button></div>
+                    <div v-html="phone.description"></div>
+                    <div>
+                      <textarea class="form-control" v-model="phone.note" placeholder="Thêm ghi chú cuộc gọi"></textarea>
+                      <div style="margin-top:5px;text-align:right" v-if="phone.show_input_note">
+                        <button class="btn btn-success" @click="updateNotePhone"> <i class="fa fa-save"></i> Lưu</button>
+                        <button class="btn btn-secondary" @click="phone.show=false"> <i class="fa fa-times"></i> Đóng</button>
                       </div>
                     </div>
-                    <div v-else><p>Nhập thông tin ghi chú sau khi cuộc kết thúc!</p></div>
                   </div>
                   <ul class="nav nav-tabs nav-justified">
                     <li class="nav-item">
@@ -718,13 +712,13 @@ export default {
           this.phone.care_id = data.care_id
           this.phone.note=''
           if(response.data.data_state == "ANSWERED"){
-            this.phone.show_input_note = true
             this.phone.css_class= 'alert alert-success'
             this.phone.title = "Kết thúc cuộc gọi - "+this.genStateCall(response.data.data_state)
           }else{
             this.phone.css_class= 'alert alert-danger'
             this.phone.title = "Kết thúc cuộc gọi - "+this.genStateCall(response.data.data_state)
           }
+          this.phone.show_input_note = true
           this.phone.description ='<p>Cuộc gọi: '+response.data.type+'</p>'+
             '<p>Số điện thoại: '+response.data.phone+'</p>'+
             '<p>Số máy nhánh: '+response.data.sip_id+'</p>'+
