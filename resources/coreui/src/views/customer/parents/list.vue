@@ -38,6 +38,19 @@
                   <option :value ="item.id" v-for="(item, index) in users_manager" :key="index">{{item.name}} - {{item.hrm_id}}</option>
                 </select></p>  
               </div>
+              <div class="form-group col-sm-3">
+                <label for="ccmonth">Lịch chăm sóc tiếp theo</label>
+                  <date-picker
+                    style="width:100%;"
+                    v-model="searchData.dateRange"
+                    :clearable="true"
+                    :lang="datepickerOptions.lang"
+                    range
+                    format="YYYY-MM-DD"
+                    id="apax-date-range"
+                    placeholder="Chọn thời gian tìm kiếm từ ngày đến ngày"
+                  ></date-picker>
+              </div>
               <div class="form-group col-sm-12">
                 <router-link class="btn btn-success" :to="'/parents/add'">
                   <i class="fa fa-plus"></i> Thêm mới
@@ -64,6 +77,7 @@
                   <th>Nguồn</th>
                   <th>Người phụ trách</th>
                   <th>Lần cuối liên hệ</th>
+                  <th>Lịch chăm sóc</th>
                   <th>Trạng thái</th>
                   <th>Thao tác</th>
                 </tr>
@@ -79,6 +93,7 @@
                   <td>{{ item.source_name }}</td>
                   <td>{{ item.owner_name }}</td>
                   <td>{{ item.last_care }}</td>
+                  <td>{{ item.next_care_date }}</td>
                   <td>{{ item.status | getStatusName }}</td>
                   <td>
                     <router-link
@@ -148,15 +163,39 @@ import axios from "axios";
 import paging from "../../../components/Pagination";
 import u from "../../../utilities/utility";
 import loader from "../../../components/Loading";
+import DatePicker from "vue2-datepicker";
 
 export default {
   components: {
+    DatePicker,
     loader: loader,
     paging: paging,
   },
   name: "List-Parent",
   data() {
     return {
+      datepickerOptions: {
+        closed: true,
+        value: "",
+        minDate: "",
+        lang: {
+          days: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+          months: [
+            "Tháng 1",
+            "Tháng 2",
+            "Tháng 3",
+            "Tháng 4",
+            "Tháng 5",
+            "Tháng 6",
+            "Tháng 7",
+            "Tháng 8",
+            "Tháng 9",
+            "Tháng 10",
+            "Tháng 11",
+            "Tháng 12"
+          ]
+        }
+      },
       loading: {
         text: "Đang tải dữ liệu...",
         processing: false,
@@ -165,7 +204,8 @@ export default {
         keyword: "",
         status: "",
         owner_id: "",
-        pagination: this.pagination
+        pagination: this.pagination,
+        dateRange: "",
       },
       users_manager:[],
       parents: [],
@@ -205,10 +245,14 @@ export default {
       location.reload();
     },
     search(a) {
+      const startDate = this.searchData.dateRange!='' && this.searchData.dateRange[0] ?`${u.dateToString(this.searchData.dateRange[0])}`:''
+      const endDate = this.searchData.dateRange!='' && this.searchData.dateRange[1] ?`${u.dateToString(this.searchData.dateRange[1])}`:''
       const data = {
         keyword: this.searchData.keyword,
         status: this.searchData.status,
         owner_id: this.searchData.owner_id,
+        start_date:startDate,
+        end_date:endDate
       };
       const link = "/api/parents/list";
 

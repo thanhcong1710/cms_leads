@@ -185,7 +185,15 @@ const is = {
   has: (obj, key) => typeof obj === 'object' && !Array.isArray(obj) ? Object.hasOwnProperty.call(obj, key) : false,
   for: obj => Object.keys(obj)
 }
+
+function dateToString (date) {
+  const mm = date.getMonth() + 1
+  const dd = date.getDate()
+  const yyyy = date.getFullYear()
+  return [yyyy, (mm > 9 ? '' : '0') + mm, (dd > 9 ? '' : '0') + dd].join('-')
+}
 export default {
+  dateToString,
   processAuthen,
   shuffle,
   vld,

@@ -146,6 +146,12 @@ export default {
         this.$i18n.locale = this.language;
         fetch(`api/language/${this.language}?token=` + localStorage.getItem("api_token"));
     },
+    changeModalInbound(data){
+      if(this.modal_inbound.show = true){
+        this.modal_inbound.title = "CUỘC GỌI NHỠ TỪ KHÁCH HÀNG"
+        this.modal_inbound.color = "danger"
+      }
+    },
     showModalInbound(data){
       u.g(`/api/parents/get_info_by_phone/${data.phone}`)
         .then((response) => {
@@ -165,6 +171,9 @@ export default {
   sockets: {
     inbound: function (data) { 
       this.showModalInbound(data)
+    },
+    call_end: function (data) { 
+      this.changeModalInbound(data)
     },
   },
 }

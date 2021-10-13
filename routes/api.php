@@ -87,7 +87,7 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('/parents/make_to_call/{parent_id}', 'ParentsController@makeToCall');
         Route::get('parents/get_info_by_phone/{phone}', 'ParentsController@getInfoByPhone');
         Route::post('/parents/send_sms', 'ParentsController@sendSms');
-        
+        Route::post('/parents/update_next_care_date', 'ParentsController@updateNextCareDate');
 
         Route::get('/provinces', 'SystemInfoController@getAllProvices');
         Route::get('/provinces/{province_id}/districts', 'SystemInfoController@getDistrictsByProvice');

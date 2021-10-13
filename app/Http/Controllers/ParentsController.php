@@ -20,6 +20,8 @@ class ParentsController extends Controller
         $status = isset($request->status) ? $request->status : '';
         $keyword = isset($request->keyword) ? $request->keyword : '';
         $owner_id = isset($request->owner_id) ? $request->owner_id : '';
+        $end_date = isset($request->end_date) ? $request->end_date : '';
+        $start_date = isset($request->start_date) ? $request->start_date : '';
 
         $pagination = (object)$request->pagination;
         $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
@@ -38,6 +40,12 @@ class ParentsController extends Controller
         }
         if ($owner_id !== '') {
             $cond .= " AND p.owner_id=$owner_id";
+        }
+        if ($end_date !== '') {
+            $cond .= " AND p.next_care_date < '$end_date 23:59:59' AND p.next_care_date IS NOT NULL";
+        }
+        if ($start_date !== '') {
+            $cond .= " AND p.next_care_date > '$start_date 00:00:00'";
         }
         $total = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond ");
         $list = u::query("SELECT p.*, (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
@@ -122,6 +130,7 @@ class ParentsController extends Controller
                 (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id) AS num_care,
                 (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_care
             FROM cms_parents AS p WHERE id=$parent_id");
+        $data->next_care_date =  $data->next_care_date ? date("Y-m-d\TH:i", strtotime($data->next_care_date)): $data->next_care_date;
         return response()->json($data);
     }
     public function delete($parent_id)
@@ -206,6 +215,14 @@ class ParentsController extends Controller
             $sms = new Sms();
             $sms->sendSms($parent_info->mobile_1,$request->content,$request->user()->id);
         }
+        return "ok";
+    }
+    public function updateNextCareDate(Request $request){
+        $data=u::updateSimpleRow(array(
+            'updated_at' => date('Y-m-d H:i:s'),
+            'updator_id' => $request->user()->id,
+            'next_care_date'=>date('Y-m-d H:i:s',strtotime($request->next_care_date)),
+        ), array('id' => $request->parent_id), 'cms_parents');
         return "ok";
     }
 }

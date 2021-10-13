@@ -8,7 +8,7 @@
             <div class="row">
               <div class="col-sm-5 border-right">
                   <div style="float: left; width: 90px;">
-                    <img class="c-avatar-img" src="img/avatars/1.jpg" >
+                    <img class="c-avatar-img" src="img/avatars/avatar.png" >
                   </div>
                   <div style="float: left; padding: 10px;">
                     <h5 style="margin-bottom:0px">{{parent.name}} </h5>
@@ -55,6 +55,9 @@
           <div class="card-body">
               <div class="row">
                 <div class="col-sm-3 border-right" >
+                  <p><i class="fa fa-calendar"></i> <strong> Lịch chăm sóc tiếp theo</strong></p>
+                  <p><input class="form-control" type="datetime-local" :value="parent.next_care_date" id="next_care_date" @change="updateNextCareDate"></p>
+                  <br>
                   <p><i class="fa fa-info-circle"></i> <strong>Thông tin khách hàng</strong></p>
                   <p>Họ tên: <span class="fl-right">{{parent.name}}</span></p>
                   <p>SĐT: <span class="fl-right">{{parent.mobile_1}}</span></p>
@@ -67,6 +70,12 @@
                   <p>Nguồn: <span class="fl-right">{{parent.source_name}}</span></p>
                   <p>Ngày tạo: <span class="fl-right">{{parent.created_at}}</span></p>
                   <p>Người tạo: <span class="fl-right">{{parent.creator_name}}</span></p>
+                  <br>
+                  <p><i class="fa fa-info-circle"></i> <strong>Thông tin học sinh</strong></p>
+                  <div v-for="(item, index) in students" :key="index">
+                    <p>Họ tên: <span class="fl-right">{{ item.name}}</span></p>
+                    <p>Ngày sinh: <span class="fl-right">{{ item.birthday}}</span></p>
+                  </div>
                 </div>
                 <div class="col-sm-9">
                   <div class="alert alert-secondary" role="alert" v-if="sms.show">
@@ -106,26 +115,28 @@
                       <div class="padding-bottom-10">
                         <button class="btn btn-success" @click="showModalCare"><i class="fa fa-plus"></i> Thêm mới</button>
                       </div>
+                      <div>
                       <table class="table table-striped table-hover">
                         <thead>
                           <tr>
-                            <th>Thời gian</th>
-                            <th>Người chăm sóc</th>
-                            <th>Phương thức</th>
-                            <th>Trạng thái</th>
-                            <th>Chi tiết</th>
+                            <th width="10%">Thời gian</th>
+                            <th width="10%">Phụ trách</th>
+                            <th width="10%">Phương thức</th>
+                            <th width="10%">Trạng thái</th>
+                            <th width="25%">Chi tiết</th>
                           </tr>
                         </thead>
                         <tbody>
                           <tr v-for="(item, index) in cares" :key="index">
-                            <td>{{ item.care_date }}</td>
-                            <td>{{ item.creator_name }}</td>
-                            <td>{{ item.method_name }}</td>
-                            <td>{{ genStateCall(item.data_state) }}</td>
-                            <td v-html="item.note"></td>
+                            <td width="10%">{{ item.care_date }}</td>
+                            <td width="10%">{{ item.creator_name }}</td>
+                            <td width="10%">{{ item.method_name}}{{item.type_call?" - "+item.type_call:''}}</td>
+                            <td width="10%">{{ genStateCall(item.data_state) }}</td>
+                            <td width="25%" v-html="item.note"></td>
                           </tr>
                         </tbody>
                       </table>
+                      </div>
                     </div>
                     <div class="tab-pane fade" :class="{ 'active show': isActive('students') }" id="students">
                       <div class="padding-bottom-10">
@@ -426,7 +437,8 @@ export default {
         job:"",
         province:"",
         district:"",
-        address:""
+        address:"",
+        next_care_date:"",
       },
       activeItem: 'customer_care',
       methods:[],
@@ -478,6 +490,7 @@ export default {
       this.methods = response.data
     })
     this.loadCares(this.$route.params.id);
+    this.loadStudents(this.$route.params.id)
     this.loadDetail();
   },
   methods: {
@@ -710,7 +723,6 @@ export default {
           this.phone.show = true
           this.phone.status = 1
           this.phone.care_id = data.care_id
-          this.phone.note=''
           if(response.data.data_state == "ANSWERED"){
             this.phone.css_class= 'alert alert-success'
             this.phone.title = "Kết thúc cuộc gọi - "+this.genStateCall(response.data.data_state)
@@ -786,6 +798,19 @@ export default {
           break
       }
       return resp
+    },
+    updateNextCareDate(){
+        const data = {
+          parent_id: this.$route.params.id,
+          next_care_date: document.getElementById('next_care_date').value
+        };
+        this.loading.processing = true;
+        u.p(`/api/parents/update_next_care_date`,data)
+        .then((response) => {
+          this.loadDetail();
+        })
+        .catch((e) => {
+        });
     }
   },
   filters: {
@@ -809,7 +834,7 @@ export default {
   },
 };
 </script>
-<style>
+<style scoped>
 p{
   margin-bottom: 3px;
 }
@@ -821,5 +846,18 @@ p{
 }
 .padding-bottom-10{
   padding-bottom: 10px; 
+}
+tbody {
+    display:block;
+    height:500px;
+    overflow:auto;
+}
+thead, tbody tr {
+    display:table;
+    width:100%;
+    table-layout:fixed;
+}
+thead {
+    width: calc( 100% - 1em )
 }
 </style>
