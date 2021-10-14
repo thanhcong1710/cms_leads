@@ -147,7 +147,7 @@ export default {
         fetch(`api/language/${this.language}?token=` + localStorage.getItem("api_token"));
     },
     changeModalInbound(data){
-      if(this.modal_inbound.show = true){
+      if(this.modal_inbound.show == true){
         this.modal_inbound.title = "CUỘC GỌI NHỠ TỪ KHÁCH HÀNG"
         this.modal_inbound.color = "danger"
       }
