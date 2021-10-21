@@ -34,12 +34,13 @@
                 <p> 
                   <select class="form-control" @change="showModalChangeStatus" v-model="tmp_status" >
                     <option value="1">Data</option>
-                    <option value="2">Enquiry</option>
-                    <option value="3">S1</option>
-                    <option value="4">S2</option>
-                    <option value="5">Checkin</option>
-                    <option value="6">New</option>
-                    <option value="7">Renew</option>
+                    <option value="2">Khai thác</option>
+                    <option value="3">Đồng ý đặt lịch</option>
+                    <option value="4">Checkin</option>
+                    <option value="5">Đăng ký mua</option>
+                    <option value="6">Tái tục</option>
+                    <option value="7">Không tiềm năng</option>
+                    <option value="8">Black list</option>
                   </select>
                 </p>  
               </div>

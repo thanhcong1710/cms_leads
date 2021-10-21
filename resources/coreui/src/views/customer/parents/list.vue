@@ -21,14 +21,14 @@
               <div class="form-group col-sm-3">
                 <label for="ccmonth">Trạng thái</label>
                 <select class="form-control" v-model="searchData.status">
-                  <option value>Chọn trạng thái</option>
                   <option value="1">Data</option>
-                  <option value="2">Enquiry</option>
-                  <option value="3">S1</option>
-                  <option value="4">S2</option>
-                  <option value="5">Checkin</option>
-                  <option value="6">New</option>
-                  <option value="7">Renew</option>
+                  <option value="2">Khai thác</option>
+                  <option value="3">Đồng ý đặt lịch</option>
+                  <option value="4">Checkin</option>
+                  <option value="5">Đăng ký mua</option>
+                  <option value="6">Tái tục</option>
+                  <option value="7">Không tiềm năng</option>
+                  <option value="8">Black list</option>
                 </select>
               </div>
               <div class="form-group col-sm-3">
@@ -309,22 +309,25 @@ export default {
               resp = 'Data'
               break
           case 2:
-              resp = 'Enquiry'
+              resp = 'Khai thác'
               break
           case 3:
-              resp = 'S1'
+              resp = 'Đồng ý đặt lịch'
               break
           case 4:
-              resp = 'S2'
-              break
-          case 5:
               resp = 'Checkin'
               break
+          case 5:
+              resp = 'Đăng ký mua'
+              break
           case 6:
-              resp = 'Enroll'
+              resp = 'Tái tục'
               break
           case 7:
-              resp = 'Renew'
+              resp = 'Không tiềm năng'
+              break
+          case 8:
+              resp = 'Black list'
               break
           default:
               resp = 'Data'

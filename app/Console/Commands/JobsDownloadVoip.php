@@ -1,0 +1,53 @@
+<?php
+
+namespace App\Console\Commands;
+
+use App\Http\Controllers\VoipController;
+use App\Models\Sms;
+use Illuminate\Console\Command;
+use App\Providers\UtilityServiceProvider as u;
+use Illuminate\Http\Request;
+
+class JobsDownloadVoip extends Command
+{
+    /**
+     * The name and signature of the console command.
+     *
+     * @var string
+     */
+    protected $signature = 'jobsDownloadVoip:command';
+
+    /**
+     * The console command description.
+     *
+     * @var string
+     */
+    protected $description = 'jobsDownloadVoip';
+
+    /**
+     * Create a new command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        parent::__construct();
+    }
+
+    /**
+     * Execute the console command.
+     *
+     * @return mixed
+     */
+    public function handle(Request $request)
+    {
+        $list_call = u::query("SELECT * FROM voip24h_data WHERE process_data = 0 ORDER BY id DESC");
+        foreach($list_call AS $row){
+            $voipControll = new VoipController();
+            $response = $voipControll->getDataCallId($row->clallid);
+            u::updateSimpleRow(array(),array('callid'=>$row->callid),'voip24h_data');
+        }
+        return "ok";
+    }
+    
+}

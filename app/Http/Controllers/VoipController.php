@@ -114,4 +114,16 @@ class VoipController extends Controller
             echo 'Sorry, we have a mistake :\'(';
         }
     }
+    public function getDataCallId($callid){
+        $method = "GET";
+        $http_data = array(
+            'voip' => $this->voip24_key,
+            'secret' => $this->voip24_secret,
+            'callid' => $callid,
+        );
+        $url = sprintf('%s?%s',$this->voip24, http_build_query($http_data));
+        $res = curl::curl($url, $method);
+        u::logRequest($url,$method,[],[],$res,'log_request_outbound');
+        return $res;
+    }
 }
