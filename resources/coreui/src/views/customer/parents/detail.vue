@@ -133,7 +133,14 @@
                             <td width="10%">{{ item.creator_name }}</td>
                             <td width="10%">{{ item.method_name}}{{item.type_call?" - "+item.type_call:''}}</td>
                             <td width="10%">{{ genStateCall(item.data_state) }}</td>
-                            <td width="25%" v-html="item.note"></td>
+                            <td width="25%">
+                              <p v-if="item.link_record">
+                                <audio controls style="height: 40px; width: 256px; border: 1px solid #ccc;">
+                                  <source :src="item.link_record" type="audio/x-wav">
+                                </audio>
+                              </p>
+                              <p v-html="item.note"></p>
+                            </td>
                           </tr>
                         </tbody>
                       </table>

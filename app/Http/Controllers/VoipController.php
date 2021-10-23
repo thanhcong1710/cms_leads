@@ -121,7 +121,7 @@ class VoipController extends Controller
             'secret' => $this->voip24_secret,
             'callid' => $callid,
         );
-        $url = sprintf('%s?%s',$this->voip24, http_build_query($http_data));
+        $url = sprintf('%s?%s',$this->voip24."/searching", http_build_query($http_data));
         $res = curl::curl($url, $method);
         u::logRequest($url,$method,[],[],$res,'log_request_outbound');
         return $res;
