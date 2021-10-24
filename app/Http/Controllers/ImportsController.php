@@ -78,6 +78,7 @@ class ImportsController extends Controller
         ),'cms_imports');
         $this->addItemDataImport($dataXslx,$import_id,(int)$request->user()->id);
         $this->processCheckDuplicateData($import_id);
+        u::query("UPDATE cms_import_parents AS p LEFT JOIN users AS u ON u.hrm_id=p.owner_hrm SET p.owner_id=u.id WHERE p.import_id =$import_id");
         $data = u::query("SELECT * FROM cms_import_parents WHERE import_id =$import_id");
         $total_error = u::first("SELECT count(id) AS total FROM cms_import_parents WHERE import_id =$import_id AND status IN (2,3,4)");
         $total_validate = u::first("SELECT count(id) AS total FROM cms_import_parents WHERE import_id =$import_id AND status IN (1)");
@@ -94,7 +95,7 @@ class ImportsController extends Controller
     public function addItemDataImport($list,$import_id,$creator_id) {
         if ($list) {
             $created_at = date('Y-m-d H:i:s');
-            $query = "INSERT INTO cms_import_parents (import_id,`name`,email,gud_mobile1,`address`,note,created_at,creator_id,`status`,error_message) VALUES ";
+            $query = "INSERT INTO cms_import_parents (import_id,`name`,email,gud_mobile1,`address`,note,created_at,creator_id,`status`,error_message,student_name_1,student_name_2,student_birthday_1,student_birthday_2,owner_hrm) VALUES ";
             if (count($list) > 10000) {
                 for($i = 0; $i < 10000; $i++) {
                     $item = $this->convertData($list[$i]);
@@ -102,7 +103,7 @@ class ImportsController extends Controller
                     $status = $validate->has_error ? 2 : 1;
                     $error_message = $validate->message;
                     $gud_mobile1 = $item->gud_mobile1 ? $item->gud_mobile1 : $list[$i][1];
-                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message'),";
+                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message','$item->student_name_1','$item->student_name_2',".($item->student_birthday_1 ? "'$item->student_birthday_1'":"NULL").",".($item->student_birthday_2 ? "'$item->student_birthday_2'":"NULL").",'$item->owner_hrm'),";
                     
                 }
                 $query = substr($query, 0, -1);
@@ -115,7 +116,7 @@ class ImportsController extends Controller
                     $status = $validate->has_error ? 2 : 1;
                     $error_message = $validate->message;
                     $gud_mobile1 = $item->gud_mobile1 ? $item->gud_mobile1 : $list[$i][1];
-                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message'),";
+                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message','$item->student_name_1','$item->student_name_2',".($item->student_birthday_1 ? "'$item->student_birthday_1'":"NULL").",".($item->student_birthday_2 ? "'$item->student_birthday_2'":"NULL").",'$item->owner_hrm'),";
                 }
                 $query = substr($query, 0, -1);
                 u::query($query);
@@ -123,12 +124,27 @@ class ImportsController extends Controller
         }
     }
     public function convertData($data){
+        if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$data[7])) {
+            $student_birthday_1 = $data[7];
+        } else {
+            $student_birthday_1 = NULL;
+        }
+        if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$data[9])) {
+            $student_birthday_2 = $data[9];
+        } else {
+            $student_birthday_2 = NULL;
+        }
         $result = (object)array(
             'name'=>$data[0],
             'gud_mobile1'=> u::phoneNew($data[1]),
             'email'=>$data[2],
             'address'=>$data[3],
             'note'=>$data[4],
+            'owner_hrm'=>$data[5],
+            'student_name_1'=>$data[6],
+            'student_birthday_1'=>$student_birthday_1,
+            'student_name_2'=>$data[8],
+            'student_birthday_2'=>$student_birthday_2,
         );
         return $result;
     }
@@ -162,7 +178,7 @@ class ImportsController extends Controller
         }
         // check duplicate cms_parents
         $list = u::query("SELECT p.id, u.name, u.hrm_id,u.branch_name FROM cms_import_parents AS p 
-                LEFT JOIN cms_parents AS ps ON ps.mobile_1=p.gud_mobile1
+                LEFT JOIN cms_parents AS ps ON (ps.mobile_1=p.gud_mobile1 OR ps.mobile_2=p.gud_mobile1)
                 LEFT JOIN users AS u ON ps.owner_id = u.id
             WHERE p.import_id = $import_id AND ps.id IS NOT NULL");
         if(!empty($list)){
@@ -183,6 +199,7 @@ class ImportsController extends Controller
         $this->addItemDataParent($list_data,$arr_owner,$source_id,$request->user()->id);
         u::query("UPDATE cms_import_parents SET status=6 WHERE import_id=$import_id AND status=1");
         u::query("UPDATE cms_imports SET status=1 WHERE id=$import_id ");
+        u::query("UPDATE cms_students AS s LEFT JOIN cms_parents AS p ON s.gud_mobile_1 =p.mobile_1 SET s.parent_id=p.id WHERE s.parent_id IS NULL ");
         $data = u::first("SELECT (SELECT count(id) FROM cms_import_parents WHERE import_id=$import_id AND status=6) AS total_success,
             (SELECT count(id) FROM cms_import_parents WHERE import_id=$import_id AND status!=6) AS total_error");
         return response()->json($data);
@@ -191,24 +208,53 @@ class ImportsController extends Controller
         if ($list) {
             $created_at = date('Y-m-d H:i:s');
             $query = "INSERT INTO cms_parents (`name`,email,mobile_1,`address`,note,created_at,creator_id,`status`,source_id,owner_id) VALUES ";
+            $query_student = "INSERT INTO cms_students (`name`,`birthday`,created_at,creator_id,gud_mobile_1) VALUES ";
+            $check_import_student =0;
             if (count($list) > 10000) {
                 for($i = 0; $i < 10000; $i++) {
                     $item = (object)$list[$i];
-                    $owner_id = $arr_owner[$i%count($arr_owner)];
+                    $owner_id = $item->owner_id? $item->owner_id : $arr_owner[$i%count($arr_owner)];
                     $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$owner_id'),";
+                    if($item->student_name_1){
+                        $check_import_student =1;
+                        $student_birthday_1 = $item->student_birthday_1 ? "'".$item->student_birthday_1."'" :NULL;
+                        $query_student.= "('$item->student_name_1',$student_birthday_1,'$created_at','$creator_id','$item->gud_mobile1'),";
+                    }
+                    if($item->student_name_2){
+                        $check_import_student =1;
+                        $student_birthday_2 = $item->student_birthday_2 ? "'".$item->student_birthday_2."'" :NULL;
+                        $query_student.= "('$item->student_name_2',$student_birthday_2,'$created_at','$creator_id','$item->gud_mobile1'),";
+                    }
                     
                 }
                 $query = substr($query, 0, -1);
                 u::query($query);
+                if($check_import_student){
+                    $query_student = substr($query_student, 0, -1);
+                    u::query($query_student);
+                }
                 $this->addItemDataImport(array_slice($list, 10000),$arr_owner,$source_id,$creator_id);
             } else {
                 foreach($list as $i=>$item) {
                     $item = (object)$item;
-                    $owner_id = $arr_owner[$i%count($arr_owner)];
+                    $owner_id = $item->owner_id? $item->owner_id : $arr_owner[$i%count($arr_owner)];
                     $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$owner_id'),";
+                    if($item->student_name_1){
+                        $check_import_student =1;
+                        $query_student.= "('$item->student_name_1',".($item->student_birthday_1 ? "'$item->student_birthday_1'":"NULL").",'$created_at','$creator_id','$item->gud_mobile1'),";
+                    }
+                    if($item->student_name_2){
+                        $check_import_student =1;
+                        $student_birthday_2 = $item->student_birthday_2 ? "'".$item->student_birthday_2."'" :NULL;
+                        $query_student.= "('$item->student_name_2',".($item->student_birthday_2 ? "'$item->student_birthday_2'":"NULL").",'$created_at','$creator_id','$item->gud_mobile1'),";
+                    }
                 }
                 $query = substr($query, 0, -1);
                 u::query($query);
+                if($check_import_student){
+                    $query_student = substr($query_student, 0, -1);
+                    u::query($query_student);
+                }
             }
         }
     }

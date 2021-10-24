@@ -39,6 +39,16 @@
                       />
                     </div>
                     <div class="form-group col-sm-6">
+                      <label for="nf-email" >Điện thoại 2</label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        name="title"
+                        v-model="parent.mobile_2"
+                        @change="validatePhone2"
+                      />
+                    </div>
+                    <div class="form-group col-sm-6">
                       <label for="nf-email">Email</label>
                       <input
                         class="form-control"
@@ -141,6 +151,19 @@
                         <option value="8">Black list</option>
                       </select>
                     </div>
+                    <div class="form-group col-sm-6">
+                      <label for="nf-email" >Người giới thiệu (ĐT)</label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        name="title"
+                        v-model="parent.c2c_mobile"
+                        @change="validatePhoneC2C"
+                      />
+                    </div>
+                    <div class="form-group col-sm-12">
+                      <p><i>{{c2c_info}}</i></p>
+                    </div> 
                   </div>
                 </div>
               </div>
@@ -228,6 +251,7 @@ export default {
         name: "",
         birthday: "",
         mobile_1: "",
+        mobile_2:"",
         note: "",
         email: "",
         status: 1,
@@ -239,10 +263,12 @@ export default {
         job:"",
         province:"",
         district:"",
-        address:""
+        address:"",
+        c2c_mobile:"",
       },
       tmp_district_id:"",
       users_manager:[],
+      c2c_info:"",
     };
   },
   created() {
@@ -276,7 +302,7 @@ export default {
   methods: {
     selectDate(date) {
       if (date) {
-        this.student.birthday = moment(date).format("YYYY-MM-DD");
+        this.parent.birthday = moment(date).format("YYYY-MM-DD");
       }
     },
     save() {
@@ -401,6 +427,46 @@ export default {
           this.modal.action_exit = "close";
         }
       })
+    },
+    validatePhone2(){
+      const data = {
+        phone: this.parent.mobile_2,
+      };
+      this.loading.processing = true
+      u.p(`/api/parents/validate_phone`,data).then(response => {
+        this.loading.processing = false
+        if(response.data.status==0){
+          this.parent.mobile_2 ="";
+          this.modal.color = "warning";
+          this.modal.body = response.data.message;
+          this.modal.show = true;
+          this.modal.action_exit = "close";
+        }else if(response.data.status==2){
+          this.modal_overwrite.show = true;
+          this.modal_overwrite.message = response.data.message;
+        }
+      })
+    },
+    validatePhoneC2C(){
+      this.c2c_info=""
+      if(this.parent.c2c_mobile){
+        const data = {
+          phone: this.parent.c2c_mobile,
+        };
+        this.loading.processing = true
+        u.p(`/api/parents/validate_c2c_phone`,data).then(response => {
+          this.loading.processing = false
+          if(response.data.status==0){
+            this.parent.c2c_mobile ="";
+            this.modal.color = "warning";
+            this.modal.body = response.data.message;
+            this.modal.show = true;
+            this.modal.action_exit = "close";
+          }else{
+            this.c2c_info = response.data.message
+          }
+        })
+      }
     }
   },
 };

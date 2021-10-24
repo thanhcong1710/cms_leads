@@ -80,8 +80,10 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::post('/parents/update/{parent_id}', 'ParentsController@update');
         Route::get('/parents/detail/{parent_id}', 'ParentsController@detail');
         Route::post('/parents/assign', 'ParentsController@assign');
+        Route::post('/parents/assign_list', 'ParentsController@assignList');
         Route::post('/parents/change_status', 'ParentsController@changeStaus');
         Route::post('/parents/validate_phone', 'ParentsController@validatePhone');
+        Route::post('/parents/validate_c2c_phone', 'ParentsController@validateC2CPhone');
         Route::post('/parents/overwrite', 'ParentsController@overwrite');
         Route::get('/parents/show/{parent_id}', 'ParentsController@show');
         Route::get('/parents/get_logs/{parent_id}', 'ParentsController@getLogs');

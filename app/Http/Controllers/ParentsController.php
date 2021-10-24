@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LogParents;
 use App\Models\Sms;
 use App\Providers\UtilityServiceProvider as u;
 
@@ -57,10 +58,11 @@ class ParentsController extends Controller
     }
     public function add(Request $request)
     {
-        $data = u::insertSimpleRow(array(
+        $id = u::insertSimpleRow(array(
             'name'=>$request->name,
             'email'=>$request->email,
             'mobile_1' => $request->mobile_1,
+            'mobile_2' => $request->mobile_2,
             'address' => $request->address,
             'province_id' => $request->province_id,
             'district_id' => $request->district_id,
@@ -73,8 +75,10 @@ class ParentsController extends Controller
             'creator_id' => Auth::user()->id,
             'owner_id'=>$request->owner_id,
             'status'=>$request->status,
+            'c2c_mobile'=>$request->c2c_mobile,
         ), 'cms_parents');
-        return response()->json($data);
+        LogParents::logAdd($id,'Khởi tạo khách hàng thủ công',Auth::user()->id);
+        return response()->json($id);
     }
     public function detail($parent_id)
     {
@@ -83,10 +87,12 @@ class ParentsController extends Controller
     }
     public function update(Request $request, $parent_id)
     {
-        $data = u::updateSimpleRow(array(
+        $pre_parent_info = u::first("SELECT * FROM cms_parents WHERE id = $parent_id");
+        $data_update = array(
             'name'=>$request->name,
             'email'=>$request->email,
             'mobile_1' => $request->mobile_1,
+            'mobile_2' => $request->mobile_2,
             'address' => $request->address,
             'province_id' => $request->province_id,
             'district_id' => $request->district_id,
@@ -99,25 +105,40 @@ class ParentsController extends Controller
             'updator_id' => Auth::user()->id,
             'owner_id'=>$request->owner_id,
             'status'=>$request->status,
-        ), array('id' => $parent_id), 'cms_parents');
+            'c2c_mobile'=>$request->c2c_mobile,
+        );
+        $data = u::updateSimpleRow($data_update, array('id' => $parent_id), 'cms_parents');
+        LogParents::logUpdateInfo($pre_parent_info,$data_update,Auth::user()->id);
         return response()->json($data);
     }
     public function assign(Request $request)
     {
+        $pre_parent_info = u::first("SELECT owner_id FROM cms_parents WHERE id=$request->parent_id");
         $data = u::updateSimpleRow(array(
             'updated_at' => date('Y-m-d H:i:s'),
             'updator_id' => Auth::user()->id,
             'owner_id'=>$request->owner_id,
         ), array('id' => $request->parent_id), 'cms_parents');
+        LogParents::logAssign($request->parent_id,$pre_parent_info->owner_id,$request->owner_id,Auth::user()->id);
         return response()->json($data);
+    }
+    public function assignList(Request $request)
+    {
+        $cond = implode(",",$request->parents);
+        $list_parent_info = u::query("SELECT p.id AS parent_id,p.owner_id,(SELECT CONCAT(name,' (',hrm_id,')') FROM users WHERE id= p.owner_id) AS pre_owner FROM cms_parents AS p WHERE p.id IN ($cond)");
+        u::query("UPDATE cms_parents SET owner_id= $request->owner_id WHERE id IN ($cond)");
+        LogParents::logAssignList($list_parent_info,$request->owner_id,Auth::user()->id);
+        return response()->json("ok");
     }
     public function changeStaus(Request $request)
     {
+        $pre_parent_info = u::first("SELECT status FROM cms_parents WHERE id=$request->parent_id");
         $data = u::updateSimpleRow(array(
             'updated_at' => date('Y-m-d H:i:s'),
             'updator_id' => Auth::user()->id,
             'status'=>$request->status,
         ), array('id' => $request->parent_id), 'cms_parents');
+        LogParents::logStatus($request->parent_id,$pre_parent_info->status,$request->status,Auth::user()->id);
         return response()->json($data);
     }
     public function show($parent_id)
@@ -151,13 +172,13 @@ class ParentsController extends Controller
             'message'=>''
         );
         if($parent_id){
-            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  WHERE p.mobile_1='$phone' AND p.id!='$parent_id'");
+            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  WHERE (p.mobile_1='$phone' OR p.mobile_2='$phone') AND p.id!='$parent_id'");
             if($duplicate_info){
                 $result->status = 0;
                 $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name";
             }
         }else{
-            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  WHERE p.mobile_1='$phone' ");
+            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  WHERE (p.mobile_1='$phone' OR p.mobile_2='$phone') ");
             if($duplicate_info){
                 if($duplicate_info->is_lock==0){
                     $result->status = 2;
@@ -186,14 +207,16 @@ class ParentsController extends Controller
                 'created_at'=>date('Y-m-d H:i:s'),
                 'creator_id'=>Auth::user()->id,
             ), 'cms_parent_overwrite');
+            LogParents::logAssign($parent_info->id,$parent_info->owner_id,Auth::user()->id,Auth::user()->id,true);
         }
         return "ok";
     }
     public function makeToCall(Request $request,$parent_id){
         $parent_info = u::first("SELECT * FROM cms_parents WHERE id='$parent_id'");
+        $phone = $request->phone ? $request->phone :$parent_info->mobile_1;
         if($parent_info){
             $voip = new VoipController();
-            $voip->makeToCall($parent_info->mobile_1,$request->user()->sip_id);
+            $voip->makeToCall($phone,$request->user()->sip_id);
         }
         return "ok";
     }
@@ -202,7 +225,8 @@ class ParentsController extends Controller
         return response()->json($parent_info);
     }
     public function sendSms(Request $request){
-        $parent_info = u::first("SELECT id,mobile_1 FROM cms_parents WHERE id='$request->parent_id'");
+        $parent_info = u::first("SELECT id,mobile_1,mobile_2 FROM cms_parents WHERE id='$request->parent_id'");
+        $phone = $request->phone ? $request->phone :$parent_info->mobile_1;
         if($parent_info){
             u::insertSimpleRow( array(
                 'parent_id'=>$parent_info->id,
@@ -210,10 +234,11 @@ class ParentsController extends Controller
                 'created_at'=>date('Y-m-d H:i:s'),
                 'creator_id'=>$request->user()->id,
                 'method_id'=>4,
-                'care_date'=>date('Y-m-d H:i:s')
+                'care_date'=>date('Y-m-d H:i:s'),
+                'phone'=>$phone 
             ),'cms_customer_care');
             $sms = new Sms();
-            $sms->sendSms($parent_info->mobile_1,$request->content,$request->user()->id);
+            $sms->sendSms($phone,$request->content,$request->user()->id);
         }
         return "ok";
     }
@@ -223,6 +248,24 @@ class ParentsController extends Controller
             'updator_id' => $request->user()->id,
             'next_care_date'=>date('Y-m-d H:i:s',strtotime($request->next_care_date)),
         ), array('id' => $request->parent_id), 'cms_parents');
+        LogParents::logAdd($request->parent_id,'Cập nhật lịch chăm sóc tiếp theo: '.date('Y-m-d H:i:s',strtotime($request->next_care_date)),$request->user()->id);
         return "ok";
+    }
+    public function validateC2CPhone(Request $request){
+        $phone = isset($request->phone) ? $request->phone : '';
+        
+        $parent_info=u::first("SELECT name,mobile_1,mobile_2 FROM cms_parents WHERE mobile_1 = '$phone' OR mobile_2 ='$phone'");
+        if($parent_info){
+            $result =(object)array(
+                'status'=>1,
+                'message'=> "Khách hàng: ".$parent_info->name." - ".$parent_info->mobile_1.($parent_info->mobile_2?" - ".$parent_info->mobile_2:'')
+            );
+        }else{
+            $result =(object)array(
+                'status'=>0,
+                'message'=>'Không tồn tại số điện thoại của khách hàng giới thiệu trên hệ thống'
+            );
+        }
+        return response()->json($result);
     }
 }

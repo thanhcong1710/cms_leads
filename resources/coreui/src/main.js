@@ -9,6 +9,12 @@ import VueInternationalization from 'vue-i18n';
 import Locale from '../../js/vue-i18n-locales.generated.js';
 import VueSocketIO from 'vue-3-socket.io'
 import SocketIO from 'socket.io-client'
+import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
+
+// Make BootstrapVue available throughout your project
+Vue.use(BootstrapVue)
+// Optionally install the BootstrapVue icon components plugin
+Vue.use(IconsPlugin)
 
 const options = {transports: ['websocket', 'polling', 'flashsocket']} ; //Options object to pass into SocketIO
 

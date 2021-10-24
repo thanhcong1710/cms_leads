@@ -11,7 +11,7 @@ class ToolsController extends Controller
 {
     public function downloadReCord()
     {
-        $last_time = date('Y-m-d h:i:s',time());
+        $last_time = date('Y-m-d h:i:s',time()-3600);
         $list_call = u::query("SELECT * FROM voip24h_data WHERE process_data = 0 AND created_at>'$last_time' ORDER BY id DESC");
         foreach($list_call AS $row){
             $voipControll = new VoipController();

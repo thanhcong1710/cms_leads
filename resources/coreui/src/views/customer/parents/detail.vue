@@ -11,16 +11,20 @@
                     <img class="c-avatar-img" src="img/avatars/avatar.png" >
                   </div>
                   <div style="float: left; padding: 10px;">
-                    <h5 style="margin-bottom:0px">{{parent.name}} </h5>
-                    <p><strong>{{parent.mobile_1}}</strong></p>
-                    <p><router-link
-                        class="btn btn-sm btn-light"
+                    <h5 style="margin-bottom:0px">{{parent.name}} 
+                      <router-link  style="padding: 2px 6px"
+                        class="btn btn-sm btn-outline-primary"
                         :to="`/parents/${parent.id}/edit`"
                       >
-                        <i class="fa fa-edit"></i> </router-link>
-                      <button class="btn btn-sm btn-light" @click="callPhone"><i class="fa fa-phone"></i> </button>
-                      <button class="btn btn-sm btn-light" @click="showSendSms"><i class="fa fa-sms"></i> </button>
-                      </p>
+                        <i class="fa fa-edit"></i></router-link></h5>
+                    <p style="margin-top: 5px;"><strong> * {{parent.mobile_1}}</strong> 
+                      <button class="btn btn-sm btn-outline-primary" style="padding: 2px 6px" @click="callPhone(parent.mobile_1)"><i class="fa fa-phone"></i> </button>
+                      <button class="btn btn-sm btn-outline-primary" style="padding: 2px 6px" @click="showSendSms(parent.mobile_1)"><i class="fa fa-sms"></i> </button></p>
+                    <p style="margin-top: 5px;" v-if="parent.mobile_2"> 
+                      <strong> * {{parent.mobile_2}}</strong> 
+                      <button class="btn btn-sm btn-outline-primary" style="padding: 2px 6px" @click="callPhone(parent.mobile_2)"><i class="fa fa-phone"></i> </button>
+                      <button class="btn btn-sm btn-outline-primary" style="padding: 2px 6px" @click="showSendSms(parent.mobile_2)"><i class="fa fa-sms"></i> </button>
+                    </p>
                   </div>
               </div>
               <div class="col-sm-2 border-right text-center">
@@ -61,7 +65,8 @@
                   <br>
                   <p><i class="fa fa-info-circle"></i> <strong>Thông tin khách hàng</strong></p>
                   <p>Họ tên: <span class="fl-right">{{parent.name}}</span></p>
-                  <p>SĐT: <span class="fl-right">{{parent.mobile_1}}</span></p>
+                  <p>SĐT 1: <span class="fl-right">{{parent.mobile_1}}</span></p>
+                  <p>SĐT 2: <span class="fl-right">{{parent.mobile_2}}</span></p>
                   <p>Email: <span class="fl-right">{{parent.email}}</span></p>
                   <p>Ngày sinh: <span class="fl-right">{{parent.birthday}}</span></p>
                   <p>Nghề nghiệp: <span class="fl-right">{{parent.job_name}}</span></p>
@@ -80,7 +85,7 @@
                 </div>
                 <div class="col-sm-9">
                   <div class="alert alert-secondary" role="alert" v-if="sms.show">
-                    <h5 class="alert-heading"> <i class="fa fa-sms" style="margin-right:10px"></i> Gửi tin nhắn SMS</h5>
+                    <h5 class="alert-heading"> <i class="fa fa-sms" style="margin-right:10px"></i> {{sms.title}}</h5>
                     <hr>
                       <textarea class="form-control" v-model="sms.content" placeholder="Nhập nội dung tin nhắn"></textarea>
                       <div style="margin-top:5px;text-align:right">
@@ -148,12 +153,16 @@
                     </div>
                     <div class="tab-pane fade" :class="{ 'active show': isActive('students') }" id="students">
                       <div class="padding-bottom-10">
-                        <button class="btn btn-success" @click="showModalStudent"><i class="fa fa-plus"></i> Thêm mới học sinh</button>
+                        <button class="btn btn-success" @click="showModalStudent(0)"><i class="fa fa-plus"></i> Thêm mới học sinh</button>
                       </div>
                       <div class="row">
                         <div class="col-sm-6" v-for="(item, index) in students" :key="index">
                           <div class="card card-accent-info" >
-                            <div class="card-header"><strong>{{ item.name }}</strong></div>
+                            <div class="card-header">
+                              <strong>{{ item.name }}</strong>
+                              <button class="btn btn-sm btn-success" @click="showModalStudent(item)"> <i class="fa fa-edit"></i> </button>
+                              <button class="btn btn-sm btn-danger" > <i class="fa fa-location-arrow"></i></button>
+                            </div>
                             <div class="card-body">
                               <p>Ngày sinh: {{ item.birthday }}</p>
                               <p>Giới tính: {{ item.gender | genTextGender}}</p>
@@ -459,6 +468,7 @@ export default {
       },
       students:[],
       student:{
+        id:0,
         parent_id:"",
         name:"",
         gender:"",
@@ -484,6 +494,8 @@ export default {
       sms:{
         content:'',
         show:false,
+        title:'Gửi tin nhắn SMS',
+        phone:''
       }
     };
   },
@@ -582,9 +594,35 @@ export default {
         this.modal_care.error_message = mess;
       }
     },
-    showModalStudent(){
-      this.modal_student.show = true
-      this.modal_student.error_message=""
+    showModalStudent(data){
+      if(data==0){
+        this.modal_student.show = true
+        this.modal_student.error_message=""
+        this.modal_student.title ="THÊM MỚI HỌC SINH"
+        this.student.id =0
+        this.student.parent_id =""
+        this.student.name =""
+        this.student.gender =""
+        this.student.school_level =""
+        this.student.birthday =""
+        this.student.select_school =""
+        this.student.note =""
+      }else{
+        console.log(data)
+        this.modal_student.show = true
+        this.modal_student.error_message=""
+        this.modal_student.title ="CẬP NHẬT THÔNG TIN HỌC SINH"
+        this.student.id =data.id
+        this.student.parent_id =data.parent_id
+        this.student.name =data.name
+        this.student.gender =data.gender
+        this.student.school_level =data.school_level
+        this.student.birthday =data.birthday
+        this.student.select_school =data.school
+        this.student.school = data.school
+        this.student.note =data.note
+        this.getSchools()
+      }
     },
     selectDate(date) {
       if (date) {
@@ -598,7 +636,9 @@ export default {
       if (school_level && district_id > 0 && province_id > 0) {        
         u.g(`/api/get/${province_id}/${district_id}/${school_level}/schools`).then(response => {
           this.html.schools.list = response.data
-          this.student.school = ""
+          if(!this.student.id){
+            this.student.school = ""
+          }
         })        
       }
     },
@@ -706,16 +746,16 @@ export default {
         .catch((e) => {
         });
     },
-    callPhone(){
+    callPhone(phone){
       this.loading.processing = true;
-      u.g(`/api/parents/make_to_call/${this.$route.params.id}`)
+      u.g(`/api/parents/make_to_call/${this.$route.params.id}?phone=${phone}`)
       .then((response) => {
         this.loading.processing = false;
         this.phone.show = true
         this.phone.status = 0
         this.phone.show_input_note = false
         this.phone.css_class= 'alert alert-success'
-        this.phone.title = "Đang thực hiện cuộc gọi đi ..."
+        this.phone.title = "Đang thực hiện cuộc gọi đi đến SĐT - "+phone+" ..."
         this.phone.care_id = ''
         this.phone.note=''
       })
@@ -768,15 +808,18 @@ export default {
           });
       }
     },
-    showSendSms(){
+    showSendSms(phone){
       this.sms.show =true
+      this.sms.phone =phone
       this.sms.content = ''
+      this.sms.title = 'Gửi tin nhắn SMS tới SĐT - '+phone
     },
     sendSms(){
       if(this.sms.content){
         const data = {
           parent_id: this.$route.params.id,
           content: this.sms.content,
+          phone: this.sms.phone,
         };
         this.loading.processing = true;
         u.p(`/api/parents/send_sms`,data)

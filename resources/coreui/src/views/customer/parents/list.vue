@@ -66,10 +66,14 @@
                   <i class="fas fa-undo-alt"></i> Reset
                 </button>
               </div>
+              <div class="form-group col-sm-12" v-if="temp.length>0">
+                <p>Bạn đã lựa chọn <b>{{temp.length}}</b> khách hàng   <button  style="margin-left:30px;" class="btn btn-outline-primary" type="button" @click="showModalAssgin">Bàn giao</button></p>
+              </div>  
             </div>
             <table class="table table-striped table-hover">
               <thead>
                 <tr>
+                  <th><b-form-checkbox class="check-item" id="select-all" v-model="selectAll"></b-form-checkbox></th>
                   <th>STT</th>
                   <th>Tên khách hàng</th>
                   <th>Số điện thoại</th>
@@ -84,6 +88,15 @@
               </thead>
               <tbody>
                 <tr v-for="(item, index) in parents" :key="index">
+                  <td>
+                    <b-form-checkbox
+                      class="check-item"
+                      v-model="temp"
+                      :value="item.id"
+                      @change.native="toggleSelectRow()"
+                      number
+                    ></b-form-checkbox>
+                  </td>
                   <td>
                     {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
                   </td>
@@ -155,6 +168,33 @@
         >
       </template>
     </CModal>
+    <CModal
+      :title="modal_assign.title"
+      :show.sync="modal_assign.show"
+      :color="modal_assign.color"
+      :closeOnBackdrop="modal_assign.closeOnBackdrop"
+      :size="modal_assign.size"
+    >
+      <div>
+        <div class="form-in-list">
+          <p>Chọn người phụ trách</p>
+          <p><select class="form-control" v-model="owner_id">
+            <option :value="item.id" v-for="(item, index) in users_manager" :key="index">{{item.name}} - {{item.hrm_id}}</option>
+          </select></p>
+        </div>
+      </div>
+      <template #header>
+        <h5 class="modal-title">{{ modal_assign.title }}</h5>
+      </template>
+      <template #footer>
+        <CButton :color="'btn btn-success'" @click="assignCustomer" type="button"
+          >Bàn giao</CButton
+        >
+        <CButton :color="'btn btn-secondary'" @click="modal_assign.show=false" type="button"
+          >Hủy</CButton
+        >
+      </template>
+    </CModal>
   </div>
 </template>
 
@@ -174,6 +214,8 @@ export default {
   name: "List-Parent",
   data() {
     return {
+      checked_list: [],
+      temp: [],
       datepickerOptions: {
         closed: true,
         value: "",
@@ -231,7 +273,34 @@ export default {
         body: "Cập nhật khách hàng thành công",
         closeOnBackdrop: false,
       },
+      modal_assign: {
+        title: "BÀN GIAO KHÁCH HÀNG",
+        show: false,
+        color: "info",
+        closeOnBackdrop: true,
+        error_message:""
+      },
+      owner_id:""
     };
+  },
+  computed: {
+    selectAll: {
+      get: function() {
+        return (
+          parseInt(this.checked_list.length) === parseInt(this.parents.length)
+        );
+      },
+      set: function(value) {
+        const selected_list = [];
+        if (value) {
+          this.parents.forEach(parent => {
+            selected_list.push(parent.id);
+          });
+        }
+        this.checked_list = selected_list;
+        this.temp = selected_list;
+      }
+    }
   },
   created() {
     u.g(`/api/user/get-users-manager`)
@@ -241,6 +310,10 @@ export default {
     this.search();
   },
   methods: {
+    showModalAssgin(){
+      this.owner_id =""
+      this.modal_assign.show =true
+    },
     reset() {
       location.reload();
     },
@@ -299,6 +372,30 @@ export default {
     },
     exit() {
       this.modal.show = false;
+    },
+    toggleSelectRow(){
+      console.log(this.temp)
+    },
+    assignCustomer(){
+      if(this.owner_id){
+        const data = {
+          parents: this.temp,
+          owner_id: this.owner_id,
+        };
+        this.modal_assign.show =false
+        this.loading.processing = true;
+          u.p(`/api/parents/assign_list`,data)
+          .then((response) => {
+            this.loading.processing = false;
+            this.modal.color = "success";
+            this.modal.body = "Bàn giao khách hàng thành công";
+            this.modal.show = true;
+            this.search();
+            this.temp=[]
+          })
+          .catch((e) => {
+          });
+      }
     },
   },
   filters: {
