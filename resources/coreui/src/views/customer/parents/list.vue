@@ -146,6 +146,15 @@
                   :pageList="pagination.pages"
                   :routing="changePage"
                 ></paging>
+                <div class="last page" style="width: 60px;float: left;height: 30px;">
+                  <select v-model="pagination.limit" style="width: 100%;height: 100%;" @change="search()">
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                    <option value="300">300</option>
+                  </select>
+                </div>
               </nav>
             </div>
           </div>
@@ -178,9 +187,20 @@
       <div>
         <div class="form-in-list">
           <p>Chọn người phụ trách</p>
-          <p><select class="form-control" v-model="owner_id">
-            <option :value="item.id" v-for="(item, index) in users_manager" :key="index">{{item.name}} - {{item.hrm_id}}</option>
-          </select></p>
+          <multiselect
+            placeholder="Chọn người phụ trách"
+            select-label="Chọn một người phụ trách"
+            v-model="owners"
+            :options="users_manager"
+            label="name"
+            :close-on-select="false"
+            :hide-selected="true"
+            :multiple="true"
+            :searchable="true"
+            track-by="id"
+          >
+            <span slot="noResult">Không tìm thấy dữ liệu</span>
+          </multiselect>
         </div>
       </div>
       <template #header>
@@ -204,12 +224,14 @@ import paging from "../../../components/Pagination";
 import u from "../../../utilities/utility";
 import loader from "../../../components/Loading";
 import DatePicker from "vue2-datepicker";
+import Multiselect from "vue-multiselect";
 
 export default {
   components: {
     DatePicker,
     loader: loader,
     paging: paging,
+    Multiselect
   },
   name: "List-Parent",
   data() {
@@ -280,7 +302,8 @@ export default {
         closeOnBackdrop: true,
         error_message:""
       },
-      owner_id:""
+      owner_id:"",
+      owners:[],
     };
   },
   computed: {
@@ -325,7 +348,8 @@ export default {
         status: this.searchData.status,
         owner_id: this.searchData.owner_id,
         start_date:startDate,
-        end_date:endDate
+        end_date:endDate,
+        pagination:this.pagination
       };
       const link = "/api/parents/list";
 
@@ -377,10 +401,17 @@ export default {
       console.log(this.temp)
     },
     assignCustomer(){
-      if(this.owner_id){
+      if(this.owners.length){
+        const ids = []
+        this.owners = u.is.obj(this.owners) ? [this.owners] : this.owners
+        if (this.owners.length) {
+          this.owners.map(item => {
+            ids.push(item.id)
+          })
+        }
         const data = {
           parents: this.temp,
-          owner_id: this.owner_id,
+          owners: ids,
         };
         this.modal_assign.show =false
         this.loading.processing = true;

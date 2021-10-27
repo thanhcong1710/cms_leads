@@ -125,9 +125,13 @@ class ParentsController extends Controller
     public function assignList(Request $request)
     {
         $cond = implode(",",$request->parents);
+        $arr_owner = $request->owners;
         $list_parent_info = u::query("SELECT p.id AS parent_id,p.owner_id,(SELECT CONCAT(name,' (',hrm_id,')') FROM users WHERE id= p.owner_id) AS pre_owner FROM cms_parents AS p WHERE p.id IN ($cond)");
-        u::query("UPDATE cms_parents SET owner_id= $request->owner_id WHERE id IN ($cond)");
-        LogParents::logAssignList($list_parent_info,$request->owner_id,Auth::user()->id);
+        foreach($list_parent_info AS $k=>$row){
+            $owner_id =  $arr_owner[$k%count($arr_owner)];
+            u::query("UPDATE cms_parents SET owner_id= $owner_id WHERE id =$row->parent_id");
+            LogParents::logAssign($row->parent_id,$row->owner_id,$owner_id,Auth::user()->id);
+        }
         return response()->json("ok");
     }
     public function changeStaus(Request $request)

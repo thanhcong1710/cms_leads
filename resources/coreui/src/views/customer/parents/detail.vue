@@ -166,7 +166,7 @@
                             <div class="card-body">
                               <p>Ngày sinh: {{ item.birthday }}</p>
                               <p>Giới tính: {{ item.gender | genTextGender}}</p>
-                              <p>Trường: {{ item.school}}</p>
+                              <!-- <p>Trường: {{ item.school}}</p> -->
                               <p>Ghi chú: {{ item.note}}</p>
                               <p>Ngày tạo: {{ item.created_at}}</p>
                               <p>Người tạo: {{ item.creator_name}}</p>
@@ -280,7 +280,7 @@
                   <option value="F">Nữ</option>
                 </select>
               </div>
-              <div class="form-group col-sm-6">
+              <!-- <div class="form-group col-sm-6">
                 <label for="nf-email">Cấp trường</label>
                 <select class="form-control" id="" v-model="student.school_level" name="school_level"  @change="getSchools()" :disabled="parent.district_id == ''">
                   <option value="" disabled>Chọn cấp trường</option>
@@ -304,7 +304,7 @@
                       :disabled="parent.district_id == ''"
                       @input="validShoolName"
                 >
-              </div>
+              </div> -->
               <div class="form-group col-sm-12">
                 <label for="nf-email">Ghi chú</label>
                 <textarea class="form-control" v-model="student.note"></textarea>
@@ -668,14 +668,14 @@ export default {
         mess += " - Giới tính không được để trống<br/>";
         resp = false;
       }
-      if (this.student.school_level == "") {
-        mess += " - Cấp trường không được để trống<br/>";
-        resp = false;
-      }
-      if (this.student.school == "") {
-        mess += " - Trường học không được để trống<br/>";
-        resp = false;
-      }
+      // if (this.student.school_level == "") {
+      //   mess += " - Cấp trường không được để trống<br/>";
+      //   resp = false;
+      // }
+      // if (this.student.school == "") {
+      //   mess += " - Trường học không được để trống<br/>";
+      //   resp = false;
+      // }
       if(resp){
         this.loading.processing = true;
         this.exit("student");
