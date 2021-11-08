@@ -161,7 +161,7 @@
                             <div class="card-header">
                               <strong>{{ item.name }}</strong>
                               <button class="btn btn-sm btn-success" @click="showModalStudent(item)"> <i class="fa fa-edit"></i> </button>
-                              <button class="btn btn-sm btn-danger" > <i class="fa fa-location-arrow"></i></button>
+                              <button v-if="item.status==0" class="btn btn-sm btn-danger" @click="showModalCheckin(item)"> <i class="fa fa-location-arrow"></i></button>
                             </div>
                             <div class="card-body">
                               <p>Ngày sinh: {{ item.birthday }}</p>
@@ -170,7 +170,9 @@
                               <p>Ghi chú: {{ item.note}}</p>
                               <p>Ngày tạo: {{ item.created_at}}</p>
                               <p>Người tạo: {{ item.creator_name}}</p>
-                              <p>Trạng thái: <b>Mới tạo</b></p>
+                              <p>Trạng thái: <b>{{ item.status | genStudentStatus}}</b></p>
+                              <p v-if="item.status>0">Trung tâm checkin: {{ item.checkin_branch_name}}</p>
+                              <p v-if="item.status>0">Thời gian checkin: {{ item.checkin_at}}</p>
                             </div>
                           </div>
                         </div>
@@ -374,6 +376,53 @@
         >
       </template>
     </CModal>
+    <CModal
+      :title="modal_checkin.title"
+      :show.sync="modal_checkin.show"
+      :color="modal_checkin.color"
+      :closeOnBackdrop="modal_checkin.closeOnBackdrop"
+      :size="modal_checkin.size"
+    >
+      <div>
+        <div class="form-in-list">
+          <div class="row">
+            <div class="form-group col-sm-6">
+              <label for="nf-email">Trung tâm checkin</label>
+              <select class="form-control" v-model="modal_checkin.branch_id">
+                <option value="">Chọn trung tâm</option>
+                <option :value="item.id" v-for="(item, index) in branches" :key="index">{{item.name}}</option>
+              </select>
+            </div>
+            <div class="form-group col-sm-6">
+              <label for="nf-email">Ngày/Giờ Checkin</label>
+              <datepicker
+                        id="checkin-at"
+                        class="form-control calendar"
+                        :value="modal_checkin.checkin_at"
+                        v-model="modal_checkin.checkin_at"
+                        placeholder="Chọn ngày giờ"
+                        lang="lang"
+                        type="datetime"
+                        format="YYYY-MM-DD HH:mm"
+                >
+                </datepicker>
+            </div>
+          </div>
+          <p style="color:red" v-html="modal_checkin.error_message"></p>
+        </div>
+      </div>
+      <template #header>
+        <h5 class="modal-title">{{ modal_checkin.title }}</h5>
+      </template>
+      <template #footer>
+        <CButton :color="'btn btn-success'" @click="checkin" type="button"
+          >Lưu</CButton
+        >
+        <CButton :color="'btn btn-secondary'" @click="exit('checkin')" type="button"
+          >Hủy</CButton
+        >
+      </template>
+    </CModal>
   </div>
 </template>
 
@@ -404,6 +453,7 @@ export default {
           list: []
         },
       },
+      branches:[],
       modal_care: {
         title: "THÊM MỚI CHĂM SÓC",
         show: false,
@@ -435,6 +485,18 @@ export default {
         color: "info",
         closeOnBackdrop: false,
         size:"lg",
+        error_message:""
+      },
+      modal_checkin: {
+        title: "TẠO CHECKIN HỌC SINH",
+        show: false,
+        color: "info",
+        closeOnBackdrop: false,
+        size:"lg",
+        error_message:"",
+        branch_id:"",
+        checkin_at:"",
+        student_id:"",
         error_message:""
       },
       parent: {
@@ -512,6 +574,10 @@ export default {
     this.loadCares(this.$route.params.id);
     this.loadStudents(this.$route.params.id)
     this.loadDetail();
+    u.g(`/api/branches`)
+      .then(response => {
+      this.branches = response.data
+    })
   },
   methods: {
     loadDetail(){
@@ -546,6 +612,8 @@ export default {
       }else if(item=='status'){
         this.modal_status.show = false;
         this.tmp_status = this.parent.status
+      }else if(item=='checkin'){
+        this.modal_checkin.show = false;
       }
     },
     showModalCare(){
@@ -862,6 +930,43 @@ export default {
         })
         .catch((e) => {
         });
+    },
+    showModalCheckin(item){
+      this.modal_checkin.show =true
+      this.modal_checkin.student_id = item.id
+      this.modal_checkin.branch_id = ""
+      this.modal_checkin.checkin_at = ""
+      this.modal_checkin.error_message=""
+    },
+    checkin(){
+      let mess = "";
+      let resp = true;
+      if (this.modal_checkin.branch_id == "") {
+        mess += " - Trung tâm checkin không được để trống<br/>";
+        resp = false;
+      }
+      if (this.modal_checkin.checkin_at == "") {
+        mess += " - Thời gian checkin không được để trống<br/>";
+        resp = false;
+      }
+      if(resp){
+        const data = {
+          student_id: this.modal_checkin.student_id,
+          branch_id: this.modal_checkin.branch_id,
+          checkin_at: moment(this.modal_checkin.checkin_at).format('YYYY-MM-DD HH:mm'),
+        };
+        this.loading.processing = true;
+        this.exit("checkin");
+        u.p(`/api/students/checkin`,data)
+        .then((response) => {
+          this.loading.processing = false;
+          this.loadStudents(this.parent.id);
+        })
+        .catch((e) => {
+        });
+      }else{
+        this.modal_checkin.error_message = mess;
+      }
     }
   },
   filters: {
@@ -871,6 +976,17 @@ export default {
         resp = 'Nam'
       }else{
         resp = 'Nữ'
+      }
+      return resp
+    },
+    genStudentStatus(item){
+      let resp = ''
+      if(item== 0){
+        resp = 'Mới tạo'
+      }else if(item==1){
+        resp = 'Thêm mới checkin'
+      }else if(item==2){
+        resp = 'Đã đến checkin'
       }
       return resp
     }

@@ -105,6 +105,7 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::post('/care/udpate_note', 'ParentCareController@updateNoteCare');
         Route::post('/students/add', 'StudentsController@add');
         Route::get('/students/get_all_data/{parent_id}', 'StudentsController@getAllDataByParent');
+        Route::post('/students/checkin', 'StudentsController@checkin');
         Route::post('/imports/list', 'ImportsController@list');
         Route::post('/imports/upload', 'ImportsController@upload');
         Route::post('/imports/assign', 'ImportsController@assign');
