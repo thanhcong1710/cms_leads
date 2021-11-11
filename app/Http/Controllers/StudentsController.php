@@ -72,7 +72,8 @@ class StudentsController extends Controller
                 p.gender AS gud_gender,
                 p.birthday AS gud_birthday,
                 p.source_id AS source, 
-                p.job_id AS  gud_job
+                p.job_id AS  gud_job,
+                (SELECT hrm_id FROM users WHERE id=p.owner_id) AS owner_hrm
             FROM cms_students AS s LEFT JOIN cms_parents AS p ON p.id=s.parent_id WHERE s.id=$student_id");
         $method = "POST";
         $data = array(
@@ -92,7 +93,8 @@ class StudentsController extends Controller
             'province_id'=>$student_info->province_id,
             'district_id'=>$student_info->district_id,
             'branch_id'=>$checkin_branch_id,
-            'checkin_at'=>$checkin_at
+            'checkin_at'=>$checkin_at,
+            'ec_hrm'=>$student_info->owner_hrm
         );
         $url = sprintf('%s/api/leads-create-checkin', 'https://staging.cmsedu.vn/');
         $res = curl::curl($url, $method,[],$data);

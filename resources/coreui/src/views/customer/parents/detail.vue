@@ -388,7 +388,7 @@
           <div class="row">
             <div class="form-group col-sm-6">
               <label for="nf-email">Trung tâm checkin</label>
-              <select class="form-control" v-model="modal_checkin.branch_id">
+              <select class="form-control" v-model="modal_checkin.branch_id" :disabled="modal_checkin.disabled">
                 <option value="">Chọn trung tâm</option>
                 <option :value="item.id" v-for="(item, index) in branches" :key="index">{{item.name}}</option>
               </select>
@@ -497,7 +497,8 @@ export default {
         branch_id:"",
         checkin_at:"",
         student_id:"",
-        error_message:""
+        error_message:"",
+        disabled:false,
       },
       parent: {
         id:"",
@@ -588,6 +589,10 @@ export default {
         this.parent = response.data
         this.tmp_owner_id = response.data.owner_id
         this.tmp_status = response.data.status
+        if(this.parent.branch_id!=0){
+          this.modal_checkin.branch_id = this.parent.branch_id
+          this.modal_checkin.disabled =true
+        }
       })
     },
     isActive (menuItem) {
@@ -934,7 +939,7 @@ export default {
     showModalCheckin(item){
       this.modal_checkin.show =true
       this.modal_checkin.student_id = item.id
-      this.modal_checkin.branch_id = ""
+      this.modal_checkin.branch_id = this.parent.branch_id
       this.modal_checkin.checkin_at = ""
       this.modal_checkin.error_message=""
     },

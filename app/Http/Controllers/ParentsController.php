@@ -145,7 +145,7 @@ class ParentsController extends Controller
         LogParents::logStatus($request->parent_id,$pre_parent_info->status,$request->status,Auth::user()->id);
         return response()->json($data);
     }
-    public function show($parent_id)
+    public function show(Request $request,$parent_id)
     {
         $data = u::first("SELECT p.*,(SELECT name FROM users WHERE id=p.creator_id) AS creator_name,
                 (SELECT name FROM cms_districts WHERE id=p.district_id) AS district_name,
@@ -155,6 +155,11 @@ class ParentsController extends Controller
                 (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id) AS num_care,
                 (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_care
             FROM cms_parents AS p WHERE id=$parent_id");
+        if(!($request->user()->hasRole('admin') || $request->user()->hasRole('Salehub'))){
+            $data->branch_id= $request->user()->branch_id;
+        }else{
+            $data->branch_id=0;
+        }
         $data->next_care_date =  $data->next_care_date ? date("Y-m-d\TH:i", strtotime($data->next_care_date)): $data->next_care_date;
         return response()->json($data);
     }
