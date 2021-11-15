@@ -19,8 +19,8 @@ class VoipController extends Controller
     {
         $this->baseUri = "35.187.235.207";
         $this->voip24 = "http://dial.voip24h.vn/dial";
-        $this->voip24_key = "b73bdbac5f096b8964a071381887490772d144da";
-        $this->voip24_secret = "bfb144dca5c842ef428216f71ab90eef";
+        $this->voip24_key = "cb7320a02d1bf15651002cac0fe56523e13d7298";
+        $this->voip24_secret = "0e43c1bc6caeb10fc22a3ca43cc29b99";
     }
     public function webhook(Request $request)
     {
