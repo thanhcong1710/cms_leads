@@ -123,12 +123,22 @@ class AuthController extends Controller
     }
     public function switchSystem(Request $request){
         $key ="CMS@abcd1234";
-        return response()->json(['link_redirect' => "http://account.cltechpro.com/#/single-sign-on/".$request->user()->hrm_id."/".md5($key.$request->user()->hrm_id)]);
+        if(env('APP_ENV', 'staging')=='production'){
+            $tmp_link_redirect = 'https://account.cmsedu.vn/#/single-sign-on/';
+        }else{
+            $tmp_link_redirect = 'https://stg-account.cmsedu.vn/#/single-sign-on/';
+        }
+        return response()->json(['link_redirect' => $tmp_link_redirect.$request->user()->hrm_id."/".md5($key.$request->user()->hrm_id)]);
     }
     protected function logoutSingleSignOn(Request $request){
         $key ="CMS@abcd1234";
         $method = "GET";
-        $url = "http://account.cltechpro.com/api/logout-single-sign-on?hrm_id=".$request->user()->hrm_id."/".md5($key.$request->user()->hrm_id);
+        if(env('APP_ENV', 'staging')=='production'){
+            $tmp_link = 'https://account.cmsedu.vn/api/logout-single-sign-on?hrm_id=';
+        }else{
+            $tmp_link = 'https://stg-account.cmsedu.vn/api/logout-single-sign-on?hrm_id=';
+        }
+        $url = $tmp_link.$request->user()->hrm_id."/".md5($key.$request->user()->hrm_id);
         $res = curl::curl($url, $method);
         return $res;
     }
