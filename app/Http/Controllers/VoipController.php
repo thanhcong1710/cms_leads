@@ -109,7 +109,7 @@ class VoipController extends Controller
         ];
         
         $socketio = new SocketIO();
-        if ($socketio->send($this->baseUri, null , 'pushData', json_encode($arr))){
+        if ($socketio->send($this->baseUri, 3000 , 'pushData', json_encode($arr))){
             echo 'we sent the message and disconnected';
         } else {
             echo 'Sorry, we have a mistake :\'(';
