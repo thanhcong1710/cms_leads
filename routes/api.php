@@ -23,7 +23,7 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::post('single-sign-on', 'AuthController@singleSignOn');
     Route::get('switch-system', 'AuthController@switchSystem');
     Route::get('webhook/voip24h', 'VoipController@webhook');
-    Route::get('socket_io/test', 'VoipController@socketIo');
+    Route::get('socket_io/test', 'VoipController@testSocket');
     Route::get('tools/download_record', 'ToolsController@downloadReCord');
 
     Route::group(['middleware' => 'admin'], function ($router) {

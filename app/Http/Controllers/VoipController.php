@@ -17,7 +17,7 @@ class VoipController extends Controller
      */
     public function __construct()
     {
-        $this->baseUri = "https://socket.cmsedu.vn";
+        $this->baseUri = "103.226.250.52";
         $this->voip24 = "http://dial.voip24h.vn/dial";
         $this->voip24_key = "cb7320a02d1bf15651002cac0fe56523e13d7298";
         $this->voip24_secret = "0e43c1bc6caeb10fc22a3ca43cc29b99";
@@ -126,5 +126,19 @@ class VoipController extends Controller
         $res = curl::curl($url, $method);
         u::logRequest($url,$method,[],[],$res,'log_request_outbound');
         return $res;
+    }
+    public function testSocket(){
+        $arr=[
+            'user_id'=>1,
+            'event'=>'call_end',
+            'data'=>'124'
+        ];
+        
+        $socketio = new SocketIO();
+        if ($socketio->send($this->baseUri, 3000 , 'pushData', json_encode($arr))){
+            echo 'we sent the message and disconnected';
+        } else {
+            echo 'Sorry, we have a mistake :\'(';
+        }
     }
 }
