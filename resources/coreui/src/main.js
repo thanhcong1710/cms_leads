@@ -20,7 +20,7 @@ const options = {transports: ['websocket', 'polling', 'flashsocket']} ; //Option
 
 Vue.use(new VueSocketIO({
     debug: true,
-    connection: SocketIO('https://soket.cmsedu.vn', options), //options object is Optional
+    connection: SocketIO('https://socket.cmsedu.vn', options), //options object is Optional
     vuex: {
       store,
       actionPrefix: "SOCKET_",
