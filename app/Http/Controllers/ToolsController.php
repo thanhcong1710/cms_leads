@@ -17,7 +17,7 @@ class ToolsController extends Controller
             $voipControll = new VoipController();
             $response = $voipControll->getDataCallId($row->callid);
             $data = json_decode($response);
-            if(isset($data->result->data[0]->download)){
+            if(isset($data->result->data[0]->download) && $data->result->data[0]->download){
                 $dir = __DIR__.'/../../../public/static/voip/'. date('Y_m').'/';
                 $dir_file = 'static/voip/'. date('Y_m').'/';
                 if(!file_exists($dir)){
