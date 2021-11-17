@@ -23,8 +23,8 @@ class ToolsController extends Controller
                 if(!file_exists($dir)){
                     mkdir($dir);
                 }
-                $file_name = $row->callid.".wav";
-                $file_name_mp3 = $row->callid.".mp3";
+                $file_name = str_replace('.','_',$row->callid).".wav";
+                $file_name_mp3 = str_replace('.','_',$row->callid).".mp3";
                 if(!file_exists($dir.$file_name_mp3)){
                     file_put_contents($dir.$file_name, fopen($data->result->data[0]->download, 'r'));
                     $result=shell_exec('ffmpeg -i ' . $dir.$file_name . ' ' . $dir.$file_name_mp3 . ''); 
