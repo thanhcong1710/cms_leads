@@ -23,12 +23,11 @@ class ToolsController extends Controller
                 if(!file_exists($dir)){
                     mkdir($dir);
                 }
-                $file_name = str_replace('.','_',$row->callid).".wav";
-                $file_name_mp3 = str_replace('.','_',$row->callid).".mp3";
-                if(!file_exists($dir.$file_name_mp3)){
+                $file_name = $row->callid.".wav";
+                $file_name_mp3 = $row->callid.".mp3";
+                if(!file_exists($dir.$file_name)){
                     file_put_contents($dir.$file_name, fopen($data->result->data[0]->download, 'r'));
-                    $result=shell_exec('ffmpeg -i ' . $dir.$file_name . ' ' . $dir.$file_name_mp3 . ''); 
-                    dd($result,file_exists($dir.$file_name));
+                    shell_exec('ffmpeg -i ' . $dir.$file_name . ' ' . $dir.$file_name_mp3 . ''); 
                     u::updateSimpleRow(array('meta_data'=>$response,'process_data'=>1,'link_record'=>$dir_file.$file_name_mp3),array('callid'=>$row->callid),'voip24h_data');
                 }
             }
