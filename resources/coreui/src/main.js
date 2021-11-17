@@ -16,7 +16,7 @@ Vue.use(BootstrapVue)
 // Optionally install the BootstrapVue icon components plugin
 Vue.use(IconsPlugin)
 
-const options = {transports: ['websocket', 'polling', 'flashsocket']} ; //Options object to pass into SocketIO
+const options = {transports: ['websocket', 'polling', 'flashsocket'],secure: true} ; //Options object to pass into SocketIO
 
 Vue.use(new VueSocketIO({
     debug: true,
