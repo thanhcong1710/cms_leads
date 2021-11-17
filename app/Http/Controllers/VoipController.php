@@ -129,7 +129,7 @@ class VoipController extends Controller
     }
     public function testSocket(){
         $arr=[
-            'user_id'=>1,
+            'user_id'=>38,
             'event'=>'call_end',
             'data'=>'124'
         ];

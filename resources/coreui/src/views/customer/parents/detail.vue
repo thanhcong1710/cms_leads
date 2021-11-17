@@ -1001,6 +1001,7 @@ export default {
       console.log('socket to notification channel connected')
     },
     call_end: function (data) { 
+      console.log(data);
       this.getInfoCall(data)
     },
   },
