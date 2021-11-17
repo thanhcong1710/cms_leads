@@ -13,6 +13,7 @@ class ToolsController extends Controller
     {
         $last_time = date('Y-m-d H:i:s',time()-3600);
         $list_call = u::query("SELECT * FROM voip24h_data WHERE process_data = 0 AND created_at>'$last_time' ORDER BY id DESC");
+        dd("SELECT * FROM voip24h_data WHERE process_data = 0 AND created_at>'$last_time' ORDER BY id DESC");
         foreach($list_call AS $row){
             $voipControll = new VoipController();
             $response = $voipControll->getDataCallId($row->callid);
@@ -27,7 +28,8 @@ class ToolsController extends Controller
                 $file_name_mp3 = $row->callid.".mp3";
                 if(!file_exists($dir.$file_name)){
                     file_put_contents($dir.$file_name, fopen($data->result->data[0]->download, 'r'));
-                    shell_exec('ffmpeg -i ' . $dir.$file_name . ' ' . $dir.$file_name_mp3 . ''); 
+                    $result=shell_exec('ffmpeg -i ' . $dir.$file_name . ' ' . $dir.$file_name_mp3 . ''); 
+                    dd($result);
                     u::updateSimpleRow(array('meta_data'=>$response,'process_data'=>1,'link_record'=>$dir_file.$file_name_mp3),array('callid'=>$row->callid),'voip24h_data');
                 }
             }
