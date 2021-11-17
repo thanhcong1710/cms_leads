@@ -13,7 +13,6 @@ class ToolsController extends Controller
     {
         $last_time = date('Y-m-d H:i:s',time()-3600);
         $list_call = u::query("SELECT * FROM voip24h_data WHERE process_data = 0 AND created_at>'$last_time' ORDER BY id DESC");
-        dd("SELECT * FROM voip24h_data WHERE process_data = 0 AND created_at>'$last_time' ORDER BY id DESC");
         foreach($list_call AS $row){
             $voipControll = new VoipController();
             $response = $voipControll->getDataCallId($row->callid);
