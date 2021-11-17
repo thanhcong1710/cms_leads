@@ -17,7 +17,7 @@ class VoipController extends Controller
      */
     public function __construct()
     {
-        $this->baseUri = "35.187.235.207";
+        $this->baseUri = "https://socket.cmsedu.vn";
         $this->voip24 = "http://dial.voip24h.vn/dial";
         $this->voip24_key = "cb7320a02d1bf15651002cac0fe56523e13d7298";
         $this->voip24_secret = "0e43c1bc6caeb10fc22a3ca43cc29b99";
