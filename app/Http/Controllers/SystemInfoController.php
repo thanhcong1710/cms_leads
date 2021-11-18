@@ -32,6 +32,10 @@ class SystemInfoController extends Controller
         $data = u::query("SELECT * FROM cms_contact_methods WHERE status=1");
         return response()->json($data);
     }
+    public function getAllTemplateNote(){
+        $data = u::query("SELECT * FROM cms_template_note WHERE status=1");
+        return response()->json($data);
+    }
     public function getAllBranches(){
         $data = u::query("SELECT * FROM cms_branches WHERE status=1");
         return response()->json($data);

@@ -98,6 +98,11 @@
                     <hr>
                     <div v-html="phone.description"></div>
                     <div>
+                      <select class="form-control" @change="phone.note = phone.select_note" v-model="phone.select_note">
+                        <option value="">Sử dụng mẫu trả lời</option>
+                        <option :value="item.title" v-for="(item, index) in template_note" :key="index">{{item.title}}</option>
+                      </select>
+                      <br>
                       <textarea class="form-control" v-model="phone.note" placeholder="Thêm ghi chú cuộc gọi"></textarea>
                       <div style="margin-top:5px;text-align:right" v-if="phone.show_input_note">
                         <button class="btn btn-success" @click="updateNotePhone"> <i class="fa fa-save"></i> Lưu</button>
@@ -552,14 +557,16 @@ export default {
         description:'',
         show_input_note:false,
         care_id:'',
-        note:''
+        note:'',
+        select_note:''
       },
       sms:{
         content:'',
         show:false,
         title:'Gửi tin nhắn SMS',
         phone:''
-      }
+      },
+      template_note:[]
     };
   },
   created() {
@@ -571,6 +578,10 @@ export default {
     u.g(`/api/methods`)
       .then(response => {
       this.methods = response.data
+    })
+    u.g(`/api/template_note`)
+      .then(response => {
+      this.template_note = response.data
     })
     this.loadCares(this.$route.params.id);
     this.loadStudents(this.$route.params.id)
