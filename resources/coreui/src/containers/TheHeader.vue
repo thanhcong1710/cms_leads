@@ -52,7 +52,7 @@
     <CMenu/>
 
     <CHeaderNav class="mr-4">
-      <CHeaderNavItem class="d-md-down-none mx-2">
+      <!-- <CHeaderNavItem class="d-md-down-none mx-2">
         <CHeaderNavLink>
           <select v-model="language" @change="changeLanguage">
             <option value="vi">VI</option>
@@ -79,7 +79,7 @@
         <CHeaderNavLink>
           <CIcon name="cil-envelope-open"/>
         </CHeaderNavLink>
-      </CHeaderNavItem>
+      </CHeaderNavItem> -->
       <TheHeaderDropdownAccnt/>
     </CHeaderNav>
     <CSubheader class="px-3">

@@ -96,7 +96,11 @@ class StudentsController extends Controller
             'checkin_at'=>$checkin_at,
             'ec_hrm'=>$student_info->owner_hrm
         );
-        $url = sprintf('%s/api/leads-create-checkin', 'https://staging.cmsedu.vn/');
+        if(env('APP_ENV', 'staging')=='production'){
+            $url = sprintf('%s/api/leads-create-checkin', 'https://crm.cmsedu.vn/');
+        }else{
+            $url = sprintf('%s/api/leads-create-checkin', 'https://staging.cmsedu.vn/');
+        }
         $res = curl::curl($url, $method,[],$data);
         u::logRequest($url,$method,[],$data,$res,'log_request_outbound');
         $res = json_decode($res);

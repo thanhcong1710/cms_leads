@@ -9,7 +9,7 @@
       <CHeaderNavLink>
         <div class="c-avatar">
           <img
-            src="img/avatars/6.jpg"
+            src="img/avatars/avatar.png"
             class="c-avatar-img "
           />
         </div>
@@ -18,7 +18,7 @@
     <CDropdownHeader tag="div" class="text-center" color="light">
       <strong>Account</strong>
     </CDropdownHeader>
-    <CDropdownItem>
+    <!-- <CDropdownItem>
       <CIcon name="cil-bell"/> Updates
       <CBadge color="info" class="ml-auto">{{ itemsCount }}</CBadge>
     </CDropdownItem>
@@ -58,7 +58,7 @@
     <CDropdownDivider/>
     <CDropdownItem>
       <CIcon name="cil-shield-alt" /> Lock Account
-    </CDropdownItem>
+    </CDropdownItem> -->
     <CDropdownItem @click="logout()">
       <CIcon name="cil-lock-locked" /> Logout
     </CDropdownItem>
