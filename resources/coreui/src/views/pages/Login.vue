@@ -43,7 +43,7 @@
                       </g>
                     </svg>
                 <h1>Login</h1>
-                <p class="text-muted">Sign In to your account</p>
+                <p class="text-muted">Sign In to your account.</p>
                 <CInput
                   v-model="email"
                   prependHtml="<i class='cui-user'></i>"
