@@ -1,4 +1,4 @@
-name: Laravel
+name: CMS_LEADS
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ master ]
 
 jobs:
-  laravel-tests:
+  cms_leads_production:
 
     runs-on: self-hosted
 
