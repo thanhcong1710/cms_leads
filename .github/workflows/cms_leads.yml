@@ -26,22 +26,22 @@ jobs:
     - name: Complete
       run: npm run watch &
       working-directory: /opt/cms_leads
- cms_leads_develop:
-   runs-on: self-hosted
-   if: github.ref == 'refs/heads/develop'
-   steps:
-     - name: Pull
-       run: git pull origin develop
-       working-directory: /opt/cms_leads_staging
-     - name: Directory Permissions
-       run: chmod -R 777 storage
-       working-directory: /opt/cms_leads_staging
-     - name: Install Node
-       run: npm install
-       working-directory: /opt/cms_leads_staging/resources/coreui
-     - name: Build Node
-       run: npm run build
-       working-directory: /opt/cms_leads_staging/resources/coreui
-     - name: Complete
-       run: npm run watch &
-       working-directory: /opt/cms_leads_staging
+  cms_leads_develop:
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/develop'
+    steps:
+    - name: Pull
+      run: git pull origin develop
+      working-directory: /opt/cms_leads_staging
+    - name: Directory Permissions
+      run: chmod -R 777 storage
+      working-directory: /opt/cms_leads_staging
+    - name: Install Node
+      run: npm install
+      working-directory: /opt/cms_leads_staging/resources/coreui
+    - name: Build Node
+      run: npm run build
+      working-directory: /opt/cms_leads_staging/resources/coreui
+    - name: Complete
+      run: npm run watch &
+      working-directory: /opt/cms_leads_staging
