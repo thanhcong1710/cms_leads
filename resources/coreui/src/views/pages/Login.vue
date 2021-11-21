@@ -42,7 +42,7 @@
                         0 -1610z"/>
                       </g>
                     </svg>
-                <h1>LOGIN</h1>
+                <h1>Login</h1>
                 <p class="text-muted">Sign In to your account</p>
                 <CInput
                   v-model="email"
