@@ -37,7 +37,7 @@ jobs:
       run: git pull origin develop
       working-directory: /opt/cms_leads_staging
     - name: Install Dependencies
-      run: php /usr/local/bin/composer.phar install
+      run: sudo -u www-data composer install --no-plugins --no-scripts
       working-directory: /opt/cms_leads_staging
     - name: Directory Permissions
       run: chmod -R 777 storage
