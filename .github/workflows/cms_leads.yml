@@ -1,0 +1,53 @@
+name: CMS_LEADS
+
+on:
+  push:
+    branches: [ master, develop ]
+  pull_request:
+    branches: [ master, develop ]
+
+jobs:
+  cms_leads_production:
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/master'
+    steps:
+    - name: Pull
+      run: git pull origin master
+      working-directory: /opt/cms_leads
+    - name: Install Dependencies
+      run: php /usr/local/bin/composer.phar install
+      working-directory: /opt/cms_leads
+    - name: Directory Permissions
+      run: chmod -R 777 storage
+      working-directory: /opt/cms_leads
+    - name: Install Node
+      run: npm install
+      working-directory: /opt/cms_leads/resources/coreui
+    - name: Build Node
+      run: npm run build
+      working-directory: /opt/cms_leads/resources/coreui
+    - name: Complete
+      run: npm run dev
+      working-directory: /opt/cms_leads
+  cms_leads_develop:
+    runs-on: self-hosted
+    if: github.ref == 'refs/heads/develop'
+    steps:
+    - name: Pull
+      run: git pull origin develop
+      working-directory: /opt/cms_leads_staging
+    - name: Install Dependencies
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      working-directory: /opt/cms_leads
+    - name: Directory Permissions
+      run: chmod -R 777 storage
+      working-directory: /opt/cms_leads_staging
+    - name: Install Node
+      run: npm install
+      working-directory: /opt/cms_leads_staging/resources/coreui
+    - name: Build Node
+      run: npm run build
+      working-directory: /opt/cms_leads_staging/resources/coreui
+    - name: Complete
+      run: npm run dev
+      working-directory: /opt/cms_leads_staging
