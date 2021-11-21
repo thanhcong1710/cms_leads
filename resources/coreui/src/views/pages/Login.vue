@@ -63,7 +63,7 @@
                 </CInput>
                 <CRow>
                   <CCol col="6" class="text-left">
-                    <CButton type="submit" color="primary" class="px-4">LOGIN</CButton>
+                    <CButton type="submit" color="primary" class="px-4">Login</CButton>
                   </CCol>
                   <CCol col="6" class="text-right">
                     <CButton color="link" class="px-0">Forgot password?</CButton>
