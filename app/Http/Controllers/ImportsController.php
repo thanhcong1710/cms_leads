@@ -135,15 +135,15 @@ class ImportsController extends Controller
             $student_birthday_2 = NULL;
         }
         $result = (object)array(
-            'name'=>$data[0],
+            'name'=> str_replace(array("'","]","\\"),"",$data[0]),
             'gud_mobile1'=> u::phoneNew($data[1]),
             'email'=>$data[2],
-            'address'=>$data[3],
+            'address'=>str_replace(array("'","]","\\"),"",$data[3]),
             'note'=>$data[4],
             'owner_hrm'=>$data[5],
-            'student_name_1'=>$data[6],
+            'student_name_1'=>str_replace(array("'","]","\\"),"",$data[6]),
             'student_birthday_1'=>$student_birthday_1,
-            'student_name_2'=>$data[8],
+            'student_name_2'=>str_replace(array("'","]","\\"),"",$data[8]),
             'student_birthday_2'=>$student_birthday_2,
         );
         return $result;
