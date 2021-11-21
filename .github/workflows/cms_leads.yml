@@ -16,7 +16,7 @@ jobs:
       run: git pull origin master
       working-directory: /opt/cms_leads
     - name: Install Dependencies
-      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+      run: composer install
       working-directory: /opt/cms_leads
     - name: Directory Permissions
       run: chmod -R 777 storage
