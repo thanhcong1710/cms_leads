@@ -14,8 +14,12 @@ jobs:
     - name: Pull
       run: git pull origin master
       working-directory: /opt/cms_leads
+    - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
+      with:
+        php-version: '7.4'
+    - uses: actions/checkout@v2
     - name: Install Dependencies
-      run: php /usr/local/bin/composer.phar install
+      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
       working-directory: /opt/cms_leads
     - name: Directory Permissions
       run: chmod -R 777 storage
