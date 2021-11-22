@@ -8,6 +8,7 @@ use App\Providers\UtilityServiceProvider as u;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ParentsController extends Controller
 {
@@ -186,6 +187,18 @@ class ParentsController extends Controller
                 $result->status = 0;
                 $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name";
             }
+            $parent_info = u::first("SELECT mobile_1,mobile_2 FROM cms_parents WHERE id=$parent_id");
+            if($parent_info->mobile_1!=$phone && $parent_info->mobile_2!=$phone){
+                $connection = DB::connection('mysql_crm');
+                $lead_info = $connection->select(DB::raw("SELECT u.full_name AS ec_name,u.hrm_id AS ec_hrm_id,(SELECT name FROM branches WHERE id=t.branch_id) AS branch_name
+                    FROM students AS s LEFT JOIN term_student_user AS t ON t.student_id =s.id LEFT JOIN users AS u ON u.id=t.ec_id 
+                        WHERE s.gud_mobile1='{$phone}' OR  s.gud_mobile2='{$phone}'"));
+                if(isset($lead_info[0])){
+                    $lead_info = $lead_info[0];
+                    $result->status = 0;
+                    $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $lead_info->ec_name - $lead_info->hrm_id $lead_info->branch_name";
+                }
+            }
         }else{
             $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  WHERE (p.mobile_1='$phone' OR p.mobile_2='$phone') ");
             if($duplicate_info){
@@ -196,6 +209,15 @@ class ParentsController extends Controller
                     $result->status = 0;
                     $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name";
                 }
+            }
+            $connection = DB::connection('mysql_crm');
+            $lead_info = $connection->select(DB::raw("SELECT u.full_name AS ec_name,u.hrm_id AS ec_hrm_id,(SELECT name FROM branches WHERE id=t.branch_id) AS branch_name
+                FROM students AS s LEFT JOIN term_student_user AS t ON t.student_id =s.id LEFT JOIN users AS u ON u.id=t.ec_id 
+                    WHERE s.gud_mobile1='{$phone}' OR  s.gud_mobile2='{$phone}'"));
+            if(isset($lead_info[0])){
+                $lead_info = $lead_info[0];
+                $result->status = 0;
+                $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $lead_info->ec_name - $lead_info->hrm_id $lead_info->branch_name";
             }
         }
         return response()->json($result);
