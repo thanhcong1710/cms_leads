@@ -24,6 +24,7 @@ class ParentsController extends Controller
         $owner_id = isset($request->owner_id) ? $request->owner_id : '';
         $end_date = isset($request->end_date) ? $request->end_date : '';
         $start_date = isset($request->start_date) ? $request->start_date : '';
+        $type_seach = isset($request->type_seach) ? $request->type_seach : 0;
 
         $pagination = (object)$request->pagination;
         $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
@@ -49,12 +50,32 @@ class ParentsController extends Controller
         if ($start_date !== '') {
             $cond .= " AND p.next_care_date > '$start_date 00:00:00'";
         }
-        $total = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond ");
+        //type_search=1
+        $cond_1 = " AND (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id)=0";
+        //type_search=2
+        $cond_2 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') = '".date('Y-m-d')."'";
+
+        $tmp_cond="";
+        if($type_seach==1){
+            $tmp_cond = $cond_1;
+        }elseif($type_seach==2){
+            $tmp_cond = $cond_2;
+        }
+        $total = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $tmp_cond");
         $list = u::query("SELECT p.*, (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
                 (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_care,
                 (SELECT name FROM users WHERE id=p.owner_id) AS owner_name 
-            FROM cms_parents AS p WHERE $cond ORDER BY p.id DESC $limitation");
+            FROM cms_parents AS p WHERE $cond $tmp_cond ORDER BY p.id DESC $limitation");
         $data = u::makingPagination($list, $total->total, $page, $limit);
+
+        $total_0 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond ");
+        $total_1 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $cond_1 ");
+        $total_2 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $cond_2 ");
+        $data->detail_total = (object)array(
+            'total_0' => $total_0->total,
+            'total_1' => $total_1->total,
+            'total_2' => $total_2->total,
+        );
         return response()->json($data);
     }
     public function add(Request $request)

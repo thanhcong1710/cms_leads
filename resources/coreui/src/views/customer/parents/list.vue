@@ -70,6 +70,17 @@
                 <p>Bạn đã lựa chọn <b>{{temp.length}}</b> khách hàng   <button  style="margin-left:30px;" class="btn btn-outline-primary" type="button" @click="showModalAssgin">Bàn giao</button></p>
               </div>  
             </div>
+            <ul class="nav nav-tabs">
+              <li class="nav-item">
+                <a class="nav-link" @click.prevent="setActive('all')" :class="{ active: isActive('all') }" href="#all">Tất cả <span class="badge badge-sm bg-danger ms-auto">{{total.total_0}}</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" @click.prevent="setActive('type_1')" :class="{ active: isActive('type_1') }" href="#type_1">Chưa chăm sóc <span class="badge badge-sm bg-danger ms-auto">{{total.total_1}}</span></a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" @click.prevent="setActive('type_2')" :class="{ active: isActive('type_2') }" href="#type_2">Đặt lịch hẹn trong ngày <span class="badge badge-sm bg-danger ms-auto">{{total.total_2}}</span></a>
+              </li>
+            </ul>
             <table class="table table-striped table-hover">
               <thead>
                 <tr>
@@ -270,6 +281,7 @@ export default {
         owner_id: "",
         pagination: this.pagination,
         dateRange: "",
+        type_seach: 0,
       },
       users_manager:[],
       parents: [],
@@ -304,6 +316,12 @@ export default {
       },
       owner_id:"",
       owners:[],
+      activeItem: 'all',
+      total:{
+        total_0:0,
+        total_1:0,
+        total_2:0,
+      }
     };
   },
   computed: {
@@ -349,7 +367,8 @@ export default {
         owner_id: this.searchData.owner_id,
         start_date:startDate,
         end_date:endDate,
-        pagination:this.pagination
+        pagination:this.pagination,
+        type_seach:this.searchData.type_seach
       };
       const link = "/api/parents/list";
 
@@ -358,6 +377,7 @@ export default {
         .then((response) => {
           this.loading.processing = false;
           this.parents = response.data.list;
+          this.total = response.data.detail_total
           this.pagination.spage = response.data.paging.spage;
           this.pagination.ppage = response.data.paging.ppage;
           this.pagination.npage = response.data.paging.npage;
@@ -428,6 +448,20 @@ export default {
           });
       }
     },
+    isActive (menuItem) {
+      return this.activeItem === menuItem
+    },
+    setActive (menuItem) {
+      if(menuItem=="all"){
+        this.searchData.type_seach=0
+      }else if(menuItem=="type_1"){
+        this.searchData.type_seach=1
+      }if(menuItem=="type_2"){
+        this.searchData.type_seach=2
+      }
+      this.activeItem = menuItem
+      this.search();
+    },
   },
   filters: {
     getStatusName(value) {
@@ -466,3 +500,8 @@ export default {
   },
 };
 </script>
+<style scoped>
+.bg-danger {
+    color: #fff;
+}
+</style>
