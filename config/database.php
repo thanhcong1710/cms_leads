@@ -62,7 +62,21 @@ return [
                 PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
             ]) : [],
         ],
-
+        // staging, production
+        'mysql_crm' => [
+            'driver' => 'mysql',
+            'host' => '103.226.250.13',
+            'port' => '63306',
+            'database' =>  env('APP_ENV', 'staging') == 'production' ? 'cms_product' : 'cms_staging',
+            'username' => 'cms_product',
+            'password' => 'CrM.cMsEdU.vN@098&^%_product',
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix' => '',
+            'strict' => false,
+            'engine' => null,
+        ],
         'pgsql' => [
             'driver' => 'pgsql',
             'url' => env('DATABASE_URL'),
