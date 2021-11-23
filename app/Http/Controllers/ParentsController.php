@@ -217,7 +217,7 @@ class ParentsController extends Controller
                 if(isset($lead_info[0])){
                     $lead_info = $lead_info[0];
                     $result->status = 0;
-                    $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $lead_info->ec_name - $lead_info->hrm_id $lead_info->branch_name";
+                    $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $lead_info->ec_name - $lead_info->ec_hrm_id $lead_info->branch_name";
                 }
             }
         }else{
@@ -238,7 +238,7 @@ class ParentsController extends Controller
             if(isset($lead_info[0])){
                 $lead_info = $lead_info[0];
                 $result->status = 0;
-                $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $lead_info->ec_name - $lead_info->hrm_id $lead_info->branch_name";
+                $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $lead_info->ec_name - $lead_info->ec_hrm_id $lead_info->branch_name";
             }
         }
         return response()->json($result);
@@ -319,5 +319,76 @@ class ParentsController extends Controller
             );
         }
         return response()->json($result);
+    }
+    public function dashboard(Request $request)
+    {
+        $owner_id = isset($request->owner_id) ? $request->owner_id : '';
+        $end_date = isset($request->end_date) ? $request->end_date : '';
+        $start_date = isset($request->start_date) ? $request->start_date : '';
+
+        $pagination = (object)$request->pagination;
+        $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
+        $limit = isset($pagination->limit) ? (int) $pagination->limit : 20;
+        $offset = $page == 1 ? 0 : $limit * ($page-1);
+        $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
+        $cond = " 1 ";
+        $cond_sub = " 1 ";
+        if(!$request->user()->hasRole('admin')){
+            $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
+        }
+        if ($owner_id !== '') {
+            $cond .= " AND u.id = $owner_id ";
+        }
+        if ($end_date !== '') {
+            $cond_sub .= " AND start_time < '$end_date 23:59:59' ";
+        }
+        if ($start_date !== '') {
+            $cond_sub .= " AND start_time > '$start_date 00:00:00'";
+        }
+
+        $sql_tongcuocgoi = " (SELECT count(id) FROM voip24h_data WHERE user_id=u.id)";
+        $sql_traloi = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND (disposition = 'NO ANSWER' OR disposition = 'BUSY'))";
+        $sql_khongtraloi = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND (disposition = 'NO ANSWER' OR disposition = 'BUSY') AND type='outbound')";
+        $sql_goinho = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND (disposition = 'NO ANSWER' OR disposition = 'BUSY') AND type='inbound')";
+        $sql_vao = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND type='inbound')";
+        $sql_ra = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND type='outbound')";
+        $total = u::first("SELECT count(u.id) AS total FROM users AS u WHERE $cond AND u.sip_id IS NOT NULL AND u.sip_id!=0");
+        $list = u::query("SELECT u.id, u.name, u.hrm_id, u.branch_name ,
+                $sql_tongcuocgoi AS tongcuocgoi,
+                $sql_traloi AS traloi,
+                $sql_khongtraloi AS khongtraloi,
+                $sql_goinho AS goinho,
+                $sql_vao AS vao,
+                $sql_ra AS ra
+            FROM users AS u WHERE $cond AND u.sip_id IS NOT NULL AND u.sip_id!=0 ORDER BY u.id DESC $limitation");
+        $data = u::makingPagination($list, $total->total, $page, $limit);
+
+        $cond_total = " 1 ";
+        if(!$request->user()->hasRole('admin')){
+            $cond_total .= " AND user_id IN (".$request->user_info->users_manager.")";
+        }
+        //Tổng cuộc gọi
+        $total_all = u::first("SELECT count(id) AS total FROM voip24h_data WHERE $cond_total");
+        $total_all_duration = u::first("SELECT SUM(duration) AS duration FROM voip24h_data WHERE $cond_total AND disposition = 'ANSWERED'");
+        $total_traloi = u::first("SELECT count(id) AS total FROM voip24h_data WHERE $cond_total AND disposition = 'ANSWERED'");
+        $total_khongtraloi = u::first("SELECT count(id) AS total FROM voip24h_data WHERE $cond_total AND (disposition = 'NO ANSWER' OR disposition = 'BUSY') AND type='outbound'");
+        $total_goinho = u::first("SELECT count(id) AS total FROM voip24h_data WHERE $cond_total AND (disposition = 'NO ANSWER' OR disposition = 'BUSY') AND type='inbound'");
+        $total_vao = u::first("SELECT count(id) AS total FROM voip24h_data WHERE $cond_total AND type='inbound'");
+        $total_ra = u::first("SELECT count(id) AS total FROM voip24h_data WHERE $cond_total AND type='outbound'");
+        $total_vao_duration = u::first("SELECT SUM(duration) AS duration AS total FROM voip24h_data WHERE $cond_total AND type='inbound' AND disposition = 'ANSWERED'");
+        $total_ra_duration = u::first("SELECT SUM(duration) AS duration AS total FROM voip24h_data WHERE $cond_total AND type='outbound' AND disposition = 'ANSWERED'");
+
+        $data->dashboard = (object)array(
+            'total_all' =>$total_all->total,
+            'total_all_duration' =>$total_all_duration->duration,
+            'total_traloi' =>$total_traloi->total,
+            'total_khongtraloi' =>$total_khongtraloi->total,
+            'total_goinho' =>$total_goinho->total,
+            'total_vao' =>$total_vao->total,
+            'total_ra' =>$total_ra->total,
+            'total_vao_duration' =>$total_vao_duration->duration,
+            'total_ra_duration' =>$total_ra_duration->duration,
+        );
+        return response()->json($data);
     }
 }
