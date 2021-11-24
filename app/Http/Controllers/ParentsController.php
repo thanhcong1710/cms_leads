@@ -346,12 +346,12 @@ class ParentsController extends Controller
             $cond_sub .= " AND start_time > '$start_date 00:00:00'";
         }
 
-        $sql_tongcuocgoi = " (SELECT count(id) FROM voip24h_data WHERE user_id=u.id)";
-        $sql_traloi = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND (disposition = 'NO ANSWER' OR disposition = 'BUSY'))";
-        $sql_khongtraloi = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND (disposition = 'NO ANSWER' OR disposition = 'BUSY') AND type='outbound')";
-        $sql_goinho = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND (disposition = 'NO ANSWER' OR disposition = 'BUSY') AND type='inbound')";
-        $sql_vao = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND type='inbound')";
-        $sql_ra = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND type='outbound')";
+        $sql_tongcuocgoi = " (SELECT count(id) FROM voip24h_data WHERE user_id=u.id $cond_sub)";
+        $sql_traloi = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id $cond_sub AND (disposition = 'NO ANSWER' OR disposition = 'BUSY'))";
+        $sql_khongtraloi = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id $cond_sub AND (disposition = 'NO ANSWER' OR disposition = 'BUSY') AND type='outbound')";
+        $sql_goinho = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id $cond_sub AND (disposition = 'NO ANSWER' OR disposition = 'BUSY') AND type='inbound')";
+        $sql_vao = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id $cond_sub AND type='inbound')";
+        $sql_ra = "(SELECT count(id) FROM voip24h_data WHERE user_id=u.id $cond_sub AND type='outbound')";
         $total = u::first("SELECT count(u.id) AS total FROM users AS u WHERE $cond AND u.sip_id IS NOT NULL AND u.sip_id!=0");
         $list = u::query("SELECT u.id, u.name, u.hrm_id, u.branch_name ,
                 $sql_tongcuocgoi AS tongcuocgoi,
