@@ -127,7 +127,7 @@
                       </select>
                     </div>
                     <div class="form-group col-sm-6">
-                      <label for="nf-email">Nguồn</label>
+                      <label for="nf-email">Nguồn  <span class="text-danger"> (*)</span></label>
                       <vue-select
                             label="name"
                             placeholder="Chọn nguồn"
@@ -348,6 +348,10 @@ export default {
       }
       if (this.parent.owner_id == "") {
         mess += " - Người phụ trách không được để trống<br/>";
+        resp = false;
+      }
+      if (this.parent.source_id == "") {
+        mess += " - Nguồn không được để trống<br/>";
         resp = false;
       }
       if (!resp) {
