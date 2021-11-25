@@ -73,7 +73,8 @@ class StudentsController extends Controller
                 p.birthday AS gud_birthday,
                 p.source_id AS source, 
                 p.job_id AS  gud_job,
-                (SELECT hrm_id FROM users WHERE id=p.owner_id) AS owner_hrm
+                (SELECT hrm_id FROM users WHERE id=p.owner_id) AS owner_hrm,
+                (SELECT crm_id FROM cms_students WHERE parent_id=p.id AND id !=s.id AND crm_id IS NOT NULL LIMIT 1) AS sibling_id 
             FROM cms_students AS s LEFT JOIN cms_parents AS p ON p.id=s.parent_id WHERE s.id=$student_id");
         $method = "POST";
         $data = array(
@@ -94,7 +95,9 @@ class StudentsController extends Controller
             'district_id'=>$student_info->district_id,
             'branch_id'=>$checkin_branch_id,
             'checkin_at'=>$checkin_at,
-            'ec_hrm'=>$student_info->owner_hrm
+            'ec_hrm'=>$student_info->owner_hrm,
+            'creator_hrm' => Auth::user()->hrm_id,
+            'sibling_id' => $student_info->sibling_id ? $student_info->sibling_id : 0,
         );
         if(env('APP_ENV', 'staging')=='production'){
             $url = sprintf('%s/api/leads-create-checkin', 'https://crm.cmsedu.vn/');
