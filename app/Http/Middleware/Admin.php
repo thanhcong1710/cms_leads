@@ -30,7 +30,8 @@ class Admin
             $users_manager = $user->id.($users_manager?",".$users_manager:"");
         }
         $request->user_info = (object)array(
-            'users_manager' => $users_manager
+            'users_manager' => $users_manager,
+            'hrm_id' => $user->hrm_id
         );
         return $next($request);
     }
