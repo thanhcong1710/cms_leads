@@ -142,4 +142,12 @@ class AuthController extends Controller
         $res = curl::curl($url, $method);
         return $res;
     }
+    public function getLoginRedirect(){
+        if(env('APP_ENV', 'staging')=='production'){
+            $data = 'https://account.cmsedu.vn/#/login';
+        }else{
+            $data = 'https://stg-account.cmsedu.vn/#/login';
+        }
+        return response()->json($data);
+    }
 }
