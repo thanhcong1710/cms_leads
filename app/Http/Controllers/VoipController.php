@@ -74,13 +74,13 @@ class VoipController extends Controller
                     'data_state'=>$disposition,
                     'phone'=>$phone,
                 ),'cms_customer_care');
-                $this->socketIo($user_info->id,'call_end',array('care_id'=>$care_id,'parent_id'=>$parent_info->id));
+                $this->socketIo($user_info->id,'call_end',array('user_id'=>$user_info->id,'care_id'=>$care_id,'parent_id'=>$parent_info->id));
             }
         }elseif($obj->state == 'Ring' && $obj->type=="inbound"){
             $user_info = u::first("SELECT id FROM users WHERE sip_id='".(int)$obj->extend."'");
             $parent_info = u::first("SELECT id FROM cms_parents WHERE mobile_1='$obj->phone'");
             if($user_info && $parent_info){ 
-                $this->socketIo($user_info->id,'inbound',array('phone'=>$obj->phone));
+                $this->socketIo($user_info->id,'inbound',array('user_id'=>$user_info->id,'phone'=>$obj->phone));
             }
         }
         
@@ -137,7 +137,9 @@ class VoipController extends Controller
         $arr=[
             'user_id'=>$request->user_id ? $request->user_id : 38,
             'event'=>$request->event ? $request->event :'call_end',
-            'data'=>$request->data ? $request->data :'test_soket'
+            'data'=> array(
+                'user_id'=>$request->user_id ? $request->user_id : 38,
+                'phone'=>'test_soket')
         ];
         $this->socketIo($arr['user_id'],$arr['event'],$arr['data']);
     }
