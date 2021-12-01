@@ -20,6 +20,7 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::post('logout', 'AuthController@logout');
     Route::post('refresh', 'AuthController@refresh');
     Route::post('register', 'AuthController@register'); 
+    Route::get('get-login-redirect', 'AuthController@getLoginRedirect'); 
     Route::post('single-sign-on', 'AuthController@singleSignOn');
     Route::get('switch-system', 'AuthController@switchSystem');
     Route::get('webhook/voip24h', 'VoipController@webhook');

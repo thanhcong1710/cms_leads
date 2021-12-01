@@ -18,7 +18,7 @@ class AuthController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login', 'register','singleSignOn']]);
+        $this->middleware('auth:api', ['except' => ['login', 'register','singleSignOn','getLoginRedirect']]);
     }
   
     /**
@@ -141,5 +141,13 @@ class AuthController extends Controller
         $url = $tmp_link.$request->user()->hrm_id."/".md5($key.$request->user()->hrm_id);
         $res = curl::curl($url, $method);
         return $res;
+    }
+    public function getLoginRedirect(){
+        if(env('APP_ENV', 'staging')=='production'){
+            $data = 'https://account.cmsedu.vn/#/login';
+        }else{
+            $data = 'https://stg-account.cmsedu.vn/#/login';
+        }
+        return response()->json($data);
     }
 }

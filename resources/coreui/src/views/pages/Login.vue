@@ -82,6 +82,7 @@
 <script>
 
 import axios from "axios";
+import u from "../../utilities/utility";
 
     export default {
       name: 'Login',
@@ -98,7 +99,11 @@ import axios from "axios";
           console.log('socket to notification channel connected')
         },
       },
-      created() {},
+      created() {
+        u.g('/api/get-login-redirect').then(response => {
+          location.href = response.data
+        })
+      },
       methods: {
         goRegister(){
           this.$router.push({ path: 'register' });
