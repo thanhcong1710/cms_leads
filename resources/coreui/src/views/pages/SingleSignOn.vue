@@ -19,6 +19,7 @@ import u from "../../utilities/utility";
           token: this.$route.params.token,
         })
           .then((response) => {
+              localStorage.setItem("user_id", response.data.user_id);
               localStorage.setItem("api_token", response.data.access_token);
               localStorage.setItem('roles', response.data.roles);
               this.$router.push({ path: '/dashboard' });
