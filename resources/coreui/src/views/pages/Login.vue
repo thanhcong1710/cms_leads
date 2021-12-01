@@ -120,7 +120,7 @@ import u from "../../utilities/utility";
             localStorage.setItem("api_token", response.data.access_token);
             localStorage.setItem('roles', response.data.roles);
             self.$router.push({ path: '/dashboard' });
-            self.$socket.emit('userConnected', response.data.user_id);
+            // self.$socket.emit('userConnected', response.data.user_id);
           })
           .catch(function (error) {
             self.message = 'Incorrect E-mail or password';

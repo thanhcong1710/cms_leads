@@ -138,7 +138,7 @@ export default {
       };
   },
   created(){
-    this.$socket.emit('userConnected', localStorage.getItem("user_id"));
+    // this.$socket.emit('userConnected', localStorage.getItem("user_id"));
   },
   methods: {
     changeLanguage() {
@@ -170,10 +170,14 @@ export default {
   },
   sockets: {
     inbound: function (data) { 
-      this.showModalInbound(data)
+      if(data.user_id == localStorage.getItem("user_id")){
+        this.showModalInbound(data)
+      }
     },
     call_end: function (data) { 
-      this.changeModalInbound(data)
+      if(data.user_id == localStorage.getItem("user_id")){
+        this.changeModalInbound(data)
+      }
     },
   },
 }

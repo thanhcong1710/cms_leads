@@ -570,7 +570,7 @@ export default {
     };
   },
   created() {
-    this.$socket.emit('userConnected', localStorage.getItem("user_id"));
+    // this.$socket.emit('userConnected', localStorage.getItem("user_id"));
     u.g(`/api/user/get-users-manager`)
       .then(response => {
       this.users_manager = response.data
@@ -1012,8 +1012,10 @@ export default {
       console.log('socket to notification channel connected')
     },
     call_end: function (data) { 
-      console.log(data);
-      this.getInfoCall(data)
+      if(data.user_id == localStorage.getItem("user_id")){
+        console.log(data);
+        this.getInfoCall(data)
+      }
     },
   },
 };
