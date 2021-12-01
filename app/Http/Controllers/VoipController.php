@@ -133,18 +133,12 @@ class VoipController extends Controller
         u::logRequest($url,$method,[],[],$res,'log_request_outbound');
         return $res;
     }
-    public function testSocket(){
+    public function testSocket(Request $request){
         $arr=[
-            'user_id'=>38,
-            'event'=>'call_end',
-            'data'=>'124'
+            'user_id'=>$request->user_id ? $request->user_id : 38,
+            'event'=>$request->event ? $request->event :'call_end',
+            'data'=>$request->data ? $request->data :'test_soket'
         ];
-        
-        $socketio = new SocketIO();
-        if ($socketio->send($this->baseUri, 3000 , 'pushData', json_encode($arr))){
-            echo 'we sent the message and disconnected';
-        } else {
-            echo 'Sorry, we have a mistake :\'(';
-        }
+        $this->socketIo($arr['user_id'],$arr['event'],$arr['data']);
     }
 }
