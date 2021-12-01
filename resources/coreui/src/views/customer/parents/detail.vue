@@ -1012,8 +1012,8 @@ export default {
       console.log('socket to notification channel connected')
     },
     call_end: function (data) { 
+      console.log(data);
       if(data.user_id == localStorage.getItem("user_id")){
-        console.log(data);
         this.getInfoCall(data)
       }
     },
