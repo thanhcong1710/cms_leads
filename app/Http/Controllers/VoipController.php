@@ -110,6 +110,12 @@ class VoipController extends Controller
         
         $socketio = new SocketIO();
         if ($socketio->send($this->baseUri, 3000 , 'pushData', json_encode($arr))){
+            u::insertSimpleRow( array(
+                'user_id'=>$user_id,
+                'event'=>$event,
+                'created_at'=>date('Y-m-d H:i:s'),
+                'data'=>json_encode($data)
+            ),'log_socket');
             echo 'we sent the message and disconnected';
         } else {
             echo 'Sorry, we have a mistake :\'(';
