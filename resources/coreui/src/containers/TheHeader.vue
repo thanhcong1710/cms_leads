@@ -129,7 +129,7 @@ export default {
             title: "CUỘC GỌI ĐẾN TỪ KHÁCH HÀNG",
             show: false,
             color: "success",
-            closeOnBackdrop: true,
+            closeOnBackdrop: false,
             error_message:"",
             parent_id:'',
             name:'',
