@@ -36,14 +36,18 @@ class LogParents extends Model
     }
     public static function logStatus($parent_id,$pre_status,$status,$creator_id){
         $arr_status = array(
-            '1'=>'Data',
-            '2'=>'Khai thác',
-            '3'=>'Đồng ý đặt lịch',
-            '4'=>'Checkin',
-            '5'=>'Đăng ký mua',
-            '6'=>'Tái tục',
-            '7'=>'Không tiềm năng',
-            '8'=>'Black list',
+            '1'=>'KH mới gắn khi thêm mới bằng import',
+            '2'=>'KH tiềm năng',
+            '3'=>'KH tiềm năng cần follow up',
+            '4'=>'KH bận gọi lại sau',
+            '5'=>'KH không nghe máy',
+            '6'=>'KH đồng ý đặt lịch checkin',
+            '7'=>'KH đã đến checkin',
+            '8'=>'KH đã mua gói phí',
+            '9'=>'KH không có nhu cầu',
+            '10'=>'KH không tiềm năng',
+            '11'=>'KH đến hạn tái tục',
+            '12'=>'Danh sách đen',
         );
         $content = "Thay đổi trạng thái: từ `".$arr_status[$pre_status]."` thành `".$arr_status[$status]."`";
         u::insertSimpleRow(array(

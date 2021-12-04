@@ -468,31 +468,43 @@ export default {
       let resp = ''
       switch (Number(value)) {
           case 1:
-              resp = 'Data'
+              resp = 'KH mới gắn khi thêm mới bằng import'
               break
           case 2:
-              resp = 'Khai thác'
+              resp = 'KH tiềm năng'
               break
           case 3:
-              resp = 'Đồng ý đặt lịch'
+              resp = 'KH tiềm năng cần follow up'
               break
           case 4:
-              resp = 'Checkin'
+              resp = 'KH bận gọi lại sau'
               break
           case 5:
-              resp = 'Đăng ký mua'
+              resp = 'KH không nghe máy'
               break
           case 6:
-              resp = 'Tái tục'
+              resp = 'KH đồng ý đặt lịch checkin'
               break
           case 7:
-              resp = 'Không tiềm năng'
+              resp = 'KH đã đến checkin'
               break
           case 8:
-              resp = 'Black list'
+              resp = 'KH đã mua gói phí'
               break
+          case 9:
+              resp = 'KH không có nhu cầu'
+              break
+          case 10:
+              resp = 'KH không tiềm năng'
+              break
+          case 11:
+              resp = 'KH đến hạn tái tục'
+              break
+          case 12:
+              resp = 'Danh sách đen'
+              break 
           default:
-              resp = 'Data'
+              resp = 'KH mới gắn khi thêm mới bằng import'
               break
       }
       return resp

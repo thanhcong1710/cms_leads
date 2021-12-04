@@ -37,14 +37,18 @@
                 <p>Trạng thái</p>
                 <p> 
                   <select class="form-control" @change="showModalChangeStatus" v-model="tmp_status" >
-                    <option value="1">Data</option>
-                    <option value="2">Khai thác</option>
-                    <option value="3">Đồng ý đặt lịch</option>
-                    <option value="4">Checkin</option>
-                    <option value="5">Đăng ký mua</option>
-                    <option value="6">Tái tục</option>
-                    <option value="7">Không tiềm năng</option>
-                    <option value="8">Black list</option>
+                    <option value="1">KH mới gắn khi thêm mới bằng import</option>
+                    <option value="2">KH tiềm năng</option>
+                    <option value="3">KH tiềm năng cần follow up</option>
+                    <option value="4">KH bận gọi lại sau</option>
+                    <option value="5">KH không nghe máy</option>
+                    <option value="6">KH đồng ý đặt lịch checkin</option>
+                    <option value="7">KH đã đến checkin</option>
+                    <option value="8">KH đã mua gói phí</option>
+                    <option value="9">KH không có nhu cầu</option>
+                    <option value="10">KH không tiềm năng</option>
+                    <option value="11">KH đến hạn tái tục</option>
+                    <option value="12">Danh sách đen</option>
                   </select>
                 </p>  
               </div>
@@ -104,7 +108,7 @@
                       </select>
                       <br>
                       <textarea class="form-control" v-model="phone.note" placeholder="Thêm ghi chú cuộc gọi"></textarea>
-                      <div style="margin-top:5px;text-align:right" v-if="phone.show_input_note">
+                      <div style="margin-top:5px;text-align:right" v-if="phone.show_input_note || 1==1">
                         <button class="btn btn-success" @click="updateNotePhone"> <i class="fa fa-save"></i> Lưu</button>
                         <button class="btn btn-secondary" @click="phone.show=false"> <i class="fa fa-times"></i> Đóng</button>
                       </div>
