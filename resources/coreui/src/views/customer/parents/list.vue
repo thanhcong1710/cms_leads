@@ -429,8 +429,8 @@ export default {
 
       const ids_owner = []
       this.searchData.arr_owner = u.is.obj(this.searchData.arr_owner) ? [this.searchData.arr_owner] : this.searchData.arr_owner
-      if (this.searchData.arr_status.length) {
-        this.searchData.arr_status.map(item => {
+      if (this.searchData.arr_owner.length) {
+        this.searchData.arr_owner.map(item => {
           ids_owner.push(item.id)
         })
       }
