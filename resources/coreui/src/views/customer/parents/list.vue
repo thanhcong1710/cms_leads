@@ -20,23 +20,54 @@
               </div>
               <div class="form-group col-sm-3">
                 <label for="ccmonth">Trạng thái</label>
-                <select class="form-control" v-model="searchData.status">
-                  <option value="1">Data</option>
-                  <option value="2">Khai thác</option>
-                  <option value="3">Đồng ý đặt lịch</option>
-                  <option value="4">Checkin</option>
-                  <option value="5">Đăng ký mua</option>
-                  <option value="6">Tái tục</option>
-                  <option value="7">Không tiềm năng</option>
-                  <option value="8">Black list</option>
-                </select>
+                <multiselect
+                  placeholder="Chọn trạng thái"
+                  select-label="Chọn trạng thái"
+                  v-model="searchData.arr_status"
+                  :options="list_status"
+                  label="label"
+                  :close-on-select="false"
+                  :hide-selected="true"
+                  :multiple="true"
+                  :searchable="true"
+                  track-by="id"
+                >
+                  <span slot="noResult">Không tìm thấy dữ liệu</span>
+                </multiselect>
               </div>
               <div class="form-group col-sm-3">
                 <label for="ccmonth">Người phụ trách</label>
-                <p><select class="form-control" v-model="searchData.owner_id">
-                  <option value="">Chọn người phụ trách</option>
-                  <option :value ="item.id" v-for="(item, index) in users_manager" :key="index">{{item.name}} - {{item.hrm_id}}</option>
-                </select></p>  
+                <multiselect
+                  placeholder="Chọn người phụ trách"
+                  select-label="Chọn một người phụ trách"
+                  v-model="searchData.arr_owner"
+                  :options="users_manager"
+                  label="label_name"
+                  :close-on-select="false"
+                  :hide-selected="true"
+                  :multiple="true"
+                  :searchable="true"
+                  track-by="id"
+                >
+                  <span slot="noResult">Không tìm thấy dữ liệu</span>
+                </multiselect>  
+              </div>
+              <div class="form-group col-sm-3">
+                <label for="ccmonth">Nguồn</label>
+                 <multiselect
+                  placeholder="Chọn nguồn"
+                  select-label="Chọn nguồn"
+                  v-model="searchData.arr_source"
+                  :options="source_list"
+                  label="name"
+                  :close-on-select="false"
+                  :hide-selected="true"
+                  :multiple="true"
+                  :searchable="true"
+                  track-by="id"
+                >
+                  <span slot="noResult">Không tìm thấy dữ liệu</span>
+                </multiselect>   
               </div>
               <div class="form-group col-sm-3">
                 <label for="ccmonth">Lịch chăm sóc tiếp theo</label>
@@ -78,7 +109,7 @@
                 <a class="nav-link" @click.prevent="setActive('type_1')" :class="{ active: isActive('type_1') }" href="#type_1">Chưa chăm sóc <span class="badge badge-sm bg-danger ms-auto">{{total.total_1}}</span></a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" @click.prevent="setActive('type_2')" :class="{ active: isActive('type_2') }" href="#type_2">Đặt lịch hẹn trong ngày <span class="badge badge-sm bg-danger ms-auto">{{total.total_2}}</span></a>
+                <a class="nav-link" @click.prevent="setActive('type_2')" :class="{ active: isActive('type_2') }" href="#type_2">Lịch chăm sóc trong ngày <span class="badge badge-sm bg-danger ms-auto">{{total.total_2}}</span></a>
               </li>
             </ul>
             <table class="table table-striped table-hover">
@@ -87,12 +118,12 @@
                   <th><b-form-checkbox class="check-item" id="select-all" v-model="selectAll"></b-form-checkbox></th>
                   <th>STT</th>
                   <th>Tên khách hàng</th>
+                  <th>Học sinh 1</th>
+                  <th>Học sinh 2</th>
                   <th>Số điện thoại</th>
-                  <th>Email</th>
                   <th>Nguồn</th>
                   <th>Người phụ trách</th>
-                  <th>Lần cuối liên hệ</th>
-                  <th>Lịch chăm sóc</th>
+                  <th>Lịch sử chăm sóc</th>
                   <th>Trạng thái</th>
                   <th>Thao tác</th>
                 </tr>
@@ -112,12 +143,12 @@
                     {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
                   </td>
                   <td><router-link :to="`/parents/${item.id}/detail`"><a>{{ item.name }}</a></router-link></td>
+                  <td>{{ item.hs1_name }}</td>
+                  <td>{{ item.hs2_name }}</td>
                   <td>{{ item.mobile_1 }}</td>
-                  <td>{{ item.email }}</td>
                   <td>{{ item.source_name }}</td>
                   <td>{{ item.owner_name }}</td>
                   <td>{{ item.last_care }}</td>
-                  <td>{{ item.next_care_date }}</td>
                   <td>{{ item.status | getStatusName }}</td>
                   <td>
                     <router-link
@@ -247,6 +278,21 @@ export default {
   name: "List-Parent",
   data() {
     return {
+      source_list:[],
+      list_status:[
+        {id:1,label:'KH mới gắn khi thêm mới bằng import'},
+        {id:2,label:'KH tiềm năng'},
+        {id:3,label:'KH tiềm năng cần follow up'},
+        {id:4,label:'KH bận gọi lại sau'},
+        {id:5,label:'KH không nghe máy'},
+        {id:6,label:'KH đồng ý đặt lịch checkin'},
+        {id:7,label:'KH đã đến checkin'},
+        {id:8,label:'KH đã mua gói phí'},
+        {id:9,label:'KH không có nhu cầu'},
+        {id:10,label:'KH không tiềm năng'},
+        {id:11,label:'KH đến hạn tái tục'},
+        {id:12,label:'Danh sách đen'}
+      ],
       checked_list: [],
       temp: [],
       datepickerOptions: {
@@ -277,8 +323,12 @@ export default {
       },
       searchData: {
         keyword: "",
+        arr_status: "",
+        arr_owner: "",
+        arr_source: "",
         status: "",
         owner_id: "",
+        source_id: "",
         pagination: this.pagination,
         dateRange: "",
         type_seach: 0,
@@ -348,6 +398,13 @@ export default {
       .then(response => {
       this.users_manager = response.data
     })
+    u.g(`/api/sources`)
+      .then(response => {
+      this.source_list = response.data
+    })
+    if(localStorage.getItem("parents_searchData")){
+      this.searchData =  JSON.parse(localStorage.getItem("parents_searchData"));
+    }
     this.search();
   },
   methods: {
@@ -361,15 +418,44 @@ export default {
     search(a) {
       const startDate = this.searchData.dateRange!='' && this.searchData.dateRange[0] ?`${u.dateToString(this.searchData.dateRange[0])}`:''
       const endDate = this.searchData.dateRange!='' && this.searchData.dateRange[1] ?`${u.dateToString(this.searchData.dateRange[1])}`:''
+      const ids = []
+      this.searchData.arr_status = u.is.obj(this.searchData.arr_status) ? [this.searchData.arr_status] : this.searchData.arr_status
+      if (this.searchData.arr_status.length) {
+        this.searchData.arr_status.map(item => {
+          ids.push(item.id)
+        })
+      }
+      this.searchData.status = ids
+
+      const ids_owner = []
+      this.searchData.arr_owner = u.is.obj(this.searchData.arr_owner) ? [this.searchData.arr_owner] : this.searchData.arr_owner
+      if (this.searchData.arr_status.length) {
+        this.searchData.arr_status.map(item => {
+          ids_owner.push(item.id)
+        })
+      }
+      this.searchData.owner_id = ids_owner
+
+      const ids_source = []
+      this.searchData.arr_source = u.is.obj(this.searchData.arr_source) ? [this.searchData.arr_source] : this.searchData.arr_source
+      if (this.searchData.arr_source.length) {
+        this.searchData.arr_source.map(item => {
+          ids_source.push(item.id)
+        })
+      }
+      this.searchData.source_id = ids_source
+
       const data = {
         keyword: this.searchData.keyword,
         status: this.searchData.status,
         owner_id: this.searchData.owner_id,
+        source_id: this.searchData.source_id,
         start_date:startDate,
         end_date:endDate,
         pagination:this.pagination,
         type_seach:this.searchData.type_seach
       };
+      localStorage.setItem("parents_searchData", JSON.stringify(this.searchData));
       const link = "/api/parents/list";
 
       this.loading.processing = true;

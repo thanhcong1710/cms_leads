@@ -19,9 +19,10 @@ class ParentsController extends Controller
      */
     public function list(Request $request)
     {
-        $status = isset($request->status) ? $request->status : '';
+        $status = isset($request->status) ? $request->status : [];
         $keyword = isset($request->keyword) ? $request->keyword : '';
-        $owner_id = isset($request->owner_id) ? $request->owner_id : '';
+        $owner_id = isset($request->owner_id) ? $request->owner_id :  [];
+        $source_id = isset($request->source_id) ? $request->source_id : [];
         $end_date = isset($request->end_date) ? $request->end_date : '';
         $start_date = isset($request->start_date) ? $request->start_date : '';
         $type_seach = isset($request->type_seach) ? $request->type_seach : 0;
@@ -35,14 +36,18 @@ class ParentsController extends Controller
         if(!$request->user()->hasRole('admin')){
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
-        if ($status !== '') {
-            $cond .= " AND p.status=$status";
+        if (!empty($status)) {
+            $cond .= " AND p.status IN (".implode(",",$status).")";
         }
+        if (!empty($owner_id)) {
+            $cond .= " AND p.owner_id IN (".implode(",",$owner_id).")";
+        }
+        if (!empty($source_id)) {
+            $cond .= " AND p.source_id IN (".implode(",",$source_id).")";
+        }
+        
         if ($keyword !== '') {
             $cond .= " AND (p.name LIKE '%$keyword%' OR p.mobile_1 LIKE '%$keyword%' OR p.mobile_2 LIKE '%$keyword%') ";
-        }
-        if ($owner_id !== '') {
-            $cond .= " AND p.owner_id=$owner_id";
         }
         if ($end_date !== '') {
             $cond .= " AND p.next_care_date < '$end_date 23:59:59' AND p.next_care_date IS NOT NULL";
@@ -64,7 +69,9 @@ class ParentsController extends Controller
         $total = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $tmp_cond");
         $list = u::query("SELECT p.*, (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
                 (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_care,
-                (SELECT name FROM users WHERE id=p.owner_id) AS owner_name 
+                (SELECT name FROM users WHERE id=p.owner_id) AS owner_name ,
+                (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 0,1) AS hs1_name,
+                (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 1,1) AS hs2_name
             FROM cms_parents AS p WHERE $cond $tmp_cond ORDER BY p.id DESC $limitation");
         $data = u::makingPagination($list, $total->total, $page, $limit);
 

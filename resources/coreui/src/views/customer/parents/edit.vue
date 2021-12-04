@@ -356,7 +356,7 @@ export default {
     },
     exit() {
       if (this.modal.action_exit == "exit") {
-        this.$router.push({ path: "/parents" });
+        this.$router.push({ path: `/parents/${this.$route.params.id}/detail` });
       } else {
         this.modal.show = false;
       }
