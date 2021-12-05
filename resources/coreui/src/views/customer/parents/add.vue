@@ -141,7 +141,7 @@
                     <div class="form-group col-sm-6">
                       <label for="nf-email">Trạng thái</label>
                       <select class="form-control" v-model="parent.status">
-                        <option value="1">KH mới gắn khi thêm mới bằng import</option>
+                        <option value="1">KH mới</option>
                         <option value="2">KH tiềm năng</option>
                         <option value="3">KH tiềm năng cần follow up</option>
                         <option value="4">KH bận gọi lại sau</option>

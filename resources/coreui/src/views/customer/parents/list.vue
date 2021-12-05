@@ -280,7 +280,7 @@ export default {
     return {
       source_list:[],
       list_status:[
-        {id:1,label:'KH mới gắn khi thêm mới bằng import'},
+        {id:1,label:'KH mới'},
         {id:2,label:'KH tiềm năng'},
         {id:3,label:'KH tiềm năng cần follow up'},
         {id:4,label:'KH bận gọi lại sau'},
@@ -554,7 +554,7 @@ export default {
       let resp = ''
       switch (Number(value)) {
           case 1:
-              resp = 'KH mới gắn khi thêm mới bằng import'
+              resp = 'KH mới'
               break
           case 2:
               resp = 'KH tiềm năng'
@@ -590,7 +590,7 @@ export default {
               resp = 'Danh sách đen'
               break 
           default:
-              resp = 'KH mới gắn khi thêm mới bằng import'
+              resp = 'KH mới'
               break
       }
       return resp

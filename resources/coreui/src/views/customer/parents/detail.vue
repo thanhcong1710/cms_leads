@@ -37,7 +37,7 @@
                 <p>Trạng thái</p>
                 <p> 
                   <select class="form-control" @change="showModalChangeStatus" v-model="tmp_status" >
-                    <option value="1">KH mới gắn khi thêm mới bằng import</option>
+                    <option value="1">KH mới</option>
                     <option value="2">KH tiềm năng</option>
                     <option value="3">KH tiềm năng cần follow up</option>
                     <option value="4">KH bận gọi lại sau</option>

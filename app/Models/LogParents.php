@@ -36,7 +36,7 @@ class LogParents extends Model
     }
     public static function logStatus($parent_id,$pre_status,$status,$creator_id){
         $arr_status = array(
-            '1'=>'KH mới gắn khi thêm mới bằng import',
+            '1'=>'KH mới',
             '2'=>'KH tiềm năng',
             '3'=>'KH tiềm năng cần follow up',
             '4'=>'KH bận gọi lại sau',

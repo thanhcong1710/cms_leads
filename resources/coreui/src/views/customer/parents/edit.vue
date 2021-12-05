@@ -127,7 +127,7 @@
                       </select>
                     </div>
                     <div class="form-group col-sm-6">
-                      <label for="nf-email">Nguồn</label>
+                      <label for="nf-email">Nguồn  <span class="text-danger"> (*)</span></label>
                       <vue-select
                             label="name"
                             placeholder="Chọn nguồn"
@@ -141,7 +141,7 @@
                     <div class="form-group col-sm-6">
                       <label for="nf-email">Trạng thái</label>
                       <select class="form-control" v-model="parent.status" disabled>
-                        <option value="1">KH mới gắn khi thêm mới bằng import</option>
+                        <option value="1">KH mới</option>
                         <option value="2">KH tiềm năng</option>
                         <option value="3">KH tiềm năng cần follow up</option>
                         <option value="4">KH bận gọi lại sau</option>
@@ -330,6 +330,10 @@ export default {
       }
       if (this.parent.owner_id == "") {
         mess += " - Người phụ trách không được để trống<br/>";
+        resp = false;
+      }
+      if (this.parent.source_id == "") {
+        mess += " - Nguồn không được để trống<br/>";
         resp = false;
       }
       if (!resp) {
