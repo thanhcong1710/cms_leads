@@ -167,9 +167,37 @@ class ImportsController extends Controller
     }
     public function processCheckDuplicateData($import_id){
         // check duplicate cms_import_parents
-        $list = u::query("SELECT p.id FROM cms_import_parents AS p 
-            WHERE p.import_id = $import_id AND 
-                (SELECT count(id) FROM cms_import_parents  WHERE import_id = $import_id AND (gud_mobile1 = p.gud_mobile1 OR gud_mobile2 = p.gud_mobile1 OR gud_mobile1 = p.gud_mobile2 OR (gud_mobile2 = p.gud_mobile2 AND gud_mobile2 IS NOT NULL AND gud_mobile2!='')) AND id<p.id)>0");
+        $list = u::query("SELECT p.id, p1.id
+            FROM
+                cms_import_parents AS p
+                LEFT JOIN cms_import_parents AS p1 ON (p.gud_mobile1 = p1.gud_mobile1 AND p.id>p1.id)
+            WHERE
+                p.import_id = $import_id AND p1.import_id=$import_id 
+                AND p1.id IS NOT NULL
+        UNION 
+            SELECT p.id, p1.id
+            FROM
+                cms_import_parents AS p
+                LEFT JOIN cms_import_parents AS p1 ON ( p1.gud_mobile2 = p.gud_mobile1 AND p1.gud_mobile2 IS NOT NULL AND p1.gud_mobile2 != '' AND p.id>p1.id)
+            WHERE
+                p.import_id = $import_id AND p1.import_id=$import_id 
+                AND p1.id IS NOT NULL
+        UNION 
+            SELECT p.id, p1.id
+            FROM
+                cms_import_parents AS p
+                LEFT JOIN cms_import_parents AS p1 ON ( p1.gud_mobile1 = p.gud_mobile2 AND p.gud_mobile2 IS NOT NULL AND p.gud_mobile2 != '' AND p.id>p1.id)
+            WHERE
+                p.import_id = $import_id AND p1.import_id=$import_id 
+                AND p1.id IS NOT NULL
+        UNION 
+            SELECT p.id, p1.id
+            FROM
+                cms_import_parents AS p
+                LEFT JOIN cms_import_parents AS p1 ON ( p1.gud_mobile2 = p.gud_mobile2 AND p1.gud_mobile2 IS NOT NULL AND p1.gud_mobile2 != '' AND p.id>p1.id)
+            WHERE
+                p.import_id = $import_id AND p1.import_id=$import_id 
+                AND p1.id IS NOT NULL");
         if(!empty($list)){
             $sql_update = "INSERT INTO cms_import_parents (id,`status`,error_message) VALUES ";
             foreach($list AS $row){
@@ -180,10 +208,41 @@ class ImportsController extends Controller
             u::query($sql_update);
         }
         // check duplicate cms_parents
-        $list = u::query("SELECT p.id, u.name, u.hrm_id,u.branch_name FROM cms_import_parents AS p 
-                LEFT JOIN cms_parents AS ps ON (ps.mobile_1=p.gud_mobile1 OR ps.mobile_2=p.gud_mobile1 OR ps.mobile_1=p.gud_mobile2 OR (ps.mobile_2=p.gud_mobile2 AND ps.mobile_2 IS NOT NULL AND ps.mobile_2!=''))
-                LEFT JOIN users AS u ON ps.owner_id = u.id
-            WHERE p.import_id = $import_id AND ps.id IS NOT NULL");
+        $list = u::query("SELECT p.id, u.name, u.hrm_id,u.branch_name 
+                    FROM
+                        cms_import_parents AS p
+                        LEFT JOIN cms_parents AS ps ON ps.mobile_1 = p.gud_mobile1
+                        LEFT JOIN users AS u ON ps.owner_id = u.id 
+                    WHERE
+                        p.import_id = $import_id 
+                        AND ps.id IS NOT NULL 
+                UNION
+                    SELECT p.id, u.name, u.hrm_id,u.branch_name
+                    FROM
+                        cms_import_parents AS p
+                        LEFT JOIN cms_parents AS ps ON ( ps.mobile_2 = p.gud_mobile1 AND ps.mobile_2 IS NOT NULL AND ps.mobile_2 != '' )
+                        LEFT JOIN users AS u ON ps.owner_id = u.id 
+                    WHERE
+                        p.import_id = $import_id 
+                        AND ps.id IS NOT NULL 
+                UNION
+                    SELECT p.id, u.name, u.hrm_id,u.branch_name 
+                    FROM
+                        cms_import_parents AS p
+                        LEFT JOIN cms_parents AS ps ON ( ps.mobile_1 = p.gud_mobile2 AND p.gud_mobile2 IS NOT NULL AND p.gud_mobile2 != '' )
+                        LEFT JOIN users AS u ON ps.owner_id = u.id 
+                    WHERE
+                        p.import_id = $import_id 
+                        AND ps.id IS NOT NULL 
+                UNION
+                    SELECT p.id, u.name, u.hrm_id,u.branch_name 
+                    FROM
+                        cms_import_parents AS p
+                        LEFT JOIN cms_parents AS ps ON ( ps.mobile_2 = p.gud_mobile2 AND ps.mobile_2 IS NOT NULL AND ps.mobile_2 != '' )
+                        LEFT JOIN users AS u ON ps.owner_id = u.id 
+                    WHERE
+                        p.import_id = $import_id 
+                        AND ps.id IS NOT NULL");
         if(!empty($list)){
             $sql_update = "INSERT INTO cms_import_parents (id,`status`,error_message) VALUES ";
             foreach($list AS $row){
