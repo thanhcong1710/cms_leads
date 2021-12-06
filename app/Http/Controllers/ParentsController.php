@@ -59,16 +59,20 @@ class ParentsController extends Controller
         $cond_1 = " AND (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id)=0";
         //type_search=2
         $cond_2 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') = '".date('Y-m-d')."'";
+        $cond_3 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') < '".date('Y-m-d')."' 
+            AND ( SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND care_date >= next_care_date )=0";
 
         $tmp_cond="";
         if($type_seach==1){
             $tmp_cond = $cond_1;
         }elseif($type_seach==2){
             $tmp_cond = $cond_2;
+        }elseif($type_seach==3){
+            $tmp_cond = $cond_3;
         }
         $total = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $tmp_cond");
         $list = u::query("SELECT p.*, (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
-                (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_care,
+                (SELECT note FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_care,
                 (SELECT name FROM users WHERE id=p.owner_id) AS owner_name ,
                 (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 0,1) AS hs1_name,
                 (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 1,1) AS hs2_name
@@ -78,10 +82,12 @@ class ParentsController extends Controller
         $total_0 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond ");
         $total_1 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $cond_1 ");
         $total_2 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $cond_2 ");
+        $total_3 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $cond_3 ");
         $data->detail_total = (object)array(
             'total_0' => $total_0->total,
             'total_1' => $total_1->total,
             'total_2' => $total_2->total,
+            'total_3' => $total_3->total,
         );
         return response()->json($data);
     }
@@ -287,6 +293,9 @@ class ParentsController extends Controller
         $parent_info = u::first("SELECT id,mobile_1,mobile_2 FROM cms_parents WHERE id='$request->parent_id'");
         $phone = $request->phone ? $request->phone :$parent_info->mobile_1;
         if($parent_info){
+            $sms = new Sms();
+            $res = $sms->sendSms($phone,$request->content,$request->user()->id);
+            $res = json_decode($res,true);
             u::insertSimpleRow( array(
                 'parent_id'=>$parent_info->id,
                 'note'=>$request->content,
@@ -294,10 +303,9 @@ class ParentsController extends Controller
                 'creator_id'=>$request->user()->id,
                 'method_id'=>4,
                 'care_date'=>date('Y-m-d H:i:s'),
-                'phone'=>$phone 
+                'phone'=>$phone ,
+                'data_state'=> isset($res['CodeResult']) && $res['CodeResult']==100 ? 'Thành công' : 'Thất bại'
             ),'cms_customer_care');
-            $sms = new Sms();
-            $sms->sendSms($phone,$request->content,$request->user()->id);
         }
         return "ok";
     }

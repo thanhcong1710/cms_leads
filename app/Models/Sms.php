@@ -44,6 +44,6 @@ class Sms
             'status'=>1
         ]);
 
-        return true;
+        return $res;
     }
 }

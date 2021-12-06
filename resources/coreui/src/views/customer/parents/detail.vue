@@ -933,7 +933,7 @@ export default {
           resp = 'Không nghe máy'
           break
         default:
-          resp = ''
+          resp = text
           break
       }
       return resp

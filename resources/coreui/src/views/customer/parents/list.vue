@@ -111,6 +111,9 @@
               <li class="nav-item">
                 <a class="nav-link" @click.prevent="setActive('type_2')" :class="{ active: isActive('type_2') }" href="#type_2">Lịch chăm sóc trong ngày <span class="badge badge-sm bg-danger ms-auto">{{total.total_2}}</span></a>
               </li>
+               <li class="nav-item">
+                <a class="nav-link" @click.prevent="setActive('type_3')" :class="{ active: isActive('type_3') }" href="#type_3">KH quá hạn xử lý <span class="badge badge-sm bg-danger ms-auto">{{total.total_3}}</span></a>
+              </li>
             </ul>
             <table class="table table-striped table-hover">
               <thead>
@@ -544,6 +547,8 @@ export default {
         this.searchData.type_seach=1
       }if(menuItem=="type_2"){
         this.searchData.type_seach=2
+      }if(menuItem=="type_3"){
+        this.searchData.type_seach=3
       }
       this.activeItem = menuItem
       this.search();
