@@ -139,7 +139,7 @@ class VoipController extends Controller
             'event'=>$request->event ? $request->event :'call_end',
             'data'=> array(
                 'user_id'=>$request->user_id ? $request->user_id : 38,
-                'phone'=>'test_soket')
+                'phone'=>'0967973295')
         ];
         $this->socketIo($arr['user_id'],$arr['event'],$arr['data']);
     }
