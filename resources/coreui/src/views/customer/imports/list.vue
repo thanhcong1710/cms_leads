@@ -43,6 +43,7 @@
                   <th>Thành công</th>
                   <th>Lỗi</th>
                   <th>Trạng thái</th>
+                  <th>Thao tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -56,7 +57,7 @@
                   <td>{{ item.count_success }}</td>
                   <td>{{ item.count_error }}</td>
                   <td>{{ item.status | getStatusName}}</td>
-                  <td></td>
+                  <td><button class="btn btn-sm btn-info" @click="exportExcel(item)"> <i class="fas fa-download"></i></button></td>
                 </tr>
               </tbody>
             </table>
@@ -107,11 +108,12 @@ import axios from "axios";
 import paging from "../../../components/Pagination";
 import u from "../../../utilities/utility";
 import loader from "../../../components/Loading";
-
+import saveAs from "file-saver";
 export default {
   components: {
     loader: loader,
     paging: paging,
+    saveAs,
   },
   name: "List-Parent",
   data() {
@@ -207,6 +209,9 @@ export default {
     },
     exit() {
       this.modal.show = false;
+    },
+    exportExcel(data) {
+      window.open(`/api/export/import/${data.id}`,"_blank")
     },
   },
   filters: {

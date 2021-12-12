@@ -26,6 +26,7 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::get('webhook/voip24h', 'VoipController@webhook');
     Route::get('socket_io/test', 'VoipController@testSocket');
     Route::get('tools/download_record', 'ToolsController@downloadReCord');
+    Route::get('/export/import/{import_id}', 'ExportController@import');
 
     Route::group(['middleware' => 'admin'], function ($router) {
         Route::resource('users', 'UsersController')->except( ['create', 'store'] );
