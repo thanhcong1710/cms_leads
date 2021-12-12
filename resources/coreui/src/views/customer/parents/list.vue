@@ -416,6 +416,7 @@ export default {
       this.modal_assign.show =true
     },
     reset() {
+      localStorage.setItem("parents_searchData", '');
       location.reload();
     },
     search(a) {
