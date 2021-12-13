@@ -115,65 +115,71 @@
                 <a class="nav-link" @click.prevent="setActive('type_3')" :class="{ active: isActive('type_3') }" href="#type_3">KH quá hạn xử lý <span class="badge badge-sm bg-danger ms-auto">{{total.total_3}}</span></a>
               </li>
             </ul>
-            <table class="table table-striped table-hover">
-              <thead>
-                <tr>
-                  <th><b-form-checkbox class="check-item" id="select-all" v-model="selectAll"></b-form-checkbox></th>
-                  <th>STT</th>
-                  <th>Tên khách hàng</th>
-                  <th>Học sinh 1</th>
-                  <th>Học sinh 2</th>
-                  <th>Số điện thoại</th>
-                  <th>Nguồn</th>
-                  <th>Người phụ trách</th>
-                  <th>Lịch sử chăm sóc</th>
-                  <th>Trạng thái</th>
-                  <th>Thao tác</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(item, index) in parents" :key="index">
-                  <td>
-                    <b-form-checkbox
-                      class="check-item"
-                      v-model="temp"
-                      :value="item.id"
-                      @change.native="toggleSelectRow()"
-                      number
-                    ></b-form-checkbox>
-                  </td>
-                  <td>
-                    {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
-                  </td>
-                  <td><router-link :to="`/parents/${item.id}/detail`"><a>{{ item.name }}</a></router-link></td>
-                  <td>{{ item.hs1_name }}</td>
-                  <td>{{ item.hs2_name }}</td>
-                  <td>{{ item.mobile_1 }}</td>
-                  <td>{{ item.source_name }}</td>
-                  <td>{{ item.owner_name }}</td>
-                  <td>{{ item.last_care }}</td>
-                  <td>{{ item.status | getStatusName }}</td>
-                  <td>
-                    <router-link
-                      class="btn btn-sm btn-success"
-                      :to="`/parents/${item.id}/edit`"
-                    >
-                      <i class="fa fa-edit"></i> </router-link>
-                    <button
-                      class="btn btn-sm btn-danger"
-                      type="button"
-                      @click="deleteItem(item.id)"
-                    >
-                      <i class="fas fa-times"></i></button>
-                    <router-link
-                      class="btn btn-sm  btn-info"
-                      :to="`/parents/${item.id}/detail`"
-                    >
-                      <i class="fa fa-eye"></i></router-link>  
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div class="wrapper1">
+                <div class="div1" style="width:1800px;height: 1px;">
+                </div>
+            </div>
+            <div class="wrapper2">
+              <table class="table table-striped table-hover" style="width:1800px">
+                <thead>
+                  <tr>
+                    <th class="sticky-col st1-col"><b-form-checkbox class="check-item" id="select-all" v-model="selectAll"></b-form-checkbox></th>
+                    <th class="sticky-col st2-col">STT</th>
+                    <th class="sticky-col st3-col">Tên khách hàng</th>
+                    <th class="sticky-col st4-col">Số điện thoại</th>
+                    <th>Học sinh 2</th>
+                    <th>Học sinh 1</th>
+                    <th>Nguồn</th>
+                    <th>Người phụ trách</th>
+                    <th>Lịch sử chăm sóc</th>
+                    <th>Trạng thái</th>
+                    <th class="sticky-col last-col">Thao tác</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item, index) in parents" :key="index">
+                    <td  class="sticky-col st1-col">
+                      <b-form-checkbox
+                        class="check-item"
+                        v-model="temp"
+                        :value="item.id"
+                        @change.native="toggleSelectRow()"
+                        number
+                      ></b-form-checkbox>
+                    </td>
+                    <td  class="sticky-col st2-col">
+                      {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
+                    </td>
+                    <td class="sticky-col st3-col"><router-link :to="`/parents/${item.id}/detail`"><a>{{ item.name }}</a></router-link></td>
+                    <td class="sticky-col st4-col">{{ item.mobile_1 }}</td>
+                    <td>{{ item.hs2_name }}</td>
+                    <td>{{ item.hs1_name }}</td>
+                    <td>{{ item.source_name }}</td>
+                    <td>{{ item.owner_name }}</td>
+                    <td>{{ item.last_care }}</td>
+                    <td>{{ item.status | getStatusName }}</td>
+                    <td class="sticky-col last-col">
+                      <router-link
+                        class="btn btn-sm btn-success"
+                        :to="`/parents/${item.id}/edit`"
+                      >
+                        <i class="fa fa-edit"></i> </router-link>
+                      <button
+                        class="btn btn-sm btn-danger"
+                        type="button"
+                        @click="deleteItem(item.id)"
+                      >
+                        <i class="fas fa-times"></i></button>
+                      <router-link
+                        class="btn btn-sm  btn-info"
+                        :to="`/parents/${item.id}/detail`"
+                      >
+                        <i class="fa fa-eye"></i></router-link>  
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             <div class="text-center">
               <nav aria-label="Page navigation">
                 <paging
@@ -605,7 +611,58 @@ export default {
 };
 </script>
 <style scoped>
-.bg-danger {
-    color: #fff;
+.wrapper2 {
+  position: relative;
+  overflow: auto;
 }
+.wrapper1 {
+  overflow-x: scroll;
+}
+.sticky-col {
+  position: -webkit-sticky;
+  position: sticky;
+  background-color: white !important;
+}
+.sticky-col {
+  position: -webkit-sticky;
+  position: sticky;
+  background-color: white !important;
+}
+.table-striped tbody tr:nth-of-type(odd) .sticky-col{
+  background-color: rgb(241 241 241) !important;
+}
+
+.st1-col {
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+  left: 0px;
+}
+
+.st2-col {
+  width: 60px;
+  min-width: 60px;
+  max-width: 60px;
+  left: 60px;
+}
+
+.st3-col {
+  width: 160px;
+  min-width: 160px;
+  max-width: 160px;
+  left: 120px;
+}
+
+.st4-col {
+  width: 120px;
+  min-width: 120px;
+  max-width: 120px;
+  left: 280px;
+}
+/* .last-col {
+  width: 120px;
+  min-width: 120px;
+  max-width: 120px;
+  right: 0px;
+} */
 </style>
