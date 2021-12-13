@@ -112,7 +112,6 @@ export default {
   components: {
     loader: loader,
     paging: paging,
-    saveAs,
   },
   name: "List-Parent",
   data() {
