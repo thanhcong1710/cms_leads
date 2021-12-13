@@ -43,7 +43,7 @@
                   <th>Thành công</th>
                   <th>Lỗi</th>
                   <th>Trạng thái</th>
-                  <th>Thao tác</th>
+                  <th>Kết quả import</th>
                 </tr>
               </thead>
               <tbody>
