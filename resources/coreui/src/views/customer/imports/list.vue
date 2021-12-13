@@ -108,7 +108,6 @@ import axios from "axios";
 import paging from "../../../components/Pagination";
 import u from "../../../utilities/utility";
 import loader from "../../../components/Loading";
-import saveAs from "file-saver";
 export default {
   components: {
     loader: loader,
