@@ -73,7 +73,86 @@ class ExportController extends Controller
         $writer = new Xlsx($spreadsheet);
         try {
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment;filename="Kết quả import - ID $import_id.xlsx"');
+            header('Content-Disposition: attachment;filename="Kết quả import - ID '.$import_id.'.xlsx"');
+            header('Cache-Control: max-age=0');
+            $writer->save("php://output");
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
+    public function report01(Request $request , $key,$value) {
+        $cond = " 1 ";
+        $arr_key =explode(',',$key);
+        $arr_value =explode(',',$value);
+        foreach($arr_key AS $k=>$key){
+            if($key=='keyword'){
+                $keyword = $arr_value[$k];
+                $cond .= " AND (p.name LIKE '%$keyword%' OR p.mobile_1 LIKE '%$keyword%' OR p.mobile_2 LIKE '%$keyword%')";
+            }
+        }
+        $list = u::query("SELECT p.id, p.name AS parent_name,p.status,
+                (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 1) AS student_name,
+                (SELECT DATE_FORMAT(birthday,'%Y') FROM cms_students WHERE parent_id=p.id  LIMIT 1) AS student_year,
+                (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
+                CONCAT(u.name,'-',u.hrm_id) AS owner_name,
+                b.name AS branch_name,
+                DATE_FORMAT(p.created_at,'%Y-%m-%d') AS created_date,
+                (SELECT DATE_FORMAT(care_date,'%Y-%m-%d') FROM cms_customer_care WHERE parent_id =p.id ORDER BY id DESC LIMIT 1) AS last_care_date,
+                (SELECT t.name FROM cms_customer_care AS c LEFT JOIN cms_contact_methods AS t ON t.id=c.method_id WHERE c.parent_id =p.id ORDER BY c.id DESC LIMIT 1) AS last_method,
+                (SELECT count(c.id) FROM cms_customer_care AS c WHERE c.parent_id =p.id ) AS total_care
+            FROM cms_parents AS p 
+                LEFT JOIN users AS u ON p.owner_id = u.id
+                LEFT JOIN cms_branches AS b ON b.id = u.branch_id
+            WHERE $cond ORDER BY p.id DESC");
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'Mã KH');
+        $sheet->setCellValue('B1', 'Tên KH');
+        $sheet->setCellValue('C1', 'Tên HS');
+        $sheet->setCellValue('D1', 'Năm sinh');
+        $sheet->setCellValue('E1', 'Nguồn');
+        $sheet->setCellValue('F1', 'Trạng thái');
+        $sheet->setCellValue('G1', 'TVV');
+        $sheet->setCellValue('H1', 'Trung tâm');
+        $sheet->setCellValue('I1', 'Ngày nhập data');
+        $sheet->setCellValue('J1', 'Ngày chăm sóc gần nhất');
+        $sheet->setCellValue('K1', 'Hình thức chăm sóc gần nhất');
+        $sheet->setCellValue('L1', 'Tổng số lần tương tác');
+
+        $sheet->getColumnDimension("A")->setWidth(20);
+        $sheet->getColumnDimension("B")->setWidth(30);
+        $sheet->getColumnDimension("C")->setWidth(30);
+        $sheet->getColumnDimension("D")->setWidth(10);
+        $sheet->getColumnDimension("E")->setWidth(20);
+        $sheet->getColumnDimension("F")->setWidth(20);
+        $sheet->getColumnDimension("G")->setWidth(30);
+        $sheet->getColumnDimension("H")->setWidth(30);
+        $sheet->getColumnDimension("I")->setWidth(20);
+        $sheet->getColumnDimension("J")->setWidth(20);
+        $sheet->getColumnDimension("K")->setWidth(20);
+        $sheet->getColumnDimension("L")->setWidth(20);
+        for ($i = 0; $i < count($list) ; $i++) {
+            $x = $i + 2;
+            $sheet->setCellValue('A' . $x, $list[$i]->id);
+            $sheet->setCellValue('B' . $x, $list[$i]->parent_name) ;
+            $sheet->setCellValue('C' . $x, $list[$i]->student_name );
+            $sheet->setCellValue('D' . $x, $list[$i]->student_year);
+            $sheet->setCellValue('E' . $x, $list[$i]->source_name);
+            $sheet->setCellValue('F' . $x, u::getStatus($list[$i]->status));
+            $sheet->setCellValue('G' . $x, $list[$i]->owner_name);
+            $sheet->setCellValue('H' . $x, $list[$i]->branch_name);
+            $sheet->setCellValue('I' . $x, $list[$i]->created_date);
+            $sheet->setCellValue('J' . $x, $list[$i]->last_care_date);
+            $sheet->setCellValue('K' . $x, $list[$i]->last_method);
+            $sheet->setCellValue('L' . $x, $list[$i]->total_care);
+            
+            $sheet->getRowDimension($x)->setRowHeight(23);
+
+        }
+        $writer = new Xlsx($spreadsheet);
+        try {
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="Báo cáo thông tin.xlsx"');
             header('Cache-Control: max-age=0');
             $writer->save("php://output");
         } catch (Exception $exception) {

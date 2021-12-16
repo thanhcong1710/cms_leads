@@ -113,6 +113,9 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::post('/imports/upload', 'ImportsController@upload');
         Route::post('/imports/assign', 'ImportsController@assign');
         Route::get('/user/get-users-manager', 'UsersController@getUserAssgin');
+
+        Route::post('/reports/01', 'ReportsController@report01');
+        Route::get('/export/report01/{key}/{value}', 'ExportController@report01');
         
     });
 });
