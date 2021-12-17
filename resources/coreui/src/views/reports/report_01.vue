@@ -5,22 +5,23 @@
         <div class="card">
           <loader :active="loading.processing" :text="loading.text" />
           <div class="card-header">
-            <strong>Danh sách Import</strong>
+            <strong> Báo cáo thông tin khách hàng</strong>
           </div>
           <div class="card-body">
             <div class="row">
               <div class="form-group col-sm-3">
-                <label for="ccmonth">Trạng thái</label>
-                <select class="form-control" v-model="searchData.status">
-                  <option value>Chọn trạng thái</option>
-                  <option value="0">Lỗi</option>
-                  <option value="1">Hoàn thành</option>
-                </select>
+                <label for="name">Từ khóa</label>
+                <input
+                  class="form-control"
+                  v-model="searchData.keyword"
+                  type="text"
+                  placeholder="Tên khách hàng, số điện thoại"
+                />
               </div>
               <div class="form-group col-sm-12">
-                <router-link class="btn btn-success" :to="'/imports/add'">
-                  <i class="fas fa-upload"></i> Import
-                </router-link>
+                <button class="btn btn-success" @click="exportExcel()">
+                  <i class="fas fa-file-excel"></i> Xuất báo cáo
+                </button>
                 <button class="btn btn-info" type="submit" @click="search()">
                   <i class="fa fa-search"></i> Tìm kiếm
                 </button>
@@ -36,14 +37,19 @@
             <table class="table table-striped table-hover">
               <thead>
                 <tr>
-                  <th>STT</th>
-                  <th>Tên File</th>
-                  <th>Thời gian import</th>
-                  <th>Người thực hiện</th>
-                  <th>Thành công</th>
-                  <th>Lỗi</th>
+                  <th>#</th>
+                  <th>Mã KH</th>
+                  <th>Tên KH</th>
+                  <th>Tên HS</th>
+                  <th>Năm sinh</th>
+                  <th>Nguồn</th>
                   <th>Trạng thái</th>
-                  <th>Kết quả import</th>
+                  <th>TVV</th>
+                  <th>Trung tâm</th>
+                  <th>Ngày nhập data</th>
+                  <th>Ngày chăm sóc gần nhất</th>
+                  <th>Hình thức chăm sóc gần nhất</th>
+                  <th>Tổng số lần tương tác</th>
                 </tr>
               </thead>
               <tbody>
@@ -51,13 +57,18 @@
                   <td>
                     {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
                   </td>
-                  <td><a :href="item.file_link" target="blank">{{ item.file_name }}</a></td>
-                  <td>{{ item.created_at }}</td>
-                  <td>{{ item.creator_name }}</td>
-                  <td>{{ item.count_success }}</td>
-                  <td>{{ item.count_error }}</td>
+                  <td>{{item.id}}</td>
+                  <td>{{ item.parent_name }}</td>
+                  <td>{{ item.student_name }}</td>
+                  <td>{{ item.student_year }}</td>
+                  <td>{{ item.source_name }}</td>
                   <td>{{ item.status | getStatusName}}</td>
-                  <td><button class="btn btn-sm btn-info" @click="exportExcel(item)"> <i class="fas fa-download"></i></button></td>
+                  <td>{{ item.owner_name}}</td>
+                  <td>{{ item.branch_name}}</td>
+                  <td>{{ item.created_date}}</td>
+                  <td>{{ item.last_care_date}}</td>
+                  <td>{{ item.last_method}}</td>
+                  <td>{{ item.total_care}}</td>
                 </tr>
               </tbody>
             </table>
@@ -84,30 +95,13 @@
         </div>
       </div>
     </div>
-    <CModal
-      :title="modal.title"
-      :show.sync="modal.show"
-      :color="modal.color"
-      :closeOnBackdrop="modal.closeOnBackdrop"
-    >
-      {{ modal.body }}
-      <template #header>
-        <h5 class="modal-title">{{ modal.title }}</h5>
-      </template>
-      <template #footer>
-        <CButton :color="'btn btn-' + modal.color" @click="exit" type="button"
-          >Đóng</CButton
-        >
-      </template>
-    </CModal>
   </div>
 </template>
 
 <script>
-import axios from "axios";
-import paging from "../../../components/Pagination";
-import u from "../../../utilities/utility";
-import loader from "../../../components/Loading";
+import paging from "../../components/Pagination";
+import u from "../../utilities/utility";
+import loader from "../../components/Loading";
 export default {
   components: {
     loader: loader,
@@ -122,7 +116,6 @@ export default {
       },
       searchData: {
         keyword: "",
-        status: "",
         pagination: this.pagination
       },
       imports: [],
@@ -141,13 +134,6 @@ export default {
         limitSource: [10, 20, 30, 40, 50],
         pages: [],
       },
-      modal: {
-        title: "THÔNG BÁO",
-        show: false,
-        color: "success",
-        body: "Cập nhật khách hàng thành công",
-        closeOnBackdrop: false,
-      },
     };
   },
   created() {
@@ -160,10 +146,8 @@ export default {
     search(a) {
       const data = {
         keyword: this.searchData.keyword,
-        status: this.searchData.status,
-        pagination:this.pagination,
       };
-      const link = "/api/imports/list";
+      const link = "/api/reports/01";
 
       this.loading.processing = true;
       u.p(link, data)
@@ -191,31 +175,65 @@ export default {
       this.pagination.cpage = parseInt(page);
       this.search();
     },
-    deleteItem(id) {
-      u.g(`/api/imports/delete/${id}`)
-        .then((response) => {
-          this.loading.processing = false;
-          if (response.status == 200) {
-            this.modal.color = "success";
-            this.modal.body = "Xóa khách hàng thành công";
-            this.modal.show = true;
-            this.search();
-          }
-        })
-        .catch((e) => {
-          u.processAuthen(e);
-        });
-    },
-    exit() {
-      this.modal.show = false;
-    },
-    exportExcel(data) {
-      window.open(`/api/export/import/${data.id}`,"_blank")
+    exportExcel() {
+      var url = `/api/export/report01/`;
+      this.key ='';
+      this.value = ''
+      if (this.searchData.keyword){
+        this.key += "keyword,"
+        this.value += this.searchData.keyword+","
+      }
+      this.key = this.key? this.key.substring(0, this.key.length - 1):'_'
+      this.value = this.value? this.value.substring(0, this.value.length - 1) : "_"
+      url += this.key+"/"+this.value +`?token=${localStorage.getItem("api_token")}`
+      window.open(url, '_blank');
     },
   },
   filters: {
     getStatusName(value) {
-      return value == 1 ? "Hoàn thành" : "Lỗi";
+      let resp = ''
+      switch (Number(value)) {
+          case 1:
+              resp = 'KH mới'
+              break
+          case 2:
+              resp = 'KH tiềm năng'
+              break
+          case 3:
+              resp = 'KH tiềm năng cần follow up'
+              break
+          case 4:
+              resp = 'KH bận gọi lại sau'
+              break
+          case 5:
+              resp = 'KH không nghe máy'
+              break
+          case 6:
+              resp = 'KH đồng ý đặt lịch checkin'
+              break
+          case 7:
+              resp = 'KH đã đến checkin'
+              break
+          case 8:
+              resp = 'KH đã mua gói phí'
+              break
+          case 9:
+              resp = 'KH không có nhu cầu'
+              break
+          case 10:
+              resp = 'KH không tiềm năng'
+              break
+          case 11:
+              resp = 'KH đến hạn tái tục'
+              break
+          case 12:
+              resp = 'Danh sách đen'
+              break 
+          default:
+              resp = 'KH mới'
+              break
+      }
+      return resp
     },
   },
 };

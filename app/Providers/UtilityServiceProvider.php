@@ -296,4 +296,48 @@ class UtilityServiceProvider extends ServiceProvider
 		// $str = preg_replace("/( )/", '-', $str);
 		return $str;
     }
+    public static function getStatus($status){
+        $tmp ="";
+        switch ($status) {
+            case 1:
+                $tmp = 'KH mới';
+                break;
+            case 2:
+                $tmp = 'KH tiềm năng';
+                break;
+            case 3:
+                $tmp = 'KH tiềm năng cần follow up';
+                break;
+            case 4:
+                $tmp = 'KH bận gọi lại sau';
+                break;
+            case 5:
+                $tmp = 'KH không nghe máy';
+                break;
+            case 6:
+                $tmp = 'KH đồng ý đặt lịch checkin';
+                break;
+            case 7:
+                $tmp = 'KH đã đến checkin';
+                break;
+            case 8:
+                $tmp = 'KH đã mua gói phí';
+                break;
+            case 9:
+                $tmp = 'KH không có nhu cầu';
+                break;
+            case 10:
+                $tmp = 'KH không tiềm năng';
+                break;
+            case 11:
+                $tmp = 'KH đến hạn tái tục';
+                break;
+            case 12:
+                $tmp = 'Danh sách đen';
+                break;
+            default:
+                $tmp = 'KH mới';
+          }
+        return $tmp;
+    }
 }

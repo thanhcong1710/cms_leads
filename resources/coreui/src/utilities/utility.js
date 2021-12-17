@@ -44,7 +44,7 @@ const g = (link, attributes = null) => new Promise((resolve, reject) => {
       headers: {
         'Authorization': `Bearer ${localStorage.getItem("api_token")}`
       },
-      params: attributes
+      params: attributes,
     }).then(response => {
       resolve(response)
     }).catch(e => {
