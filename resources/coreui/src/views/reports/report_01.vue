@@ -146,6 +146,7 @@ export default {
     search(a) {
       const data = {
         keyword: this.searchData.keyword,
+        pagination:this.pagination,
       };
       const link = "/api/reports/01";
 
