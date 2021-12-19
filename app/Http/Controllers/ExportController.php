@@ -89,6 +89,15 @@ class ExportController extends Controller
                 $keyword = $arr_value[$k];
                 $cond .= " AND (p.name LIKE '%$keyword%' OR p.mobile_1 LIKE '%$keyword%' OR p.mobile_2 LIKE '%$keyword%')";
             }
+            if($key=='start_date'){
+                $cond .= " AND p.created_at >= '$arr_value[$k]'";
+            }
+            if($key=='end_date'){
+                $cond .= " AND p.created_at <= '$arr_value[$k]'";
+            }
+        }
+        if(!$request->user()->hasRole('admin')){
+            $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
         $list = u::query("SELECT p.id, p.name AS parent_name,p.status,
                 (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 1) AS student_name,

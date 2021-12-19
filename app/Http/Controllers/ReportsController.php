@@ -27,6 +27,12 @@ class ReportsController extends Controller
         if($keyword!==''){
             $cond .= " AND (p.name LIKE '%$keyword%' OR p.mobile_1 LIKE '%$keyword%' OR p.mobile_2 LIKE '%$keyword%')";
         }
+        if($request->start_date){
+            $cond .= " AND p.created_at >= '$request->start_date 00:00:00'";
+        }
+        if($request->end_date){
+            $cond .= " AND p.created_at <= '$request->end_date 23:59:59'";
+        }
         if(!$request->user()->hasRole('admin')){
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
