@@ -81,6 +81,7 @@ class ExportController extends Controller
         }
     }
     public function report01(Request $request , $key,$value) {
+        set_time_limit(300);
         $cond = " 1 ";
         $arr_key =explode(',',$key);
         $arr_value =explode(',',$value);
@@ -112,7 +113,7 @@ class ExportController extends Controller
             FROM cms_parents AS p 
                 LEFT JOIN users AS u ON p.owner_id = u.id
                 LEFT JOIN cms_branches AS b ON b.id = u.branch_id
-            WHERE $cond ORDER BY p.id DESC");
+            WHERE $cond ORDER BY p.id DESC LIMIT 100000");
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('A1', 'Mã KH');
