@@ -114,59 +114,96 @@ class ExportController extends Controller
                 LEFT JOIN users AS u ON p.owner_id = u.id
                 LEFT JOIN cms_branches AS b ON b.id = u.branch_id
             WHERE $cond ORDER BY p.id DESC LIMIT 100000");
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('A1', 'Mã KH');
-        $sheet->setCellValue('B1', 'Tên KH');
-        $sheet->setCellValue('C1', 'Tên HS');
-        $sheet->setCellValue('D1', 'Năm sinh');
-        $sheet->setCellValue('E1', 'Nguồn');
-        $sheet->setCellValue('F1', 'Trạng thái');
-        $sheet->setCellValue('G1', 'TVV');
-        $sheet->setCellValue('H1', 'Trung tâm');
-        $sheet->setCellValue('I1', 'Ngày nhập data');
-        $sheet->setCellValue('J1', 'Ngày chăm sóc gần nhất');
-        $sheet->setCellValue('K1', 'Hình thức chăm sóc gần nhất');
-        $sheet->setCellValue('L1', 'Tổng số lần tương tác');
+        if(count($list)<10000){
+            $spreadsheet = new Spreadsheet();
+            $sheet = $spreadsheet->getActiveSheet();
+            $sheet->setCellValue('A1', 'Mã KH');
+            $sheet->setCellValue('B1', 'Tên KH');
+            $sheet->setCellValue('C1', 'Tên HS');
+            $sheet->setCellValue('D1', 'Năm sinh');
+            $sheet->setCellValue('E1', 'Nguồn');
+            $sheet->setCellValue('F1', 'Trạng thái');
+            $sheet->setCellValue('G1', 'TVV');
+            $sheet->setCellValue('H1', 'Trung tâm');
+            $sheet->setCellValue('I1', 'Ngày nhập data');
+            $sheet->setCellValue('J1', 'Ngày chăm sóc gần nhất');
+            $sheet->setCellValue('K1', 'Hình thức chăm sóc gần nhất');
+            $sheet->setCellValue('L1', 'Tổng số lần tương tác');
 
-        $sheet->getColumnDimension("A")->setWidth(20);
-        $sheet->getColumnDimension("B")->setWidth(30);
-        $sheet->getColumnDimension("C")->setWidth(30);
-        $sheet->getColumnDimension("D")->setWidth(10);
-        $sheet->getColumnDimension("E")->setWidth(20);
-        $sheet->getColumnDimension("F")->setWidth(20);
-        $sheet->getColumnDimension("G")->setWidth(30);
-        $sheet->getColumnDimension("H")->setWidth(30);
-        $sheet->getColumnDimension("I")->setWidth(20);
-        $sheet->getColumnDimension("J")->setWidth(20);
-        $sheet->getColumnDimension("K")->setWidth(20);
-        $sheet->getColumnDimension("L")->setWidth(20);
-        for ($i = 0; $i < count($list) ; $i++) {
-            $x = $i + 2;
-            $sheet->setCellValue('A' . $x, $list[$i]->id);
-            $sheet->setCellValue('B' . $x, $list[$i]->parent_name) ;
-            $sheet->setCellValue('C' . $x, $list[$i]->student_name );
-            $sheet->setCellValue('D' . $x, $list[$i]->student_year);
-            $sheet->setCellValue('E' . $x, $list[$i]->source_name);
-            $sheet->setCellValue('F' . $x, u::getStatus($list[$i]->status));
-            $sheet->setCellValue('G' . $x, $list[$i]->owner_name);
-            $sheet->setCellValue('H' . $x, $list[$i]->branch_name);
-            $sheet->setCellValue('I' . $x, $list[$i]->created_date);
-            $sheet->setCellValue('J' . $x, $list[$i]->last_care_date);
-            $sheet->setCellValue('K' . $x, $list[$i]->last_method);
-            $sheet->setCellValue('L' . $x, $list[$i]->total_care);
-            
-            $sheet->getRowDimension($x)->setRowHeight(23);
+            $sheet->getColumnDimension("A")->setWidth(20);
+            $sheet->getColumnDimension("B")->setWidth(30);
+            $sheet->getColumnDimension("C")->setWidth(30);
+            $sheet->getColumnDimension("D")->setWidth(10);
+            $sheet->getColumnDimension("E")->setWidth(20);
+            $sheet->getColumnDimension("F")->setWidth(20);
+            $sheet->getColumnDimension("G")->setWidth(30);
+            $sheet->getColumnDimension("H")->setWidth(30);
+            $sheet->getColumnDimension("I")->setWidth(20);
+            $sheet->getColumnDimension("J")->setWidth(20);
+            $sheet->getColumnDimension("K")->setWidth(20);
+            $sheet->getColumnDimension("L")->setWidth(20);
+            for ($i = 0; $i < count($list) ; $i++) {
+                $x = $i + 2;
+                $sheet->setCellValue('A' . $x, $list[$i]->id);
+                $sheet->setCellValue('B' . $x, $list[$i]->parent_name) ;
+                $sheet->setCellValue('C' . $x, $list[$i]->student_name );
+                $sheet->setCellValue('D' . $x, $list[$i]->student_year);
+                $sheet->setCellValue('E' . $x, $list[$i]->source_name);
+                $sheet->setCellValue('F' . $x, u::getStatus($list[$i]->status));
+                $sheet->setCellValue('G' . $x, $list[$i]->owner_name);
+                $sheet->setCellValue('H' . $x, $list[$i]->branch_name);
+                $sheet->setCellValue('I' . $x, $list[$i]->created_date);
+                $sheet->setCellValue('J' . $x, $list[$i]->last_care_date);
+                $sheet->setCellValue('K' . $x, $list[$i]->last_method);
+                $sheet->setCellValue('L' . $x, $list[$i]->total_care);
+                
+                $sheet->getRowDimension($x)->setRowHeight(23);
 
+            }
+            $writer = new Xlsx($spreadsheet);
+            try {
+                header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                header('Content-Disposition: attachment;filename="Báo cáo thông tin.xlsx"');
+                header('Cache-Control: max-age=0');
+                $writer->save("php://output");
+            } catch (Exception $exception) {
+                throw $exception;
+            }
+        }else{
+            self::download_send_headers("data_export_" . date("Y-m-d") . ".csv");
+            echo self::array2csv($list);
+            die();
         }
-        $writer = new Xlsx($spreadsheet);
-        try {
-            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment;filename="Báo cáo thông tin.xlsx"');
-            header('Cache-Control: max-age=0');
-            $writer->save("php://output");
-        } catch (Exception $exception) {
-            throw $exception;
+    }
+    public static function array2csv(array &$array)
+    {
+        if (count($array) == 0) {
+            return null;
         }
+        ob_start();
+        $df = fopen("php://output", 'w');
+        fputcsv($df, array_keys(reset($array)));
+        foreach ($array as $row) {
+            fputcsv($df, $row);
+        }
+        fclose($df);
+        return ob_get_clean();
+    }
+    public static function download_send_headers($filename) {
+        // disable caching
+        $now = gmdate("D, d M Y H:i:s");
+        $expires = gmdate("D, d M Y H:i:s", time()+900);
+        header("Expires: {$expires} GMT");
+        header("Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate");
+        header("Last-Modified: {$now} GMT");
+    
+        // force download  
+        header("Content-Type: application/force-download");
+        header("Content-Type: application/octet-stream");
+        header("Content-Type: application/download");
+    
+        // disposition / encoding on response body
+        header("Content-Disposition: attachment;filename={$filename}");
+        header("Content-Transfer-Encoding: binary");
     }
 }
