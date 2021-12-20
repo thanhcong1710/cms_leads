@@ -114,7 +114,7 @@ class ExportController extends Controller
             FROM cms_parents AS p 
                 LEFT JOIN users AS u ON p.owner_id = u.id
                 LEFT JOIN cms_branches AS b ON b.id = u.branch_id
-            WHERE $cond ORDER BY p.id DESC LIMIT 500000");
+            WHERE $cond ORDER BY p.id DESC LIMIT 80000");
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('A1', 'Mã KH');
