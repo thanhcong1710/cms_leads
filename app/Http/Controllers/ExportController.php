@@ -90,10 +90,10 @@ class ExportController extends Controller
                 $cond .= " AND (p.name LIKE '%$keyword%' OR p.mobile_1 LIKE '%$keyword%' OR p.mobile_2 LIKE '%$keyword%')";
             }
             if($key=='start_date'){
-                $cond .= " AND p.created_at >= '$arr_value[$k]'";
+                $cond .= " AND p.created_at >= '$arr_value[$k] 00:00:00'";
             }
             if($key=='end_date'){
-                $cond .= " AND p.created_at <= '$arr_value[$k]'";
+                $cond .= " AND p.created_at <= '$arr_value[$k] 23:59:59'";
             }
         }
         if(!$request->user()->hasRole('admin')){

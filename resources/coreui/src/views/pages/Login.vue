@@ -118,7 +118,7 @@ import u from "../../utilities/utility";
             self.password = '';
             localStorage.setItem("user_id", response.data.user_id);
             localStorage.setItem("api_token", response.data.access_token);
-            localStorage.setItem('roles', response.data.roles);
+            localStorage.setItem('roles', JSON.stringify(response.data.roles));
             self.$router.push({ path: '/dashboard' });
             // self.$socket.emit('userConnected', response.data.user_id);
           })

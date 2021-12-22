@@ -12,18 +12,18 @@
                   </div>
                   <div style="float: left; padding: 10px;">
                     <h5 style="margin-bottom:0px">{{parent.name}} 
-                      <router-link  style="padding: 2px 6px"
+                      <router-link  v-if="!disabled_action" style="padding: 2px 6px"
                         class="btn btn-sm btn-outline-primary"
                         :to="`/parents/${parent.id}/edit`"
                       >
                         <i class="fa fa-edit"></i></router-link></h5>
                     <p style="margin-top: 5px;"><strong> * {{parent.mobile_1}}</strong> 
-                      <button class="btn btn-sm btn-outline-primary" style="padding: 2px 6px" @click="callPhone(parent.mobile_1)"><i class="fa fa-phone"></i> </button>
-                      <button class="btn btn-sm btn-outline-primary" style="padding: 2px 6px" @click="showSendSms(parent.mobile_1)"><i class="fa fa-sms"></i> </button></p>
+                      <button :disabled="disabled_action" class="btn btn-sm btn-outline-primary" style="padding: 2px 6px" @click="callPhone(parent.mobile_1)"><i class="fa fa-phone"></i> </button>
+                      <button :disabled="disabled_action" class="btn btn-sm btn-outline-primary" style="padding: 2px 6px" @click="showSendSms(parent.mobile_1)"><i class="fa fa-sms"></i> </button></p>
                     <p style="margin-top: 5px;" v-if="parent.mobile_2"> 
                       <strong> * {{parent.mobile_2}}</strong> 
-                      <button class="btn btn-sm btn-outline-primary" style="padding: 2px 6px" @click="callPhone(parent.mobile_2)"><i class="fa fa-phone"></i> </button>
-                      <button class="btn btn-sm btn-outline-primary" style="padding: 2px 6px" @click="showSendSms(parent.mobile_2)"><i class="fa fa-sms"></i> </button>
+                      <button :disabled="disabled_action" class="btn btn-sm btn-outline-primary" style="padding: 2px 6px" @click="callPhone(parent.mobile_2)"><i class="fa fa-phone"></i> </button>
+                      <button :disabled="disabled_action" class="btn btn-sm btn-outline-primary" style="padding: 2px 6px" @click="showSendSms(parent.mobile_2)"><i class="fa fa-sms"></i> </button>
                     </p>
                   </div>
               </div>
@@ -36,7 +36,7 @@
               <div class="col-sm-2 border-right text-center">
                 <p>Trạng thái</p>
                 <p> 
-                  <select class="form-control" @change="showModalChangeStatus" v-model="tmp_status" >
+                  <select class="form-control" @change="showModalChangeStatus" v-model="tmp_status" :disabled="disabled_action" >
                     <option value="1">KH mới</option>
                     <option value="2">KH tiềm năng</option>
                     <option value="3">KH tiềm năng cần follow up</option>
@@ -54,7 +54,7 @@
               </div>
               <div class="col-sm-3 text-center">
                 <p>Người phụ trách</p>
-                <p><select class="form-control" @change="showModalAssgin" v-model="tmp_owner_id">
+                <p><select class="form-control" @change="showModalAssgin" v-model="tmp_owner_id" :disabled="disabled_action">
                   <option :value="item.id" v-for="(item, index) in users_manager" :key="index">{{item.name}} - {{item.hrm_id}}</option>
                 </select></p>  
               </div>
@@ -65,7 +65,7 @@
               <div class="row">
                 <div class="col-sm-3 border-right" >
                   <p><i class="fa fa-calendar"></i> <strong> Lịch chăm sóc tiếp theo</strong></p>
-                  <p><input class="form-control" type="datetime-local" :value="parent.next_care_date" id="next_care_date" @change="updateNextCareDate"></p>
+                  <p><input class="form-control" type="datetime-local" :value="parent.next_care_date" id="next_care_date" @change="updateNextCareDate" :disabled="disabled_action"></p>
                   <br>
                   <p><i class="fa fa-info-circle"></i> <strong>Thông tin khách hàng</strong></p>
                   <p>Họ tên: <span class="fl-right">{{parent.name}}</span></p>
@@ -128,7 +128,7 @@
                   <div class="tab-content py-3" id="myTabContent">
                     <div class="tab-pane fade" :class="{ 'active show': isActive('customer_care') }" id="customer_care">
                       <div class="padding-bottom-10">
-                        <button class="btn btn-success" @click="showModalCare"><i class="fa fa-plus"></i> Thêm mới</button>
+                        <button :disabled="disabled_action" class="btn btn-success" @click="showModalCare"><i class="fa fa-plus"></i> Thêm mới</button>
                       </div>
                       <div>
                       <table class="table table-striped table-hover">
@@ -162,15 +162,15 @@
                     </div>
                     <div class="tab-pane fade" :class="{ 'active show': isActive('students') }" id="students">
                       <div class="padding-bottom-10">
-                        <button class="btn btn-success" @click="showModalStudent(0)"><i class="fa fa-plus"></i> Thêm mới học sinh</button>
+                        <button :disabled="disabled_action" class="btn btn-success" @click="showModalStudent(0)"><i class="fa fa-plus"></i> Thêm mới học sinh</button>
                       </div>
                       <div class="row">
                         <div class="col-sm-6" v-for="(item, index) in students" :key="index">
                           <div class="card card-accent-info" >
                             <div class="card-header">
                               <strong>{{ item.name }}</strong>
-                              <button class="btn btn-sm btn-success" @click="showModalStudent(item)"> <i class="fa fa-edit"></i> </button>
-                              <button v-if="item.status==0" class="btn btn-sm btn-danger" @click="showModalCheckin(item)"> <i class="fa fa-location-arrow"></i></button>
+                              <button :disabled="disabled_action" class="btn btn-sm btn-success" @click="showModalStudent(item)"> <i class="fa fa-edit"></i> </button>
+                              <button :disabled="disabled_action" v-if="item.status==0" class="btn btn-sm btn-danger" @click="showModalCheckin(item)"> <i class="fa fa-location-arrow"></i></button>
                             </div>
                             <div class="card-body">
                               <p>Ngày sinh: {{ item.birthday }}</p>
@@ -570,10 +570,15 @@ export default {
         title:'Gửi tin nhắn SMS',
         phone:''
       },
-      template_note:[]
+      template_note:[],
+      disabled_action:false
     };
   },
   created() {
+    const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
+    if(arr_role.indexOf("Supervisor")> -1){
+      this.disabled_action = true
+    }
     // this.$socket.emit('userConnected', localStorage.getItem("user_id"));
     u.g(`/api/user/get-users-manager`)
       .then(response => {

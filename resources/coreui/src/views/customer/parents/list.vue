@@ -83,7 +83,7 @@
                   ></date-picker>
               </div>
               <div class="form-group col-sm-12">
-                <router-link class="btn btn-success" :to="'/parents/add'">
+                <router-link v-if="!disabled_action" class="btn btn-success" :to="'/parents/add'">
                   <i class="fa fa-plus"></i> Thêm mới
                 </router-link>
                 <button class="btn btn-info" type="submit" @click="search()">
@@ -133,7 +133,7 @@
                     <th>Người phụ trách</th>
                     <th>Lịch sử chăm sóc</th>
                     <th>Trạng thái</th>
-                    <th class="sticky-col last-col">Thao tác</th>
+                    <th v-if="!disabled_action" class="sticky-col last-col">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -158,7 +158,7 @@
                     <td>{{ item.owner_name }}</td>
                     <td>{{ item.last_care }}</td>
                     <td>{{ item.status | getStatusName }}</td>
-                    <td class="sticky-col last-col">
+                    <td v-if="!disabled_action" class="sticky-col last-col">
                       <router-link
                         class="btn btn-sm btn-success"
                         :to="`/parents/${item.id}/edit`"
@@ -380,7 +380,8 @@ export default {
         total_0:0,
         total_1:0,
         total_2:0,
-      }
+      },
+      disabled_action:false
     };
   },
   computed: {
@@ -403,6 +404,10 @@ export default {
     }
   },
   created() {
+    const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
+    if(arr_role.indexOf("Supervisor")> -1){
+      this.disabled_action = true
+    }
     u.g(`/api/user/get-users-manager`)
       .then(response => {
       this.users_manager = response.data
