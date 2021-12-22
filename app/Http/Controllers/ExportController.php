@@ -182,8 +182,8 @@ class ExportController extends Controller
         }
         ob_start();
         $df = fopen("php://output", 'w');
-        fputcsv($df, array_keys(reset($array)));
         foreach ($array as $row) {
+            $row=self::encode_items((array)$row);
             fputcsv($df, $row);
         }
         fclose($df);
@@ -205,5 +205,16 @@ class ExportController extends Controller
         // disposition / encoding on response body
         header("Content-Disposition: attachment;filename={$filename}");
         header("Content-Transfer-Encoding: binary");
+    }
+    public static function encode_items($array)
+    {
+        foreach ($array as $key => $value) {
+            if (is_array($value)) {
+                $array[$key] = self::encode_items($value);
+            } else {
+                $array[$key] = mb_convert_encoding($value, 'UTF-16LE', 'UTF-8');
+            }
+        }
+        return $array;
     }
 }
