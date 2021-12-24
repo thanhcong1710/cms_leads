@@ -95,7 +95,7 @@ class AuthController extends Controller
      */
     protected function respondWithToken($token, $email)
     {
-        $user = User::select('menuroles as roles')->select('id')->where('email', '=', $email)->first();
+        $user = u::first("SELECT *,menuroles AS roles FROM users WHERE email='$email' AND status=1");
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
