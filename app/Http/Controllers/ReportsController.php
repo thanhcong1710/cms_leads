@@ -33,7 +33,7 @@ class ReportsController extends Controller
         if($request->end_date){
             $cond .= " AND p.created_at <= '$request->end_date 23:59:59'";
         }
-        if(!$request->user()->hasRole('admin')){
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
         $total = u::first("SELECT count(p.id) AS total FROM cms_parents AS p 
