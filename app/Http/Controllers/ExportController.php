@@ -96,7 +96,7 @@ class ExportController extends Controller
                 $cond .= " AND p.created_at <= '$arr_value[$k] 23:59:59'";
             }
         }
-        if(!$request->user()->hasRole('admin')){
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
         $list = u::query("SELECT p.id, p.name AS parent_name,p.status,
