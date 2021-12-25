@@ -132,6 +132,7 @@
                     <th>Nguồn</th>
                     <th>Người phụ trách</th>
                     <th>Lịch sử chăm sóc</th>
+                    <th>Thời gian chăm sóc gần nhất</th>
                     <th>Trạng thái</th>
                     <th v-if="!disabled_action" class="sticky-col last-col">Thao tác</th>
                   </tr>
@@ -157,6 +158,7 @@
                     <td>{{ item.source_name }}</td>
                     <td>{{ item.owner_name }}</td>
                     <td>{{ item.last_care }}</td>
+                    <td>{{ item.last_time_care }}</td>
                     <td>{{ item.status | getStatusName }}</td>
                     <td v-if="!disabled_action" class="sticky-col last-col">
                       <router-link
@@ -383,6 +385,14 @@ export default {
       },
       disabled_action:false
     };
+  },
+  mounted() {
+    let externalScript = document.createElement('script')
+    externalScript.setAttribute('src', 'https://code.jquery.com/jquery-1.12.4.js')
+    document.head.appendChild(externalScript)
+    let externalScript1 = document.createElement('script')
+    externalScript1.setAttribute('src', './js/scroll.js')
+    document.head.appendChild(externalScript1)
   },
   computed: {
     selectAll: {

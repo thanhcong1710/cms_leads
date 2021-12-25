@@ -64,21 +64,5 @@
     <!-- built files will be auto injected -->
 
     <script src="{{ asset('js/app.js') }}"></script>
-    <script
-      src="https://code.jquery.com/jquery-1.12.4.js"
-      integrity="sha256-Qw82+bXyGq6MydymqBxNPYTaUXXq7c8v3CwiYwLLNXU="
-      crossorigin="anonymous"></script>
-    <script>
-    $(function(){
-        $(".wrapper1").scroll(function(){
-            $(".wrapper2")
-                .scrollLeft($(".wrapper1").scrollLeft());
-        });
-        $(".wrapper2").scroll(function(){
-            $(".wrapper1")
-                .scrollLeft($(".wrapper2").scrollLeft());
-        });
-    });
-    </script>
   </body>
 </html>
