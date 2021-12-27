@@ -479,3 +479,7 @@ text-shadow: 0 1px 1px #111;
   right: auto;
   left: 1px
 }
+.table thead th , .table td{
+  border-right: 1px solid #d8dbe0;
+  text-align: center;
+}
