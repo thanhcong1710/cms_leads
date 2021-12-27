@@ -131,6 +131,7 @@
                     <th>Học sinh 1</th>
                     <th>Nguồn</th>
                     <th>Người phụ trách</th>
+                    <th>Lịch chăm sóc tiếp theo</th>
                     <th>Lịch sử chăm sóc</th>
                     <th>Thời gian chăm sóc gần nhất</th>
                     <th>Trạng thái</th>
@@ -157,6 +158,7 @@
                     <td>{{ item.hs1_name }}</td>
                     <td>{{ item.source_name }}</td>
                     <td>{{ item.owner_name }}</td>
+                    <td>{{ item.next_care_date}}</td>
                     <td>{{ item.last_care }}</td>
                     <td>{{ item.last_time_care }}</td>
                     <td>{{ item.status | getStatusName }}</td>
