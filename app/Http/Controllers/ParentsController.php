@@ -61,22 +61,25 @@ class ParentsController extends Controller
         $cond_2 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') = '".date('Y-m-d')."'";
         $cond_3 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') < '".date('Y-m-d')."' 
             AND ( SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND care_date >= next_care_date )=0";
-
+        $order_by = " ORDER BY p.id DESC ";
         $tmp_cond="";
         if($type_seach==1){
             $tmp_cond = $cond_1;
         }elseif($type_seach==2){
             $tmp_cond = $cond_2;
+            $order_by = " ORDER BY next_care_date ASC ";
         }elseif($type_seach==3){
             $tmp_cond = $cond_3;
+            $order_by = " ORDER BY next_care_date ASC ";
         }
         $total = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $tmp_cond");
         $list = u::query("SELECT p.*, (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
                 (SELECT note FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_care,
+                (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_time_care,
                 (SELECT name FROM users WHERE id=p.owner_id) AS owner_name ,
                 (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 0,1) AS hs1_name,
                 (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 1,1) AS hs2_name
-            FROM cms_parents AS p WHERE $cond $tmp_cond ORDER BY p.id DESC $limitation");
+            FROM cms_parents AS p WHERE $cond $tmp_cond $order_by $limitation");
         $data = u::makingPagination($list, $total->total, $page, $limit);
 
         $total_0 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond ");
