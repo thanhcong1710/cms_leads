@@ -139,6 +139,18 @@
                         ></vue-select>
                     </div>
                     <div class="form-group col-sm-6">
+                      <label for="nf-email">Nguồn chi tiết</label>
+                      <vue-select
+                            label="name"
+                            placeholder="Chọn nguồn chi tiết"
+                            :options="html.source_detail.list"
+                            v-model="parent.source_detail"
+                            :searchable="true"
+                            language="tv-VN"
+                            :onChange="saveSourceDetail"
+                        ></vue-select>
+                    </div>
+                    <div class="form-group col-sm-6">
                       <label for="nf-email">Trạng thái</label>
                       <select class="form-control" v-model="parent.status">
                         <option value="1">KH mới</option>
@@ -281,6 +293,10 @@ export default {
           item: '',
           list: []
         },
+        source_detail: {
+          item: '',
+          list: []
+        },
       },
       parent: {
         gender: "",
@@ -296,6 +312,8 @@ export default {
         job_id:"",
         source_id:"",
         source:"",
+        source_detail_id:"",
+        source_detail:"",
         job:"",
         province:"",
         district:"",
@@ -323,6 +341,10 @@ export default {
      u.g(`/api/sources`)
       .then(response => {
       this.html.source.list = response.data
+    })
+    u.g(`/api/source_detail`)
+      .then(response => {
+      this.html.source_detail.list = response.data
     })
   },
   methods: {
@@ -435,6 +457,16 @@ export default {
       }else{
         this.parent.source = ""
         this.parent.source_id = ""
+      }
+    },
+    saveSourceDetail(data = null){
+      if (data && typeof data === 'object') {
+        const source_id = data.id
+        this.parent.source_detail = data
+        this.parent.source_detail_id = source_id
+      }else{
+        this.parent.source_detail = ""
+        this.parent.source_detail_id = ""
       }
     },
     validatePhone(){

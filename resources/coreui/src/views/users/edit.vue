@@ -80,6 +80,13 @@
                         <option value="1">Kích hoạt</option>
                       </select>
                     </div>
+                    <div class="col-sm-12 form-group">
+                      <label> Cấu hình hệ thống </label>
+                      <select class="form-control" v-model="rules_setting">
+                        <option value="0">Không được phép</option>
+                        <option value="1">Được phép</option>
+                      </select>
+                    </div>
                   </div>
                 </div>
                 <div class="col-sm-6">
@@ -171,7 +178,8 @@ export default {
         dismissCountDown: 0,
         showDismissibleAlert: false,
         status:1,
-        branch_id:0
+        branch_id:0,
+        rules_setting:0,
     }
   },
   created() {
@@ -192,6 +200,7 @@ export default {
           self.hrm_id = response.data.hrm_id;
           self.manager_hrm_id = response.data.manager_hrm_id; 
           self.branch_id = response.data.branch_id; 
+          self.rules_setting = response.data.rules_setting; 
           let arr_role = response.data.roles.split(",");
           self.roles.map(item => {
             if (arr_role.indexOf(item.name) != -1) {
@@ -267,7 +276,8 @@ export default {
         status: this.status,
         hrm_id: this.hrm_id,
         manager_hrm_id : this.manager_hrm_id,
-        branch_id:this.branch_id
+        branch_id:this.branch_id,
+        rules_setting:this.rules_setting
       })
         .then((response) => {
           this.loading.processing = false;

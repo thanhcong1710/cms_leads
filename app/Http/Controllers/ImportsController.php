@@ -255,10 +255,11 @@ class ImportsController extends Controller
     }
     public function assign(Request $request){
         $source_id = $request->source_id;
+        $source_detail_id = $request->source_detail_id;
         $arr_owner = $request->owners_id;
         $import_id = $request->import_id;
         $list_data = u::query("SELECT * FROM cms_import_parents WHERE import_id=$import_id AND status=1");
-        $this->addItemDataParent($list_data,$arr_owner,$source_id,$request->user()->id);
+        $this->addItemDataParent($list_data,$arr_owner,$source_id,$request->user()->id, $source_detail_id);
         u::query("UPDATE cms_import_parents SET status=6 WHERE import_id=$import_id AND status=1");
         u::query("UPDATE cms_imports SET status=1 WHERE id=$import_id ");
         u::query("UPDATE cms_students AS s LEFT JOIN cms_parents AS p ON s.gud_mobile_1 =p.mobile_1 SET s.parent_id=p.id WHERE s.parent_id IS NULL ");
@@ -266,17 +267,17 @@ class ImportsController extends Controller
             (SELECT count(id) FROM cms_import_parents WHERE import_id=$import_id AND status!=6) AS total_error");
         return response()->json($data);
     }
-    public function addItemDataParent($list,$arr_owner,$source_id,$creator_id) {
+    public function addItemDataParent($list,$arr_owner,$source_id,$creator_id,$source_detail_id) {
         if ($list) {
             $created_at = date('Y-m-d H:i:s');
-            $query = "INSERT INTO cms_parents (`name`,email,mobile_1,`address`,note,created_at,creator_id,`status`,source_id,owner_id,mobile_2) VALUES ";
+            $query = "INSERT INTO cms_parents (`name`,email,mobile_1,`address`,note,created_at,creator_id,`status`,source_id,source_detail_id,owner_id,mobile_2) VALUES ";
             $query_student = "INSERT INTO cms_students (`name`,`birthday`,created_at,creator_id,gud_mobile_1) VALUES ";
             $check_import_student =0;
             if (count($list) > 10000) {
                 for($i = 0; $i < 10000; $i++) {
                     $item = (object)$list[$i];
                     $owner_id = $item->owner_id? $item->owner_id : $arr_owner[$i%count($arr_owner)];
-                    $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$owner_id','$item->gud_mobile2'),";
+                    $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$source_detail_id','$owner_id','$item->gud_mobile2'),";
                     if($item->student_name_1){
                         $check_import_student =1;
                         $student_birthday_1 = $item->student_birthday_1 ? "'".$item->student_birthday_1."'" :NULL;
@@ -300,7 +301,7 @@ class ImportsController extends Controller
                 foreach($list as $i=>$item) {
                     $item = (object)$item;
                     $owner_id = $item->owner_id? $item->owner_id : $arr_owner[$i%count($arr_owner)];
-                    $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$owner_id','$item->gud_mobile2'),";
+                    $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$source_detail_id','$owner_id','$item->gud_mobile2'),";
                     if($item->student_name_1){
                         $check_import_student =1;
                         $query_student.= "('$item->student_name_1',".($item->student_birthday_1 ? "'$item->student_birthday_1'":"NULL").",'$created_at','$creator_id','$item->gud_mobile1'),";

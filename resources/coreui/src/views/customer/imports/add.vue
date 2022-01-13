@@ -148,6 +148,18 @@
                         :onChange="selectSource"
                     ></vue-select>
                   </div>
+                  <div class="form-group col-sm-6">
+                    <label for="nf-email">Chọn nguồn chi tiết</label>
+                    <vue-select
+                        label="name"
+                        placeholder="Chọn nguồn chi tiết"
+                        :options="list_source_detail"
+                        v-model="data_assign.source_detail"
+                        :searchable="true"
+                        language="tv-VN"
+                        :onChange="selectSourceDetail"
+                    ></vue-select>
+                  </div>
                   <div class="form-group col-sm-12">
                     <p style="color:red" v-html="data_assign.error_message"></p>
                     <button class="btn btn-secondary fl-right" @click="reloadPage()"> Hủy</button>
@@ -222,11 +234,14 @@ export default {
       total_validate:0,
       list_owner:[],
       list_source:[],
+      list_source_detail:[],
       data_assign:{
         owners:"",
         import_id:"",
         source:"",
         source_id:"",
+        source_detail:"",
+        source_detail_id:"",
         owners_id:"",
         error_message:"",
       },
@@ -242,6 +257,10 @@ export default {
     u.g(`/api/sources`)
       .then(response => {
       this.list_source = response.data
+    })
+    u.g(`/api/source_detail`)
+      .then(response => {
+      this.list_source_detail = response.data
     })
   },
   methods: {
@@ -293,6 +312,16 @@ export default {
       }else{
         this.data_assign.source = ""
         this.data_assign.source_id = ""
+      }
+    },
+    selectSourceDetail(data = null){
+      if (data && typeof data === 'object') {
+        const source_id = data.id
+        this.data_assign.source_detail = data
+        this.data_assign.source_detail_id = source_id
+      }else{
+        this.data_assign.source_detail = ""
+        this.data_assign.source_detail_id = ""
       }
     },
     assginContact(){

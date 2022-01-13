@@ -102,6 +102,7 @@ class AuthController extends Controller
             'expires_in' => auth()->factory()->getTTL() * 60,
             'roles' => $user->roles,
             'user_id'=>$user->id,
+            'rules_setting'=>$user->rules_setting
         ]);
     }
     public function singleSignOn(Request $request){

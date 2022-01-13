@@ -28,6 +28,10 @@ class SystemInfoController extends Controller
         $data = u::query("SELECT * FROM cms_sources WHERE status=1");
         return response()->json($data);
     }
+    public function getAllSourceDetail(){
+        $data = u::query("SELECT * FROM cms_source_detail WHERE status=1");
+        return response()->json($data);
+    }
     public function getAllMethods(){
         $data = u::query("SELECT * FROM cms_contact_methods WHERE status=1");
         return response()->json($data);
@@ -55,5 +59,58 @@ class SystemInfoController extends Controller
             }
         }
         return response()->json($data);
+    }
+    public function getListSourceDetail(Request $request)
+    {
+        $status = isset($request->status) ? $request->status : '';
+        $keyword = isset($request->keyword) ? $request->keyword : '';
+        
+        $pagination = (object)$request->pagination;
+        $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
+        $limit = isset($pagination->limit) ? (int) $pagination->limit : 20;
+        $offset = $page == 1 ? 0 : $limit * ($page-1);
+        $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
+        $cond = " 1 ";
+        if($status!==''){
+            $cond .= " AND s.status=$status";
+        }
+        if($keyword!==''){
+            $cond .= " AND s.name LIKE '%$keyword%'";
+        }
+        if(!$request->user()->hasRole('admin')){
+            $edit = "IF(".$request->user()->id." = s.creator_id,1,0) AS can_edit";
+        }else{
+            $edit = "1 AS can_edit";
+        }
+        $total = u::first("SELECT count(id) AS total FROM cms_source_detail AS s WHERE $cond ");
+        $list = u::query("SELECT s.*,$edit 
+            FROM cms_source_detail AS s WHERE $cond ORDER BY s.id DESC $limitation");
+        $data = u::makingPagination($list, $total->total, $page, $limit);
+        return response()->json($data);
+    }
+    public function addSourceDetail(Request $request)
+    {
+        $id = u::insertSimpleRow(array(
+            'name'=>$request->name,
+            'created_at' => date('Y-m-d H:i:s'),
+            'creator_id' => Auth::user()->id,
+            'status'=>$request->status,
+        ), 'cms_source_detail');
+        return response()->json($id);
+    }
+    public function infoSourceDetail(Request $request,$source_detail_id)
+    {
+        $data = u::first("SELECT * FROM cms_source_detail WHERE id=$source_detail_id");
+        return response()->json($data);
+    }
+    public function updateSourceDetail(Request $request,$source_detail_id)
+    {
+        $id = u::updateSimpleRow(array(
+            'name'=>$request->name,
+            'updated_at' => date('Y-m-d H:i:s'),
+            'updator_id' => Auth::user()->id,
+            'status'=>$request->status,
+        ), array('id'=>$source_detail_id),'cms_source_detail');
+        return response()->json($id);
     }
 }

@@ -23,6 +23,7 @@ class ParentsController extends Controller
         $keyword = isset($request->keyword) ? $request->keyword : '';
         $owner_id = isset($request->owner_id) ? $request->owner_id :  [];
         $source_id = isset($request->source_id) ? $request->source_id : [];
+        $source_detail_id = isset($request->source_detail_id) ? $request->source_detail_id : [];
         $end_date = isset($request->end_date) ? $request->end_date : '';
         $start_date = isset($request->start_date) ? $request->start_date : '';
         $type_seach = isset($request->type_seach) ? $request->type_seach : 0;
@@ -44,6 +45,9 @@ class ParentsController extends Controller
         }
         if (!empty($source_id)) {
             $cond .= " AND p.source_id IN (".implode(",",$source_id).")";
+        }
+        if (!empty($source_detail_id)) {
+            $cond .= " AND p.source_detail_id IN (".implode(",",$source_detail_id).")";
         }
         
         if ($keyword !== '') {
@@ -74,6 +78,7 @@ class ParentsController extends Controller
         }
         $total = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $tmp_cond");
         $list = u::query("SELECT p.*, (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
+                (SELECT name FROM cms_source_detail WHERE id=p.source_detail_id) AS source_detail_name,
                 (SELECT note FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_care,
                 (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_time_care,
                 (SELECT name FROM users WHERE id=p.owner_id) AS owner_name ,
@@ -108,6 +113,7 @@ class ParentsController extends Controller
             'birthday' => $request->birthday,
             'job_id' => $request->job_id,
             'source_id' => $request->source_id,
+            'source_detail_id' => $request->source_detail_id,
             'note' => $request->note,
             'created_at' => date('Y-m-d H:i:s'),
             'creator_id' => Auth::user()->id,
@@ -138,6 +144,7 @@ class ParentsController extends Controller
             'birthday' => $request->birthday,
             'job_id' => $request->job_id,
             'source_id' => $request->source_id,
+            'source_detail_id' => $request->source_detail_id,
             'note' => $request->note,
             'updated_at' => date('Y-m-d H:i:s'),
             'updator_id' => Auth::user()->id,
@@ -189,6 +196,7 @@ class ParentsController extends Controller
                 (SELECT name FROM cms_districts WHERE id=p.district_id) AS district_name,
                 (SELECT name FROM cms_provinces WHERE id=p.province_id) AS province_name,
                 (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
+                (SELECT name FROM cms_source_detail WHERE id=p.source_detail_id) AS source_detail_name,
                 (SELECT title FROM cms_jobs WHERE id=p.job_id) AS job_name,
                 (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id) AS num_care,
                 (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_care

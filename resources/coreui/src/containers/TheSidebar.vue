@@ -102,40 +102,42 @@ export default {
         _children: []
       }];
       for(let k=0; k<data.length; k++){
-        switch(data[k]['slug']){
-          case 'link':
-            if(data[k]['href'].indexOf('http') !== -1){
-              this.buffor[0]._children.push(
-                  {
-                      _name: 'CSidebarNavItem',
-                      name: data[k]['name'],
-                      href: data[k]['href'],
-                      icon: data[k]['icon'],
-                      target: '_blank'
-                  }
-              );
-            }else{
-              this.buffor[0]._children.push(
-                  {
-                      _name: 'CSidebarNavItem',
-                      name: data[k]['name'],
-                      to:   data[k]['href'],
-                      icon: data[k]['icon'],
-                  }
-              );
-            }
-          break;
-          case 'title':
-            this.buffor[0]._children.push(
-              {
-                _name: 'CSidebarNavTitle',
-                _children: [data[k]['name']]
+        if(data[k]['name']!='Settings' || localStorage.getItem("rules_setting") ==1){
+          switch(data[k]['slug']){
+            case 'link':
+              if(data[k]['href'].indexOf('http') !== -1){
+                this.buffor[0]._children.push(
+                    {
+                        _name: 'CSidebarNavItem',
+                        name: data[k]['name'],
+                        href: data[k]['href'],
+                        icon: data[k]['icon'],
+                        target: '_blank'
+                    }
+                );
+              }else{
+                this.buffor[0]._children.push(
+                    {
+                        _name: 'CSidebarNavItem',
+                        name: data[k]['name'],
+                        to:   data[k]['href'],
+                        icon: data[k]['icon'],
+                    }
+                );
               }
-            );
-          break;
-          case 'dropdown':
-            this.buffor[0]._children.push( this.dropdown(data[k]) );
-          break;
+            break;
+            case 'title':
+              this.buffor[0]._children.push(
+                {
+                  _name: 'CSidebarNavTitle',
+                  _children: [data[k]['name']]
+                }
+              );
+            break;
+            case 'dropdown':
+              this.buffor[0]._children.push( this.dropdown(data[k]) );
+            break;
+          }
         }
       }
       return this.buffor;
