@@ -5,7 +5,7 @@
         <div class="card">
           <loader :active="loading.processing" :text="loading.text" />
           <div class="card-header">
-            <strong>Cập nhật khách hàng </strong>
+            <strong>Cập nhật khách hàng</strong>
           </div>
           <div class="card-body">
             <form action method="post">
