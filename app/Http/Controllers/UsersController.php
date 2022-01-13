@@ -44,7 +44,7 @@ class UsersController extends Controller
     public function show($id)
     {
         $user = DB::table('users')
-        ->select('users.id','users.branch_id AS branch_id', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status', 'users.email_verified_at as registered')
+        ->select('users.id','users.branch_id AS branch_id', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status', 'users.email_verified_at as registered','users.rules_setting')
         ->where('users.id', '=', $id)
         ->first();
         return response()->json( $user );
@@ -59,7 +59,7 @@ class UsersController extends Controller
     public function edit($id)
     {
         $user = DB::table('users')
-        ->select('users.id','users.branch_id','users.phone', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status')
+        ->select('users.id','users.branch_id','users.phone', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status','users.rules_setting')
         ->where('users.id', '=', $id)
         ->first();
         return response()->json( $user );
@@ -89,6 +89,7 @@ class UsersController extends Controller
             $user->hrm_id      = $request->input('hrm_id');
             $user->manager_hrm_id      = $request->input('manager_hrm_id');
             $user->branch_id      = $request->input('branch_id');
+            $user->rules_setting = $request->input('rules_setting');
             $user->status      = $request->input('status');
             if($request->password){
                 $user->password = bcrypt($request->password);
@@ -146,6 +147,7 @@ class UsersController extends Controller
             $user->manager_hrm_id      = $request->input('manager_hrm_id');
             $user->email_verified_at = date('Y-m-d H:i:s');
             $user->branch_id      = $request->input('branch_id');
+            $user->rules_setting = $request->input('rules_setting');
             $user->save();
             $roles = $request->roles;
             $menuroles = "";

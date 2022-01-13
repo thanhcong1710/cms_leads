@@ -98,6 +98,7 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('/provinces/{province_id}/districts', 'SystemInfoController@getDistrictsByProvice');
         Route::get('/jobs', 'SystemInfoController@getAllJobs');
         Route::get('/sources', 'SystemInfoController@getAllSources');
+        Route::get('/source_detail', 'SystemInfoController@getAllSourceDetail');
         Route::get('/methods', 'SystemInfoController@getAllMethods');
         Route::get('/branches', 'SystemInfoController@getAllBranches');
         Route::get('/template_note', 'SystemInfoController@getAllTemplateNote');
@@ -113,6 +114,10 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::post('/imports/upload', 'ImportsController@upload');
         Route::post('/imports/assign', 'ImportsController@assign');
         Route::get('/user/get-users-manager', 'UsersController@getUserAssgin');
+        Route::post('/source_detail/list', 'SystemInfoController@getListSourceDetail');
+        Route::post('/source_detail/add', 'SystemInfoController@addSourceDetail');
+        Route::get('/source_detail/show/{source_detail_id}', 'SystemInfoController@infoSourceDetail');
+        Route::post('/source_detail/update/{source_detail_id}', 'SystemInfoController@updateSourceDetail');
 
         Route::post('/reports/01', 'ReportsController@report01');
         Route::get('/export/report01/{key}/{value}', 'ExportController@report01');

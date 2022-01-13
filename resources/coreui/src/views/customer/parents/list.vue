@@ -69,6 +69,23 @@
                   <span slot="noResult">Không tìm thấy dữ liệu</span>
                 </multiselect>   
               </div>
+               <div class="form-group col-sm-3">
+                <label for="ccmonth">Nguồn chi tiết</label>
+                 <multiselect
+                  placeholder="Chọn nguồn chi tiết"
+                  select-label="Chọn nguồn chi tiết "
+                  v-model="searchData.arr_source_detail"
+                  :options="source_detail_list"
+                  label="name"
+                  :close-on-select="false"
+                  :hide-selected="true"
+                  :multiple="true"
+                  :searchable="true"
+                  track-by="id"
+                >
+                  <span slot="noResult">Không tìm thấy dữ liệu</span>
+                </multiselect>   
+              </div>
               <div class="form-group col-sm-3">
                 <label for="ccmonth">Lịch chăm sóc tiếp theo</label>
                   <date-picker
@@ -130,6 +147,7 @@
                     <th>Học sinh 2</th>
                     <th>Học sinh 1</th>
                     <th>Nguồn</th>
+                    <th>Nguồn chi tiết</th>
                     <th>Người phụ trách</th>
                     <th>Lịch chăm sóc tiếp theo</th>
                     <th>Lịch sử chăm sóc</th>
@@ -157,6 +175,7 @@
                     <td>{{ item.hs2_name }}</td>
                     <td>{{ item.hs1_name }}</td>
                     <td>{{ item.source_name }}</td>
+                    <td>{{ item.source_detail_name }}</td>
                     <td>{{ item.owner_name }}</td>
                     <td>{{ item.next_care_date}}</td>
                     <td>{{ item.last_care }}</td>
@@ -292,6 +311,7 @@ export default {
   data() {
     return {
       source_list:[],
+      source_detail_list:[],
       list_status:[
         {id:1,label:'KH mới'},
         {id:2,label:'KH tiềm năng'},
@@ -339,9 +359,11 @@ export default {
         arr_status: "",
         arr_owner: "",
         arr_source: "",
+        arr_source_detail: "",
         status: "",
         owner_id: "",
         source_id: "",
+        source_detail_id: "",
         pagination: this.pagination,
         dateRange: "",
         type_seach: 0,
@@ -427,6 +449,11 @@ export default {
     u.g(`/api/sources`)
       .then(response => {
       this.source_list = response.data
+      this.source_detail_list = response.data
+    })
+     u.g(`/api/source_detail`)
+      .then(response => {
+      this.source_detail_list = response.data
     })
     if(localStorage.getItem("parents_searchData")){
       this.searchData =  JSON.parse(localStorage.getItem("parents_searchData"));
@@ -472,11 +499,21 @@ export default {
       }
       this.searchData.source_id = ids_source
 
+       const ids_source_detail = []
+      this.searchData.arr_source_detail = u.is.obj(this.searchData.arr_source_detail) ? [this.searchData.arr_source_detail] : this.searchData.arr_source_detail
+      if (this.searchData.arr_source_detail.length) {
+        this.searchData.arr_source_detail.map(item => {
+          ids_source_detail.push(item.id)
+        })
+      }
+      this.searchData.source_detail_id = ids_source_detail
+
       const data = {
         keyword: this.searchData.keyword,
         status: this.searchData.status,
         owner_id: this.searchData.owner_id,
         source_id: this.searchData.source_id,
+        source_detail_id: this.searchData.source_detail_id,
         start_date:startDate,
         end_date:endDate,
         pagination:this.pagination,

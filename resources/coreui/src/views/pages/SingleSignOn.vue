@@ -22,6 +22,7 @@ import u from "../../utilities/utility";
               localStorage.setItem("user_id", response.data.user_id);
               localStorage.setItem("api_token", response.data.access_token);
               localStorage.setItem('roles', JSON.stringify(response.data.roles));
+              localStorage.setItem('rules_setting', response.data.rules_setting);
               this.$router.push({ path: '/dashboard' });
           })
           .catch((e) => {

@@ -78,6 +78,7 @@
                   <p>Tỉnh/Thành phố: <span class="fl-right">{{parent.province_name}}</span></p>
                   <p>Quận huyện: <span class="fl-right">{{parent.district_name}}</span></p>
                   <p>Nguồn: <span class="fl-right">{{parent.source_name}}</span></p>
+                  <p>Nguồn chi tiết: <span class="fl-right">{{parent.source_detail_name}}</span></p>
                   <p>Ngày tạo: <span class="fl-right">{{parent.created_at}}</span></p>
                   <p>Người tạo: <span class="fl-right">{{parent.creator_name}}</span></p>
                   <br>
