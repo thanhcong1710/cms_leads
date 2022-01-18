@@ -255,7 +255,7 @@ class ImportsController extends Controller
     }
     public function assign(Request $request){
         $source_id = $request->source_id;
-        $source_detail_id = $request->source_detail_id;
+        $source_detail_id = $request->source_detail_id ? $request->source_detail_id : 0;
         $arr_owner = $request->owners_id;
         $import_id = $request->import_id;
         $list_data = u::query("SELECT * FROM cms_import_parents WHERE import_id=$import_id AND status=1");
