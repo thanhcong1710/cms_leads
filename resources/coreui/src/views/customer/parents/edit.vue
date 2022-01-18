@@ -321,6 +321,7 @@ export default {
       this.parent = response.data
       this.parent.job = this.html.jobs.list.filter(item => item.id == this.parent.job_id)[0]
       this.parent.source = this.html.source.list.filter(item => item.id == this.parent.source_id)[0]
+      this.parent.source_detail = this.html.source_detail.list.filter(item => item.id == this.parent.source_detail_id)[0]
       this.parent.province = this.html.province.list.filter(item => item.id == this.parent.province_id)[0]
       this.tmp_district_id = this.parent.district_id
     })
