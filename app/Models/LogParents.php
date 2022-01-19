@@ -105,6 +105,10 @@ class LogParents extends Model
                     $pre_source_info = u::first("SELECT name FROM cms_sources WHERE id =".(int)$pre_parent_info->$key);
                     $source_info = u::first("SELECT name FROM cms_sources WHERE id =".(int)$row);
                     $content.= "Nguồn từ `".$pre_source_info->name."` thành `".$source_info->name."`, ";
+                }elseif($key=='source_detail_id'){
+                    $pre_source_info = u::first("SELECT name FROM cms_source_detail WHERE id =".(int)$pre_parent_info->$key);
+                    $source_info = u::first("SELECT name FROM cms_source_detail WHERE id =".(int)$row);
+                    $content.= "Nguồn chi tiết từ `".$pre_source_info->name."` thành `".$source_info->name."`, ";
                 }elseif($key=='note'){
                     $content.= "Ghi chú từ `".$pre_parent_info->$key."` thành `".$row."`, ";
                 }elseif($key=='c2c_mobile'){
