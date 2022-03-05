@@ -84,7 +84,7 @@ class UtilityServiceProvider extends ServiceProvider
 		$field = "";
 		$field_value = "";
 		foreach ( $arr_params as $key => $value ) {
-			$field .= $key . ",";
+			$field .= "`".$key . "`,";
 			$field_value .= ":" . $key . ",";
 		}
 		$field = rtrim ( $field, "," );
@@ -98,7 +98,7 @@ class UtilityServiceProvider extends ServiceProvider
 		$set_clause = "";
 		$arr_binding = array();
 		foreach ( $arr_params as $key => $value ) {
-			$set_clause .= $key . "= :value_" . $key . ",";
+			$set_clause .= "`".$key . "`= :value_" . $key . ",";
 			$arr_binding['value_'.$key] = $value;
 		}
 		$set_clause = rtrim ( $set_clause, "," );
@@ -339,5 +339,28 @@ class UtilityServiceProvider extends ServiceProvider
                 $tmp = 'KH mới';
           }
         return $tmp;
+    }
+    public static function queryCRM($query, $print = false)
+    {
+        $resp = null;
+        $query = trim($query);
+        $upperQuery = strtoupper(substr($query, 0, 6));
+        $connection = DB::connection('mysql_crm');
+        if ($print) {
+            dd('\n-------------------------------------------------------------\n', $query, '\n-------------------------------------------------------------\n');
+        } else {
+            if ($upperQuery == ('SELECT')) {
+                $resp = $connection->select(DB::raw($query));
+            } elseif ($upperQuery == ('INSERT')) {
+                $resp = $connection->insert(DB::raw($query));
+            } elseif ($upperQuery == ('UPDATE')) {
+                $resp = $connection->update(DB::raw($query));
+            } elseif ($upperQuery == ('DELETE')) {
+                $resp = $connection->delete(DB::raw($query));
+            } else {
+                $resp = $connection->statement(DB::raw($query));
+            }
+        }
+        return $resp;
     }
 }

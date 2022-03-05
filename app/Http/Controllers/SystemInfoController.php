@@ -44,6 +44,19 @@ class SystemInfoController extends Controller
         $data = u::query("SELECT * FROM cms_branches WHERE status=1");
         return response()->json($data);
     }
+    public function getAllReportWeekReport(Request $request){
+        $type= $request->type ? $request->type :0 ;
+        if($type == 'all'){
+            $cond = "1";
+        }elseif($type==1){
+            $cond = "start_date >='".date('Y-m-d',strtotime('previous monday'))."' ORDER BY start_date";
+        }else{
+            $cond = "start_date <='".date('Y-m-d')."' ORDER BY start_date DESC";
+        }
+        
+        $data = u::query("SELECT *, CONCAT('Tuần từ ngày ',start_date,' đến ', end_date) AS label FROM cms_report_week WHERE $cond");
+        return response()->json($data);
+    }
     public function getSchools($province_id, $district_id, $school_level)
     {
         $data = null;
@@ -111,6 +124,84 @@ class SystemInfoController extends Controller
             'updator_id' => Auth::user()->id,
             'status'=>$request->status,
         ), array('id'=>$source_detail_id),'cms_source_detail');
+        return response()->json($id);
+    }
+    public function getListTarget(Request $request)
+    {
+        $week_id = isset($request->week_id) ? $request->week_id : '';
+        $keyword = isset($request->keyword) ? $request->keyword : '';
+        
+        $pagination = (object)$request->pagination;
+        $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
+        $limit = isset($pagination->limit) ? (int) $pagination->limit : 20;
+        $offset = $page == 1 ? 0 : $limit * ($page-1);
+        $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
+        $cond = " 1 ";
+        if($keyword!==''){
+            $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%')";
+        }
+        if($week_id!==''){
+            $cond .= " AND r.report_week_id= $week_id";
+        }
+        if(!$request->user()->hasRole('admin')){
+            $cond .= " AND r.user_id IN (".$request->user_info->users_manager.")";
+        }
+        
+        $total = u::first("SELECT count(r.id) AS total FROM cms_report_target AS r LEFT JOIN users AS u ON u.id=r.user_id WHERE $cond ");
+        $list = u::query("SELECT r.*,CONCAT(u.name,' - ',u.hrm_id) AS user_label,CONCAT('Tuần từ ngày ',w.start_date,' đến ',w.end_date) AS week_label,
+            IF(w.end_date < CURRENT_DATE,0,1) AS can_edit 
+            FROM cms_report_target AS r 
+                LEFT JOIN users AS u ON u.id=r.user_id 
+                LEFT JOIN cms_report_week AS w ON w.id=r.report_week_id
+            WHERE $cond ORDER BY r.id DESC $limitation");
+        $data = u::makingPagination($list, $total->total, $page, $limit);
+        return response()->json($data);
+    }
+    public function addTarget(Request $request)
+    {
+        $target_info = u::first("SELECT id FROM cms_report_target WHERe user_id=$request->user_id  AND report_week_id=$request->week_id");
+        if($target_info){
+            $result = array(
+              'status'=>0,
+              'message'=>'Đã tồn tại bản của ghi'
+            );  
+        }else{
+            $id = u::insertSimpleRow(array(
+                'report_week_id'=>$request->week_id,
+                'user_id'=>$request->user_id,
+                'call'=>$request->call,
+                'talk_time'=>$request->talk_time,
+                'trial_accept'=>$request->trial_accept,
+                'trial_actual'=>$request->trial_actual,
+                'new_enroll'=>$request->new_enroll,
+                'created_at' => date('Y-m-d H:i:s'),
+                'creator_id' => Auth::user()->id,
+            ), 'cms_report_target');
+            $result = array(
+                'status'=>1,
+                'message'=>'ok'
+            ); 
+        }
+        return response()->json($result);
+    }
+    public function infoTarget(Request $request,$target_id)
+    {
+        $data = u::first("SELECT r.*,(SELECT CONCAT('Tuần từ ngày ',start_date,' đến ',end_date ) FROM cms_report_week WHERE id=r.report_week_id) AS report_week_label, 
+                (SELECT CONCAT(name, ' - ',hrm_id) FROM users WHERE id=r.user_id) AS user_label
+            FROM cms_report_target AS r WHERE id=$target_id");
+        return response()->json($data);
+    }
+    public function updateTarget(Request $request,$target_id)
+    {
+        $id = u::updateSimpleRow(array(
+            'call'=>$request->call,
+            'talk_time'=>$request->talk_time,
+            'trial_accept'=>$request->trial_accept,
+            'trial_actual'=>$request->trial_actual,
+            'new_enroll'=>$request->new_enroll,
+            'updated_at' => date('Y-m-d H:i:s'),
+            'updator_id' => Auth::user()->id
+        ), array('id'=>$target_id),'cms_report_target');
         return response()->json($id);
     }
 }

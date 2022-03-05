@@ -57,4 +57,36 @@ class ReportsController extends Controller
         $data = u::makingPagination($list, $total->total, $page, $limit);
         return response()->json($data);
     }
+    public function report02(Request $request)
+    {
+        $keyword = isset($request->keyword) ? $request->keyword : '';
+        $report_week_id = isset($request->report_week_id) ? $request->report_week_id : 0;
+        
+        $pagination = (object)$request->pagination;
+        $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
+        $limit = isset($pagination->limit) ? (int) $pagination->limit : 20;
+        $offset = $page == 1 ? 0 : $limit * ($page-1);
+        $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
+        $cond = " r.report_week_id =  $report_week_id";
+        if($keyword!==''){
+            $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm LIKE '%$keyword%')";
+        }
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
+            $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
+        }
+        $total = u::first("SELECT count(u.id) AS total FROM users AS u 
+            LEFT JOIN cms_report_week_sale_hub AS r ON r.user_id=u.id
+            WHERE u.status=1 AND $cond ");
+        $list = u::query("SELECT CONCAT(u.name,' - ',u.hrm_id) AS user_label,
+                t.call AS target_call, t.talk_time AS target_talk_time, t.trial_accept AS target_trial_accept, t.trial_actual AS target_trial_actual, t.new_enroll AS target_new_enroll,
+                r.call , r.talk_time , r.trial_accept , r.trial_actual, r.new_enroll, r.collection
+            FROM users AS u 
+                LEFT JOIN cms_report_week_sale_hub AS r ON r.user_id=u.id
+                LEFT JOIN cms_report_target AS t ON t.user_id=u.id AND t.report_week_id=r.report_week_id
+            WHERE u.status=1 AND $cond 
+            ORDER BY u.id DESC $limitation");
+            
+        $data = u::makingPagination($list, $total->total, $page, $limit);
+        return response()->json($data);
+    }
 }
