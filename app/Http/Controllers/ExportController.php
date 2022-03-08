@@ -170,4 +170,139 @@ class ExportController extends Controller
             throw $exception;
         }
     }
+    public function report02(Request $request , $key,$value) {
+        set_time_limit(300);
+        ini_set('memory_limit', '-1');
+        $cond = " 1 ";
+        $arr_key =explode(',',$key);
+        $arr_value =explode(',',$value);
+        $report_week_id = "";
+        foreach($arr_key AS $k=>$key){
+            if($key=='keyword'){
+                $keyword = $arr_value[$k];
+                $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm LIKE '%$keyword%')";
+            }
+            if($key=='report_week_id'){
+                $report_week_id = $arr_value[$k];
+            }
+        }
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
+            $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
+        }
+
+        if(!$report_week_id){
+            $report_week_info = u::first("SELECT * FROM cms_report_week WHERE start_date <= CURRENT_DATE AND  end_date>= CURRENT_DATE");
+            $report_week_id = $report_week_info->id;
+        }
+        $cond.=" AND r.report_week_id =  $report_week_id";
+
+        $list = u::query("SELECT CONCAT(u.name,' - ',u.hrm_id) AS user_label,
+                t.call AS target_call, t.talk_time AS target_talk_time, t.trial_accept AS target_trial_accept, t.trial_actual AS target_trial_actual, t.new_enroll AS target_new_enroll,
+                r.call , r.talk_time , r.trial_accept , r.trial_actual, r.new_enroll, r.collection
+            FROM users AS u 
+                LEFT JOIN cms_report_week_sale_hub AS r ON r.user_id=u.id
+                LEFT JOIN cms_report_target AS t ON t.user_id=u.id AND t.report_week_id=r.report_week_id
+            WHERE u.status=1 AND $cond 
+            ORDER BY u.id DESC");
+        $tmp_report_week = u::first("SELECT CONCAT('Tuần từ ngày ',start_date,' đến ', end_date) AS label FROM cms_report_week WHERE id= $report_week_id");
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'Báo cáo tuần Sale HUB -'.$tmp_report_week->label);
+
+        $sheet->setCellValue('A2', 'STT');
+        $sheet->setCellValue('B2', 'Tên nhân viên');
+        $sheet->setCellValue('C2', 'Target tuần');
+        $sheet->setCellValue('H2', 'Thực đạt tuần');
+        $sheet->setCellValue('C3', 'Call');
+        $sheet->setCellValue('D3', 'Talk time');
+        $sheet->setCellValue('E3', 'Trial accept');
+        $sheet->setCellValue('F3', 'Trial actual');
+        $sheet->setCellValue('G3', 'New Enroll');
+        $sheet->setCellValue('H3', 'Call');
+        $sheet->setCellValue('I3', 'Talk time');
+        $sheet->setCellValue('J3', 'Trial accept');
+        $sheet->setCellValue('K3', 'Trial actual');
+        $sheet->setCellValue('L3', 'New Enroll');
+        $sheet->setCellValue('M3', 'Collection');
+        $sheet->mergeCells('A1:M1');
+        $sheet->mergeCells('A2:A3');
+        $sheet->mergeCells('B2:B3');
+        $sheet->mergeCells('C2:G2');
+        $sheet->mergeCells('H2:M2');
+
+        ProcessExcel::styleCells($spreadsheet, "A1:M1", NULL, NULL, 16, 1, 3, "center", "center", true, 0, 'Calibri');
+        ProcessExcel::styleCells($spreadsheet, "A2:A3", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "B2:B3", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "C2:G2", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "H2:M2", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "C3", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "D3", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "E3", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "F3", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "G3", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "H3", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "I3", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "J3", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "K3", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "L3", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "M3", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        $sheet->getRowDimension(1)->setRowHeight(30);
+        $sheet->getRowDimension(2)->setRowHeight(23);
+        $sheet->getRowDimension(3)->setRowHeight(23);
+        $sheet->getColumnDimension("A")->setWidth(10);
+        $sheet->getColumnDimension("B")->setWidth(30);
+        $sheet->getColumnDimension("C")->setWidth(20);
+        $sheet->getColumnDimension("D")->setWidth(20);
+        $sheet->getColumnDimension("E")->setWidth(20);
+        $sheet->getColumnDimension("F")->setWidth(20);
+        $sheet->getColumnDimension("G")->setWidth(20);
+        $sheet->getColumnDimension("H")->setWidth(20);
+        $sheet->getColumnDimension("I")->setWidth(20);
+        $sheet->getColumnDimension("J")->setWidth(20);
+        $sheet->getColumnDimension("K")->setWidth(20);
+        $sheet->getColumnDimension("L")->setWidth(20);
+        $sheet->getColumnDimension("M")->setWidth(20);
+        for ($i = 0; $i < count($list) ; $i++) {
+            $x = $i + 4;
+            $sheet->setCellValue('A' . $x, $i+1);
+            $sheet->setCellValue('B' . $x, $list[$i]->user_label) ;
+            $sheet->setCellValue('C' . $x, $list[$i]->target_call );
+            $sheet->setCellValue('D' . $x, $list[$i]->target_talk_time);
+            $sheet->setCellValue('E' . $x, $list[$i]->target_trial_accept);
+            $sheet->setCellValue('F' . $x, $list[$i]->target_trial_actual);
+            $sheet->setCellValue('G' . $x, $list[$i]->target_new_enroll);
+            $sheet->setCellValue('H' . $x, $list[$i]->call);
+            $sheet->setCellValue('I' . $x, $list[$i]->talk_time);
+            $sheet->setCellValue('J' . $x, $list[$i]->trial_accept);
+            $sheet->setCellValue('K' . $x, $list[$i]->trial_actual);
+            $sheet->setCellValue('L' . $x, $list[$i]->new_enroll);
+            $sheet->setCellValue('M' . $x, $list[$i]->collection);
+            
+            $sheet->getRowDimension($x)->setRowHeight(23);
+            ProcessExcel::styleCells($spreadsheet, "A$x", 'FFFFFF', '111111', 11, 0, 3, "right", "center", true, 0, 'Cambria');
+            ProcessExcel::styleCells($spreadsheet, "B$x", 'FFFFFF', '111111', 11, 0, 3, "left", "center", true, 0, 'Cambria');
+            ProcessExcel::styleCells($spreadsheet, "C$x", 'FFFFFF', '111111', 11, 0, 3, "right", "center", true, 0, 'Cambria');
+            ProcessExcel::styleCells($spreadsheet, "D$x", 'FFFFFF', '111111', 11, 0, 3, "right", "center", true, 0, 'Cambria');
+            ProcessExcel::styleCells($spreadsheet, "E$x", 'FFFFFF', '111111', 11, 0, 3, "right", "center", true, 0, 'Cambria');
+            ProcessExcel::styleCells($spreadsheet, "F$x", 'FFFFFF', '111111', 11, 0, 3, "right", "center", true, 0, 'Cambria');
+            ProcessExcel::styleCells($spreadsheet, "G$x", 'FFFFFF', '111111', 11, 0, 3, "right", "center", true, 0, 'Cambria');
+            ProcessExcel::styleCells($spreadsheet, "H$x", 'FFFFFF', '111111', 11, 0, 3, "right", "center", true, 0, 'Cambria');
+            ProcessExcel::styleCells($spreadsheet, "I$x", 'FFFFFF', '111111', 11, 0, 3, "right", "center", true, 0, 'Cambria');
+            ProcessExcel::styleCells($spreadsheet, "J$x", 'FFFFFF', '111111', 11, 0, 3, "right", "center", true, 0, 'Cambria');
+            ProcessExcel::styleCells($spreadsheet, "K$x", 'FFFFFF', '111111', 11, 0, 3, "right", "center", true, 0, 'Cambria');
+            ProcessExcel::styleCells($spreadsheet, "L$x", 'FFFFFF', '111111', 11, 0, 3, "right", "center", true, 0, 'Cambria');
+            ProcessExcel::styleCells($spreadsheet, "M$x", 'FFFFFF', '111111', 11, 0, 3, "right", "center", true, 0, 'Cambria');
+
+        }
+        $writer = new Xlsx($spreadsheet);
+        try {
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="Báo cáo tuần sale hub.xlsx"');
+            header('Cache-Control: max-age=0');
+            $writer->save("php://output");
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
 }

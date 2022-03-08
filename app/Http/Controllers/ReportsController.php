@@ -61,6 +61,10 @@ class ReportsController extends Controller
     {
         $keyword = isset($request->keyword) ? $request->keyword : '';
         $report_week_id = isset($request->report_week_id) ? $request->report_week_id : 0;
+        if(!$report_week_id){
+            $report_week_info = u::first("SELECT * FROM cms_report_week WHERE start_date <= CURRENT_DATE AND  end_date>= CURRENT_DATE");
+            $report_week_id = $report_week_info->id;
+        }
         
         $pagination = (object)$request->pagination;
         $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
@@ -87,6 +91,8 @@ class ReportsController extends Controller
             ORDER BY u.id DESC $limitation");
             
         $data = u::makingPagination($list, $total->total, $page, $limit);
+        $tmp_report_week = u::first("SELECT CONCAT('Tuần từ ngày ',start_date,' đến ', end_date) AS label FROM cms_report_week WHERE id= $report_week_id");
+        $data->label_report=$tmp_report_week->label;
         return response()->json($data);
     }
 }
