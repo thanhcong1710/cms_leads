@@ -5,7 +5,7 @@
         <div class="card">
           <loader :active="loading.processing" :text="loading.text" />
           <div class="card-header">
-            <strong> Báo cáo tuần Sale HUB</strong>
+            <strong> Báo cáo tuần Sale HUB - {{label_report}}</strong>
           </div>
           <div class="card-body">
             <div class="row">
@@ -143,6 +143,7 @@ export default {
         pagination: this.pagination
       },
       imports: [],
+      label_report:'',
       pagination: {
         url: "/api/imports/list",
         id: "",
@@ -191,6 +192,7 @@ export default {
           this.pagination.cpage = response.data.paging.cpage;
           this.pagination.total = response.data.paging.total;
           this.pagination.limit = response.data.paging.limit;
+          this.label_report=response.data.label_report
         })
         .catch((e) => {
           u.processAuthen(e);
@@ -213,6 +215,10 @@ export default {
       if (this.searchData.keyword){
         this.key += "keyword,"
         this.value += this.searchData.keyword+","
+      }
+       if (this.searchData.week_id){
+        this.key += "report_week_id,"
+        this.value += this.searchData.week_id+","
       }
       this.key = this.key? this.key.substring(0, this.key.length - 1):'_'
       this.value = this.value? this.value.substring(0, this.value.length - 1) : "_"
