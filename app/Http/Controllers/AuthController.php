@@ -12,8 +12,6 @@ use App\Providers\CurlServiceProvider as curl;
 class AuthController extends Controller
 { 
     /**
-     * Create a new AuthController instance
-     *
      * @return void
      */
     public function __construct()
