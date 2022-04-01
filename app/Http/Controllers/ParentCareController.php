@@ -27,7 +27,7 @@ class ParentCareController extends Controller
                 (SELECT name FROM cms_contact_methods WHERE id=c.method_id) AS method_name ,
                 (SELECT type FROM voip24h_data WHERE id= c.data_id) AS type_call,
                 (SELECT link_record FROM voip24h_data WHERE id = c.data_id) AS link_record,
-                (SELECT name FROM cms_branch WHERE id=c.branch_id) AS branch_name
+                (SELECT name FROM cms_branches WHERE id=c.branch_id) AS branch_name
             FROM cms_customer_care AS c WHERE parent_id=$parent_id ORDER BY c.care_date DESC");
         return response()->json($data);
     }
