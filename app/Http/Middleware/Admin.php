@@ -20,7 +20,7 @@ class Admin
             return response()->json(['message' => 'Unauthenticated. Admin role required'], 401);
         }
         $list_users = u::query("SELECT id,manager_id FROM users WHERE status=1");
-        if($user->hasRole('admin')){
+        if($user->hasRole('admin') || $user->hasRole('Supervisor')){
             $users_manager="";
             foreach($list_users AS $row){
                 $users_manager.=$users_manager ? ",".$row->id : $row->id;

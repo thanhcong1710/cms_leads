@@ -61,7 +61,7 @@ class VoipController extends Controller
                 'created_at'=>date('Y-m-d H:i:s'),
             ),'voip24h_data');
             $parent_info = u::first("SELECT id FROM cms_parents WHERE (mobile_1='$phone' OR mobile_2='$phone')");
-            $user_info = u::first("SELECT id FROM users WHERE sip_id='".(int)$obj->extend."'");
+            $user_info = u::first("SELECT id,branch_id FROM users WHERE sip_id='".(int)$obj->extend."'");
             if($data_id && $parent_info && $user_info){
                 $care_id = u::insertSimpleRow( array(
                     'parent_id'=>$parent_info->id,
@@ -73,6 +73,7 @@ class VoipController extends Controller
                     'data_id'=>$data_id,
                     'data_state'=>$disposition,
                     'phone'=>$phone,
+                    'branch_id'=>$user_info->branch_id,
                 ),'cms_customer_care');
                 $this->socketIo($user_info->id,'call_end',array('user_id'=>$user_info->id,'care_id'=>$care_id,'parent_id'=>$parent_info->id));
             }

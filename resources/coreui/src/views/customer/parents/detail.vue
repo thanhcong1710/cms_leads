@@ -137,6 +137,7 @@
                           <tr>
                             <th width="10%">Thời gian</th>
                             <th width="10%">Phụ trách</th>
+                            <th width="10%">Trung tâm</th>
                             <th width="10%">Phương thức</th>
                             <th width="10%">Trạng thái</th>
                             <th width="25%">Chi tiết</th>
@@ -146,6 +147,7 @@
                           <tr v-for="(item, index) in cares" :key="index">
                             <td width="10%">{{ item.care_date }}</td>
                             <td width="10%">{{ item.creator_name }}</td>
+                            <td width="10%">{{ item.branch_name }}</td>
                             <td width="10%">{{ item.method_name}}{{item.type_call?" - "+item.type_call:''}}</td>
                             <td width="10%">{{ genStateCall(item.data_state) }}</td>
                             <td width="25%">
