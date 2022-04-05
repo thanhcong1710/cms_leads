@@ -26,7 +26,9 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::get('webhook/voip24h', 'VoipController@webhook');
     Route::get('socket_io/test', 'VoipController@testSocket');
     Route::get('tools/download_record', 'ToolsController@downloadReCord');
+    Route::get('tools/gen_week', 'ToolsController@genWeek');
     Route::get('/export/import/{import_id}', 'ExportController@import');
+    Route::get('/tools/report_salehub/{report_week_id}', 'ToolsController@processReportSaleHub');
 
     Route::group(['middleware' => 'admin'], function ($router) {
         Route::resource('users', 'UsersController')->except( ['create', 'store'] );
@@ -118,10 +120,16 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::post('/source_detail/add', 'SystemInfoController@addSourceDetail');
         Route::get('/source_detail/show/{source_detail_id}', 'SystemInfoController@infoSourceDetail');
         Route::post('/source_detail/update/{source_detail_id}', 'SystemInfoController@updateSourceDetail');
+        Route::post('/target/list', 'SystemInfoController@getListTarget');
+        Route::post('/target/add', 'SystemInfoController@addTarget');
+        Route::get('/target/show/{target_id}', 'SystemInfoController@infoTarget');
+        Route::post('/target/update/{target_id}', 'SystemInfoController@updateTarget');
+        Route::get('/report_week', 'SystemInfoController@getAllReportWeekReport');
 
         Route::post('/reports/01', 'ReportsController@report01');
         Route::get('/export/report01/{key}/{value}', 'ExportController@report01');
-        
+        Route::post('/reports/02', 'ReportsController@report02');
+        Route::get('/export/report02/{key}/{value}', 'ExportController@report02');
     });
 });
 
