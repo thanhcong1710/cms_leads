@@ -80,7 +80,7 @@ class ReportsController extends Controller
         }
         $total = u::first("SELECT count(u.id) AS total FROM users AS u 
             LEFT JOIN cms_report_week_sale_hub AS r ON r.user_id=u.id
-            WHERE u.status=1 AND $cond AND (SELECT count(id) FROM model_has_roles WHERE model_id=u.id AND role_id=4)>0");
+            WHERE u.status=1 AND $cond AND (SELECT count(role_id) FROM model_has_roles WHERE model_id=u.id AND role_id=4)>0");
         $list = u::query("SELECT CONCAT(u.name,' - ',u.hrm_id) AS user_label,
                 t.call AS target_call, t.talk_time AS target_talk_time, t.trial_accept AS target_trial_accept, t.trial_actual AS target_trial_actual, t.new_enroll AS target_new_enroll,
                 r.call , SEC_TO_TIME(r.talk_time) AS talk_time , r.trial_accept , r.trial_actual, r.new_enroll, r.collection
