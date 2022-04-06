@@ -23,7 +23,7 @@ class ParentCareController extends Controller
         return response()->json($data);
     }
     public function getAllDataByParent($parent_id){
-        $data = u::query("SELECT c.*, (SELECT name FROM users WHERE id=c.creator_id) AS creator_name,
+        $data = u::query("SELECT c.*, (SELECT CONCAT(name,' - ',hrm_id) FROM users WHERE id=c.creator_id) AS creator_name,
                 (SELECT name FROM cms_contact_methods WHERE id=c.method_id) AS method_name ,
                 (SELECT type FROM voip24h_data WHERE id= c.data_id) AS type_call,
                 (SELECT link_record FROM voip24h_data WHERE id = c.data_id) AS link_record,
