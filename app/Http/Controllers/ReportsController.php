@@ -87,7 +87,7 @@ class ReportsController extends Controller
             FROM users AS u 
                 LEFT JOIN cms_report_week_sale_hub AS r ON r.user_id=u.id
                 LEFT JOIN cms_report_target AS t ON t.user_id=u.id AND t.report_week_id=r.report_week_id
-            WHERE u.status=1 AND $cond AND (SELECT count(id) FROM model_has_roles WHERE model_id=u.id AND role_id=4)>0
+            WHERE u.status=1 AND $cond AND (SELECT count(role_id) FROM model_has_roles WHERE model_id=u.id AND role_id=4)>0
             ORDER BY u.id DESC $limitation");
             
         $data = u::makingPagination($list, $total->total, $page, $limit);
