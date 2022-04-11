@@ -73,7 +73,7 @@ class ReportsController extends Controller
         $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
         $cond = " r.report_week_id =  $report_week_id";
         if($keyword!==''){
-            $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm LIKE '%$keyword%')";
+            $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%')";
         }
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
