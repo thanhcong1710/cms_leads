@@ -64,7 +64,7 @@ class ParentsController extends Controller
         //type_search=2
         $cond_2 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') = '".date('Y-m-d')."'";
         $cond_3 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') < '".date('Y-m-d')."' 
-            AND ( SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND care_date >= next_care_date )=0";
+            AND ( SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND care_date >= next_care_date )=0 AND p.status NOT IN (8,9,10,12)";
         $order_by = " ORDER BY p.id DESC ";
         $tmp_cond="";
         if($type_seach==1){

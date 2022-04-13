@@ -366,7 +366,7 @@ export default {
         source_detail_id: "",
         pagination: this.pagination,
         dateRange: "",
-        type_seach: 0,
+        type_seach: 1,
       },
       users_manager:[],
       parents: [],
