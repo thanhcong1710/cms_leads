@@ -107,7 +107,7 @@ class ToolsController extends Controller
                 FROM
                     users AS u 
                 WHERE
-                    u.status =1");
+                    u.status =1 ");
         $this->addItemsReportWeekSaleHub($list,$report_week_info->id);
 
         return "ok";
