@@ -305,4 +305,101 @@ class ExportController extends Controller
             throw $exception;
         }
     }
+    public function report03(Request $request , $key,$value) {
+        set_time_limit(300);
+        ini_set('memory_limit', '-1');
+        $cond = "1";
+        $cond1 = "1";
+        $arr_key =explode(',',$key);
+        $arr_value =explode(',',$value);
+        foreach($arr_key AS $k=>$key){
+            if($key=='keyword'){
+                $keyword = $arr_value[$k];
+                $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%')";;
+            }
+            if($key=='type_status'){
+                if($arr_value[$k] == 1){
+                    $cond1 .= " AND disposition = 'ANSWERED'";
+                }elseif($arr_value[$k] == 2){
+                    $cond1 .= " AND disposition = 'NO ANSWER'";
+                }elseif($arr_value[$k] == 3){
+                    $cond1 .= " AND disposition = 'BUSY'";
+                }
+            }
+            if($key=='type_date'){
+                if($arr_value[$k] == 1){
+                    $cond1 .= " AND start_time >= '".date('Y-m-d 00:00:00')."'";
+                }elseif($arr_value[$k] == 2){
+                    $cond1 .= " AND start_time < '".date('Y-m-d 00:00:00')."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime ( '-1 day' , time() ) )."'";
+                }elseif($arr_value[$k] == 3){
+                    $cond1 .= " AND start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday"))."'";
+                }elseif($arr_value[$k] == 4){
+                    $cond1 .= " AND start_time < '".date('Y-m-d 00:00:00',strtotime("last Monday"))."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday")-24*7*3600)."'";
+                }elseif($arr_value[$k] == 5){
+                    $cond1 .= " AND start_time < '".date('Y-m-01 00:00:00')."'";
+                }elseif($arr_value[$k] == 6){
+                    $cond1 .= " AND start_time < '".date('Y-m-01 00:00:00')."' AND start_time >= '".date('Y-m-01 00:00:00',strtotime('-1 month'))."'";
+                }
+            }
+        }
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
+            $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
+        }
+        $list = u::query("SELECT CONCAT(u.sip_id,' - ',u.name,' - ',u.hrm_id) AS sip_name,
+                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND $cond1) AS total_inbound,
+                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND $cond1) AS total_outbound,
+                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND $cond1) AS total_duration_inbound,
+                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND $cond1) AS total_duration_outbound,
+                0 As duration_inbound,
+                0 AS duration_outbound
+            FROM users AS u 
+            WHERE u.status=1 AND $cond AND sip_id IS NOT NULL
+            ORDER BY u.id DESC ");
+        foreach($list AS $k=>$row){
+            $list[$k]->duration_inbound = gmdate("H:i:s", ($row->total_inbound ? $row->total_duration_inbound / $row->total_inbound :0));
+            $list[$k]->duration_outbound = gmdate("H:i:s", ($row->total_outbound ? $row->total_duration_outbound/ $row->total_outbound :0));
+            $list[$k]->total_duration_inbound = gmdate("H:i:s", $row->total_duration_inbound);
+            $list[$k]->total_duration_outbound = gmdate("H:i:s", $row->total_duration_outbound);
+        }
+            
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'Tên máy nhánh');
+        $sheet->setCellValue('B1', 'Tổng gọi vào');
+        $sheet->setCellValue('C1', 'Tổng gọi ra');
+        $sheet->setCellValue('D1', 'Thời gian gọi vào TB');
+        $sheet->setCellValue('E1', 'Thời gian gọi ra TB');
+        $sheet->setCellValue('F1', 'Tổng thời gian gọi vào');
+        $sheet->setCellValue('G1', 'Tổng thời gian gọi ra');
+
+        $sheet->getColumnDimension("A")->setWidth(30);
+        $sheet->getColumnDimension("B")->setWidth(20);
+        $sheet->getColumnDimension("C")->setWidth(20);
+        $sheet->getColumnDimension("D")->setWidth(20);
+        $sheet->getColumnDimension("E")->setWidth(20);
+        $sheet->getColumnDimension("F")->setWidth(20);
+        $sheet->getColumnDimension("G")->setWidth(20);
+        for ($i = 0; $i < count($list) ; $i++) {
+            $x = $i + 2;
+            $sheet->setCellValue('A' . $x, $list[$i]->sip_name);
+            $sheet->setCellValue('B' . $x, $list[$i]->total_inbound) ;
+            $sheet->setCellValue('C' . $x, $list[$i]->total_outbound );
+            $sheet->setCellValue('D' . $x, $list[$i]->duration_inbound);
+            $sheet->setCellValue('E' . $x, $list[$i]->duration_outbound);
+            $sheet->setCellValue('F' . $x, $list[$i]->total_duration_inbound);
+            $sheet->setCellValue('G' . $x, $list[$i]->total_duration_outbound);
+            
+            $sheet->getRowDimension($x)->setRowHeight(23);
+
+        }
+        $writer = new Xlsx($spreadsheet);
+        try {
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="Báo cáo cuộc gọi.xlsx"');
+            header('Cache-Control: max-age=0');
+            $writer->save("php://output");
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
 }

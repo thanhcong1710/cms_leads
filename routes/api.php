@@ -130,6 +130,8 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('/export/report01/{key}/{value}', 'ExportController@report01');
         Route::post('/reports/02', 'ReportsController@report02');
         Route::get('/export/report02/{key}/{value}', 'ExportController@report02');
+        Route::post('/reports/03', 'ReportsController@report03');
+        Route::get('/export/report03/{key}/{value}', 'ExportController@report03');
     });
 });
 

@@ -9,6 +9,7 @@
           <div class="card-body report-list">
             <p class="h6"><router-link to="/reports/01" >01. Báo cáo thông tin khách hàng</router-link></p>
             <p class="h6"><router-link to="/reports/02" >02. Báo cáo tuần Sale HUB</router-link></p>
+            <p class="h6"><router-link to="/reports/03" >03. Báo cáo cuộc gọi</router-link></p>
           </div>
         </div>
       </div>
