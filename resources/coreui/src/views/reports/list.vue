@@ -7,8 +7,9 @@
             <strong>DANH SÁCH BÁO CÁO</strong>
           </div>
           <div class="card-body report-list">
-            <p class="h6"><router-link to="/reports/01" >01. Báo cáo thông tin khách hàng</router-link></p>
-            <p class="h6"><router-link to="/reports/02" >02. Báo cáo tuần Sale HUB</router-link></p>
+            <p class="h6"><router-link to="/reports/01" v-if="showBC01" >01. Báo cáo thông tin khách hàng</router-link></p>
+            <p class="h6"><router-link to="/reports/02" v-if="showBC02" >02. Báo cáo tuần Sale HUB</router-link></p>
+            <p class="h6"><router-link to="/reports/03" v-if="showBC03" >03. Báo cáo cuộc gọi</router-link></p>
           </div>
         </div>
       </div>
@@ -25,10 +26,19 @@ export default {
   name: "List-Parent",
   data() {
     return {
+      showBC01:false,
+      showBC02:false,
+      showBC03:false,
     }
   },
   created() {
-    
+    this.showBC01 = true;
+    this.showBC02 = true;
+    this.showBC03 = true;
+    // const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
+    // if(arr_role.indexOf("Supervisor")> -1){
+    //   this.disabled_action = true
+    // }
   },
   methods: {
   }
