@@ -366,7 +366,7 @@ export default {
         source_detail_id: "",
         pagination: this.pagination,
         dateRange: "",
-        type_seach: 0,
+        type_seach: 1,
       },
       users_manager:[],
       parents: [],
@@ -457,6 +457,15 @@ export default {
     })
     if(localStorage.getItem("parents_searchData")){
       this.searchData =  JSON.parse(localStorage.getItem("parents_searchData"));
+    }
+    if(this.searchData.type_seach ==0){
+      this.activeItem = "all"
+    }else if(this.searchData.type_seach == 1){
+      this.activeItem = "type_1"
+    }else if(this.searchData.type_seach == 2){
+      this.activeItem = "type_2"
+    }else if(this.searchData.type_seach == 3){
+      this.activeItem = "type_3"
     }
     this.search();
   },

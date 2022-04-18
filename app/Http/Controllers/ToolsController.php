@@ -72,7 +72,7 @@ class ToolsController extends Controller
             FROM
                 students AS s
             WHERE
-                s.update_checked >='".$report_week_info->start_date."'");
+                s.update_checked >='".$report_week_info->start_date."' AND s.update_checked <='".$report_week_info->end_date."'");
         $this->addItemsTmpStudent($list_trial_actual,$report_week_info->id,1);
 
         // New Enroll
@@ -83,7 +83,7 @@ class ToolsController extends Controller
             WHERE
                 c.count_recharge = 0 
                 AND ( SELECT count( id ) FROM payment WHERE contract_id = c.id AND charge_date > p.charge_date )= 0 
-                AND p.charge_date >='".$report_week_info->start_date."'");
+                AND p.charge_date >='".$report_week_info->start_date."' AND p.charge_date <='".$report_week_info->end_date."'");
         $this->addItemsTmpStudent($list_new_enroll,$report_week_info->id,2);
         // Collection
         $list_collection = u::queryCRM("SELECT p.charge_date AS finish_date,c.student_id AS student_crm_id, p.amount
@@ -91,15 +91,15 @@ class ToolsController extends Controller
                 payment AS p
                 LEFT JOIN contracts AS c ON c.id = p.contract_id 
             WHERE
-                c.count_recharge = 0 
-                AND p.charge_date >='".$report_week_info->start_date."'");
+                c.count_recharge = 0 AND  p.debt=0
+                AND p.charge_date >='".$report_week_info->start_date."' AND p.charge_date <='".$report_week_info->end_date."'");
         $this->addItemsTmpStudent($list_collection,$report_week_info->id,3);
         u::query("UPDATE cms_tmp_student AS t LEFT JOIN cms_students AS s ON t.student_crm_id=s.crm_id LEFT JOIN cms_parents AS p ON p.id=s.parent_id SET t.user_id=p.owner_id WHERE t.report_week_id = $report_week_info->id");
       
         u::query("DELETE FROM cms_report_week_sale_hub WHERE report_week_id = $report_week_info->id");
         $list = u::query("SELECT u.id AS user_id,
-                    (SELECT count(id) FROM voip24h_data WHERE created_at >='".$report_week_info->start_date." 00:00:00' AND user_id=u.id ) AS `call` ,
-                    (SELECT SUM(duration) FROM voip24h_data WHERE created_at >='".$report_week_info->start_date." 00:00:00' AND user_id=u.id ) AS talk_time,
+                    (SELECT count(id) FROM voip24h_data WHERE created_at >='".$report_week_info->start_date." 00:00:00' AND user_id=u.id AND disposition='ANSWERED') AS `call` ,
+                    (SELECT SUM(duration) FROM voip24h_data WHERE created_at >='".$report_week_info->start_date." 00:00:00' AND user_id=u.id AND disposition='ANSWERED') AS talk_time,
                     (SELECT count(s.id) FROM cms_students AS s LEFT JOIN cms_parents AS p ON p.id=s.parent_id WHERE s.checkin_at >='".$report_week_info->start_date." 00:00:00' AND p.owner_id=u.id ) AS trial_accept, 
                     (SELECT count(id) FROM cms_tmp_student WHERE type=1 AND user_id=u.id AND report_week_id = $report_week_info->id) AS trial_actual,
                     (SELECT count(id) FROM cms_tmp_student WHERE type=2 AND user_id=u.id AND report_week_id = $report_week_info->id) AS new_enroll,
@@ -107,7 +107,7 @@ class ToolsController extends Controller
                 FROM
                     users AS u 
                 WHERE
-                    u.status =1");
+                    u.status =1 ");
         $this->addItemsReportWeekSaleHub($list,$report_week_info->id);
 
         return "ok";

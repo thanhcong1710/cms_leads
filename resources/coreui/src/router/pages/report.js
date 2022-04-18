@@ -2,6 +2,7 @@ import u from '../../utilities/utility'
 const ReportList = () => import('../../views/reports/list')
 const Report01 = () => import('../../views/reports/report_01')
 const Report02 = () => import('../../views/reports/report_02')
+const Report03 = () => import('../../views/reports/report_03')
 
 export default {
   router: {
@@ -27,6 +28,11 @@ export default {
         path: '/reports/02',
         name: 'Báo cáo tuần Sale HUB',
         component: Report02
+      },
+      {
+        path: '/reports/03',
+        name: 'Báo cáo cuộc gọi',
+        component: Report03
       },
     ]
   }
