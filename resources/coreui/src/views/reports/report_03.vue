@@ -10,17 +10,17 @@
           <div class="card-body">
             <div class="row">
               <div class="form-group col-sm-12 search_date_type">
-                <input type="radio" id="type1" name="type_date" v-model="searchData.type_date" value="1">
+                <input type="radio" id="type1" name="type_date" v-model="searchData.type_date" value="1" @change="search()">
                 <label for="type1">Hôm nay</label>
-                <input type="radio" id="type2" name="type_date" v-model="searchData.type_date" value="2">
+                <input type="radio" id="type2" name="type_date" v-model="searchData.type_date" value="2"  @change="search()">
                 <label for="type2">Hôm qua</label>
-                <input type="radio" id="type3" name="type_date" v-model="searchData.type_date" value="3">
+                <input type="radio" id="type3" name="type_date" v-model="searchData.type_date" value="3"  @change="search()">
                 <label for="type3">Tuần này</label>
-                <input type="radio" id="type4" name="type_date" v-model="searchData.type_date" value="4">
+                <input type="radio" id="type4" name="type_date" v-model="searchData.type_date" value="4"  @change="search()">
                 <label for="type4">Tuần trước</label>
-                <input type="radio" id="type5" name="type_date" v-model="searchData.type_date" value="5">
+                <input type="radio" id="type5" name="type_date" v-model="searchData.type_date" value="5"  @change="search()">
                 <label for="type5">Tháng này</label>
-                <input type="radio" id="type6" name="type_date" v-model="searchData.type_date"  value="6">
+                <input type="radio" id="type6" name="type_date" v-model="searchData.type_date"  value="6"  @change="search()">
                 <label for="type6">Tháng trước</label>
               </div>  
               <div class="form-group col-sm-3">
