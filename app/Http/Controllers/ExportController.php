@@ -318,12 +318,19 @@ class ExportController extends Controller
                 $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%')";;
             }
             if($key=='type_status'){
-                if($arr_value[$k] == 1){
-                    $cond1 .= " AND disposition = 'ANSWERED'";
-                }elseif($arr_value[$k] == 2){
-                    $cond1 .= " AND disposition = 'NO ANSWER'";
-                }elseif($arr_value[$k] == 3){
-                    $cond1 .= " AND disposition = 'BUSY'";
+                $arr_type_status = explode('-',$arr_value[$k]);
+                $cond2 ="";
+                if(in_array(1,$arr_type_status)){
+                    $cond2 .= $cond2 ? " OR disposition = 'ANSWERED'" : "disposition = 'ANSWERED'";
+                }
+                if(in_array(2,$arr_type_status)){
+                    $cond2 .= $cond2 ? " OR disposition = 'NO ANSWER'" : "disposition = 'NO ANSWER'";
+                }
+                if(in_array(3,$arr_type_status)){
+                    $cond2 .= $cond2 ? " OR disposition = 'BUSY'" : "disposition = 'BUSY'";
+                }
+                if($cond2){
+                    $cond1.=" AND ( $cond2 ) ";
                 }
             }
             if($key=='type_date'){
@@ -336,16 +343,21 @@ class ExportController extends Controller
                 }elseif($arr_value[$k] == 4){
                     $cond1 .= " AND start_time < '".date('Y-m-d 00:00:00',strtotime("last Monday"))."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday")-24*7*3600)."'";
                 }elseif($arr_value[$k] == 5){
-                    $cond1 .= " AND start_time < '".date('Y-m-01 00:00:00')."'";
+                    $cond1 .= " AND start_time >= '".date('Y-m-01 00:00:00')."'";
                 }elseif($arr_value[$k] == 6){
                     $cond1 .= " AND start_time < '".date('Y-m-01 00:00:00')."' AND start_time >= '".date('Y-m-01 00:00:00',strtotime('-1 month'))."'";
                 }
             }
+            if($key=='branch_id'){
+                $cond .= " AND u.branch_id IN (".str_replace("-",",", $arr_value[$k]).")";
+            }
         }
+        
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
         }
         $list = u::query("SELECT CONCAT(u.sip_id,' - ',u.name,' - ',u.hrm_id) AS sip_name,
+                (SELECT name FROM cms_branches WHERE id=u.branch_id) AS branch_name,
                 (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND $cond1) AS total_inbound,
                 (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND $cond1) AS total_outbound,
                 (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND $cond1) AS total_duration_inbound,
@@ -364,30 +376,33 @@ class ExportController extends Controller
             
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('A1', 'Tên máy nhánh');
-        $sheet->setCellValue('B1', 'Tổng gọi vào');
-        $sheet->setCellValue('C1', 'Tổng gọi ra');
-        $sheet->setCellValue('D1', 'Thời gian gọi vào TB');
-        $sheet->setCellValue('E1', 'Thời gian gọi ra TB');
-        $sheet->setCellValue('F1', 'Tổng thời gian gọi vào');
-        $sheet->setCellValue('G1', 'Tổng thời gian gọi ra');
+        $sheet->setCellValue('A1', 'Trung tâm');
+        $sheet->setCellValue('B1', 'Tên máy nhánh');
+        $sheet->setCellValue('C1', 'Tổng gọi vào');
+        $sheet->setCellValue('D1', 'Tổng gọi ra');
+        $sheet->setCellValue('E1', 'Thời gian gọi vào TB');
+        $sheet->setCellValue('F1', 'Thời gian gọi ra TB');
+        $sheet->setCellValue('G1', 'Tổng thời gian gọi vào');
+        $sheet->setCellValue('H1', 'Tổng thời gian gọi ra');
 
         $sheet->getColumnDimension("A")->setWidth(30);
-        $sheet->getColumnDimension("B")->setWidth(20);
+        $sheet->getColumnDimension("B")->setWidth(30);
         $sheet->getColumnDimension("C")->setWidth(20);
         $sheet->getColumnDimension("D")->setWidth(20);
         $sheet->getColumnDimension("E")->setWidth(20);
         $sheet->getColumnDimension("F")->setWidth(20);
         $sheet->getColumnDimension("G")->setWidth(20);
+        $sheet->getColumnDimension("H")->setWidth(20);
         for ($i = 0; $i < count($list) ; $i++) {
             $x = $i + 2;
-            $sheet->setCellValue('A' . $x, $list[$i]->sip_name);
-            $sheet->setCellValue('B' . $x, $list[$i]->total_inbound) ;
-            $sheet->setCellValue('C' . $x, $list[$i]->total_outbound );
-            $sheet->setCellValue('D' . $x, $list[$i]->duration_inbound);
-            $sheet->setCellValue('E' . $x, $list[$i]->duration_outbound);
-            $sheet->setCellValue('F' . $x, $list[$i]->total_duration_inbound);
-            $sheet->setCellValue('G' . $x, $list[$i]->total_duration_outbound);
+            $sheet->setCellValue('A' . $x, $list[$i]->branch_name);
+            $sheet->setCellValue('B' . $x, $list[$i]->sip_name);
+            $sheet->setCellValue('C' . $x, $list[$i]->total_inbound) ;
+            $sheet->setCellValue('D' . $x, $list[$i]->total_outbound );
+            $sheet->setCellValue('E' . $x, $list[$i]->duration_inbound);
+            $sheet->setCellValue('F' . $x, $list[$i]->duration_outbound);
+            $sheet->setCellValue('G' . $x, $list[$i]->total_duration_inbound);
+            $sheet->setCellValue('H' . $x, $list[$i]->total_duration_outbound);
             
             $sheet->getRowDimension($x)->setRowHeight(23);
 
