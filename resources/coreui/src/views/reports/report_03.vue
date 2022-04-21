@@ -23,7 +23,24 @@
                 <input type="radio" id="type6" name="type_date" v-model="searchData.type_date"  value="6"  @change="search()">
                 <label for="type6">Tháng trước</label>
               </div>  
-              <div class="form-group col-sm-3">
+              <div class="form-group col-sm-4">
+                <label for="name">Trung tâm</label>
+                <multiselect
+                  placeholder="Chọn trung tâm"
+                  select-label="Chọn trung tâm"
+                  v-model="searchData.branch_id"
+                  :options="list_branches"
+                  label="name"
+                  :close-on-select="false"
+                  :hide-selected="true"
+                  :multiple="true"
+                  :searchable="true"
+                  track-by="id"
+                >
+                  <span slot="noResult">Không tìm thấy dữ liệu</span>
+                </multiselect>
+              </div>
+              <div class="form-group col-sm-4">
                 <label for="name">Từ khóa</label>
                 <input
                   class="form-control"
@@ -45,14 +62,22 @@
                     placeholder="Chọn thời gian tìm kiếm từ ngày đến ngày"
                   ></date-picker>
               </div> -->
-              <div class="form-group col-sm-3">
+              <div class="form-group col-sm-4">
                 <label for="name">Trạng thái cuộc gọi</label>
-                <select class="form-control"  v-model="searchData.type_status">
-                  <option value="0">Chọn trạng thái cuộc gọi</option>
-                  <option value="1">Nghe máy</option>
-                  <option value="2">Không nghe máy</option>
-                  <option value="3">Máy bận</option>
-                </select>
+                <multiselect
+                  placeholder="Chọn trạng thái"
+                  select-label="Chọn trạng thái"
+                  v-model="searchData.type_status"
+                  :options="list_type_status"
+                  label="label"
+                  :close-on-select="false"
+                  :hide-selected="true"
+                  :multiple="true"
+                  :searchable="true"
+                  track-by="id"
+                >
+                  <span slot="noResult">Không tìm thấy dữ liệu</span>
+                </multiselect>
               </div>
               <div class="form-group col-sm-12">
                 <button class="btn btn-success" @click="exportExcel()">
@@ -74,6 +99,7 @@
               <thead>
                 <tr>
                   <th>#</th>
+                  <th>Trung tâm</th>
                   <th>Tên máy nhánh</th>
                   <th>Tổng gọi vào</th>
                   <th>Tổng gọi ra</th>
@@ -88,6 +114,7 @@
                   <td>
                     {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
                   </td>
+                  <td>{{ item.branch_name }}</td> 
                   <td>{{ item.sip_name }}</td>
                   <td>{{ item.total_inbound }}</td>
                   <td>{{ item.total_outbound }}</td>
@@ -123,27 +150,35 @@
     </div>
   </div>
 </template>
-
 <script>
 import paging from "../../components/Pagination";
 import u from "../../utilities/utility";
 import loader from "../../components/Loading";
 import DatePicker from "vue2-datepicker";
+import Multiselect from "vue-multiselect";
 export default {
   components: {
     DatePicker,
     loader: loader,
     paging: paging,
+    Multiselect
   },
   name: "List-Parent",
   data() {
     return {
+      list_type_status:[
+        {id:1,label:'Nghe máy'},
+        {id:2,label:'Không nghe máy'},
+        {id:3,label:'Máy bận'},
+      ],
+      list_branches:[],
       loading: {
         text: "Đang tải dữ liệu...",
         processing: false,
       },
       searchData: {
-        type_status: 0,
+        type_status: "",
+        branch_id:"",
         type_date:5,
         keyword: "",
         pagination: this.pagination
@@ -168,6 +203,10 @@ export default {
     };
   },
   created() {
+    u.g(`/api/branches`)
+      .then(response => {
+      this.list_branches = response.data
+    })
     this.search();
   },
   methods: {
@@ -175,9 +214,24 @@ export default {
       location.reload();
     },
     search(a) {
+      const ids_branch_id = []
+      this.searchData.branch_id = u.is.obj(this.searchData.branch_id) ? [this.searchData.branch_id] : this.searchData.branch_id
+      if (this.searchData.branch_id.length) {
+        this.searchData.branch_id.map(item => {
+          ids_branch_id.push(item.id)
+        })
+      }
+      const ids_type_status = []
+      this.searchData.type_status = u.is.obj(this.searchData.type_status) ? [this.searchData.type_status] : this.searchData.type_status
+      if (this.searchData.type_status.length) {
+        this.searchData.type_status.map(item => {
+          ids_type_status.push(item.id)
+        })
+      }
       const data = {
+        branch_id:ids_branch_id,
         type_date:this.searchData.type_date,
-        type_status:this.searchData.type_status,
+        type_status:ids_type_status,
         keyword: this.searchData.keyword,
         pagination:this.pagination,
       };
@@ -210,6 +264,20 @@ export default {
       this.search();
     },
     exportExcel() {
+      var ids_branch_id = ''
+      this.searchData.branch_id = u.is.obj(this.searchData.branch_id) ? [this.searchData.branch_id] : this.searchData.branch_id
+      if (this.searchData.branch_id.length) {
+        this.searchData.branch_id.map(item => {
+          ids_branch_id += ids_branch_id ? '-'+item.id : item.id
+        })
+      }
+      var ids_type_status = ''
+      this.searchData.type_status = u.is.obj(this.searchData.type_status) ? [this.searchData.type_status] : this.searchData.type_status
+      if (this.searchData.type_status.length) {
+        this.searchData.type_status.map(item => {
+         ids_type_status += ids_type_status ? '-'+item.id : item.id
+        })
+      }
       var url = `/api/export/report03/`;
       this.key ='';
       this.value = ''
@@ -217,13 +285,17 @@ export default {
         this.key += "keyword,"
         this.value += this.searchData.keyword+","
       }
-      if (this.searchData.type_status){
+      if (ids_type_status){
         this.key += "type_status,"
-        this.value += this.searchData.type_status+","
+        this.value += ids_type_status+","
       }
       if (this.searchData.type_date){
         this.key += "type_date,"
         this.value += this.searchData.type_date+","
+      }
+      if (ids_branch_id){
+        this.key += "branch_id,"
+        this.value += ids_branch_id+","
       }
       this.key = this.key? this.key.substring(0, this.key.length - 1):'_'
       this.value = this.value? this.value.substring(0, this.value.length - 1) : "_"

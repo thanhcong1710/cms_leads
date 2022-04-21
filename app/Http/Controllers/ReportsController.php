@@ -120,12 +120,21 @@ class ReportsController extends Controller
         if($keyword!==''){
             $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%')";
         }
-        if($request->type_status == 1){
-            $cond1 .= " AND disposition = 'ANSWERED'";
-        }elseif($request->type_status == 2){
-            $cond1 .= " AND disposition = 'NO ANSWER'";
-        }elseif($request->type_status == 3){
-            $cond1 .= " AND disposition = 'BUSY'";
+        $cond2 ="";
+        if(in_array(1,$request->type_status)){
+            $cond2 .= $cond2 ? " OR disposition = 'ANSWERED'" : "disposition = 'ANSWERED'";
+        }
+        if(in_array(2,$request->type_status)){
+            $cond2 .= $cond2 ? " OR disposition = 'NO ANSWER'" : "disposition = 'NO ANSWER'";
+        }
+        if(in_array(3,$request->type_status)){
+            $cond2 .= $cond2 ? " OR disposition = 'BUSY'" : "disposition = 'BUSY'";
+        }
+        if($cond2){
+            $cond1.=" AND ( $cond2 ) ";
+        }
+        if (!empty($request->branch_id)) {
+            $cond .= " AND u.branch_id IN (".implode(",",$request->branch_id).")";
         }
         if($request->type_date == 1){
             $cond1 .= " AND start_time >= '".date('Y-m-d 00:00:00')."'";
@@ -136,7 +145,7 @@ class ReportsController extends Controller
         }elseif($request->type_date == 4){
             $cond1 .= " AND start_time < '".date('Y-m-d 00:00:00',strtotime("last Monday"))."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday")-24*7*3600)."'";
         }elseif($request->type_date == 5){
-            $cond1 .= " AND start_time < '".date('Y-m-01 00:00:00')."'";
+            $cond1 .= " AND start_time >= '".date('Y-m-01 00:00:00')."'";
         }elseif($request->type_date == 6){
             $cond1 .= " AND start_time < '".date('Y-m-01 00:00:00')."' AND start_time >= '".date('Y-m-01 00:00:00',strtotime('-1 month'))."'";
         }
@@ -146,6 +155,7 @@ class ReportsController extends Controller
         $total = u::first("SELECT count(u.id) AS total FROM users AS u 
             WHERE u.status=1 AND $cond ");
         $list = u::query("SELECT CONCAT(u.sip_id,' - ',u.name,' - ',u.hrm_id) AS sip_name,
+                (SELECT name FROM cms_branches WHERE id=u.branch_id) AS branch_name,
                 (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND $cond1) AS total_inbound,
                 (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND $cond1) AS total_outbound,
                 (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND $cond1) AS total_duration_inbound,
