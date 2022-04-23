@@ -214,9 +214,15 @@ class ParentsController extends Controller
         $data = u::query("DELETE FROM cms_parents WHERE id=$parent_id");
         return response()->json($data);
     }
-    public function getLogs($parent_id){
+    public function getLogs(Request $request, $parent_id){
+        $check_role = 0 ;
+        if($request->user()->hasRole('admin')  || in_array($request->user()->id,[39,40])){
+            $check_role = 1 ;
+        }
         $data = u::query("SELECT l.*,(SELECT name FROM users WHERE id=l.creator_id) AS creator_name
-            FROM cms_parent_logs AS l WHERE l.parent_id=$parent_id  AND l.status=1 ORDER BY l.id DESC");
+            FROM cms_parent_logs AS l WHERE l.parent_id=$parent_id  
+                AND (l.status=1 OR (l.status=0 AND 1=$check_role))
+            ORDER BY l.id DESC");
         return response()->json($data);
     }
     public function validatePhone(Request $request){
