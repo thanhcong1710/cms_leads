@@ -43,7 +43,7 @@ class JobsProcessReport extends Command
     public function handle(Request $request)
     {
         $date_time = date('Y-m-d',time()-3600);
-        $report_week = u::first("SELECT * FROM cms_report_week WHERE star_date <='$date_time' AND end_date>='$date_time'");
+        $report_week = u::first("SELECT * FROM cms_report_week WHERE start_date <='$date_time' AND end_date>='$date_time'");
         if($report_week){
             $tool = new ToolsController();
             $tool->processReportSaleHub($report_week->id);

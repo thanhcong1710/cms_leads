@@ -216,7 +216,7 @@ class ParentsController extends Controller
     }
     public function getLogs($parent_id){
         $data = u::query("SELECT l.*,(SELECT name FROM users WHERE id=l.creator_id) AS creator_name
-            FROM cms_parent_logs AS l WHERE l.parent_id=$parent_id ORDER BY l.id DESC");
+            FROM cms_parent_logs AS l WHERE l.parent_id=$parent_id  AND l.status=1 ORDER BY l.id DESC");
         return response()->json($data);
     }
     public function validatePhone(Request $request){
