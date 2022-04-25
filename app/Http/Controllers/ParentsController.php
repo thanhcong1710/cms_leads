@@ -38,7 +38,7 @@ class ParentsController extends Controller
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
         if($request->user()->hasRole('Marketing')){
-            $cond .= " AND p.creator_id IN (".$request->user_info->id.")";
+            $cond .= " AND p.creator_id IN (".$request->user()->id.")";
         }
         if (!empty($status)) {
             $cond .= " AND p.status IN (".implode(",",$status).")";

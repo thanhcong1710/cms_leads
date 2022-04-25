@@ -25,6 +25,13 @@ class Admin
             foreach($list_users AS $row){
                 $users_manager.=$users_manager ? ",".$row->id : $row->id;
             }
+        }if($user->hasRole('Marketing')){
+            $list_users = u::query("SELECT u.id,u.manager_id FROM users AS u WHERE u.status=1 AND
+            ((SELECT count(role_id) FROM model_has_roles WHERE model_id=u.id AND role_id=7)>0 OR u.id=$user->id)");
+            $users_manager="";
+            foreach($list_users AS $row){
+                $users_manager.=$users_manager ? ",".$row->id : $row->id;
+            }
         }else{
             $users_manager = implode(",",$this->data_tree($list_users,$user->id));
             $users_manager = $user->id.($users_manager?",".$users_manager:"");
