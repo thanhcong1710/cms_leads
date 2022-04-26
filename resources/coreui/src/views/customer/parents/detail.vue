@@ -111,7 +111,7 @@
                       <textarea class="form-control" v-model="phone.note" placeholder="Thêm ghi chú cuộc gọi"></textarea>
                       <div style="margin-top:5px;text-align:right" v-if="phone.show_input_note || 1==1">
                         <button class="btn btn-success" @click="updateNotePhone"> <i class="fa fa-save"></i> Lưu</button>
-                        <button class="btn btn-secondary" @click="phone.show=false"> <i class="fa fa-times"></i> Đóng</button>
+                        <!-- <button class="btn btn-secondary" @click="phone.show=false"> <i class="fa fa-times"></i> Đóng</button> -->
                       </div>
                     </div>
                   </div>
@@ -149,7 +149,7 @@
                             <td width="10%">{{ item.creator_name }}</td>
                             <td width="10%">{{ item.branch_name }}</td>
                             <td width="10%">{{ item.method_name}}{{item.type_call?" - "+item.type_call:''}}</td>
-                            <td width="10%">{{ genStateCall(item.data_state) }}</td>
+                            <td width="10%">{{ genStateCall(item.data_state) }} <span v-if="item.status==0"> - Không kích hoạt</span></td>
                             <td width="25%">
                               <p v-if="item.link_record">
                                 <audio controls style="height: 40px; width: 256px; border: 1px solid #ccc;">

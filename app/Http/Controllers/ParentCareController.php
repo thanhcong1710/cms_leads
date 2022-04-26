@@ -22,13 +22,17 @@ class ParentCareController extends Controller
         ), 'cms_customer_care');
         return response()->json($data);
     }
-    public function getAllDataByParent($parent_id){
+    public function getAllDataByParent(Request $request, $parent_id){
+        $cond = "";
+        if($request->user()->hasRole('admin')){
+            $cond = "AND c.status=1";
+        }
         $data = u::query("SELECT c.*, (SELECT CONCAT(name,' - ',hrm_id) FROM users WHERE id=c.creator_id) AS creator_name,
                 (SELECT name FROM cms_contact_methods WHERE id=c.method_id) AS method_name ,
                 (SELECT type FROM voip24h_data WHERE id= c.data_id) AS type_call,
                 (SELECT link_record FROM voip24h_data WHERE id = c.data_id) AS link_record,
                 (SELECT name FROM cms_branches WHERE id=c.branch_id) AS branch_name
-            FROM cms_customer_care AS c WHERE parent_id=$parent_id ORDER BY c.care_date DESC");
+            FROM cms_customer_care AS c WHERE parent_id=$parent_id $cond ORDER BY c.care_date DESC");
         return response()->json($data);
     }
     public function getInfoCall($care_id){
@@ -39,7 +43,7 @@ class ParentCareController extends Controller
         return response()->json($data);
     }
     public function updateNoteCare(Request $request){
-        u::updateSimpleRow(array('note'=>$request->note),array('id'=>$request->care_id),'cms_customer_care');
+        u::updateSimpleRow(array('note'=>$request->note,'status'=>1),array('id'=>$request->care_id),'cms_customer_care');
         return "ok";
     }
 }
