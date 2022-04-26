@@ -34,8 +34,11 @@ class ParentsController extends Controller
         $offset = $page == 1 ? 0 : $limit * ($page-1);
         $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
         $cond = " 1 ";
-        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
+        }
+        if($request->user()->hasRole('Marketing')){
+            $cond .= " AND p.creator_id IN (".$request->user()->id.")";
         }
         if (!empty($status)) {
             $cond .= " AND p.status IN (".implode(",",$status).")";
