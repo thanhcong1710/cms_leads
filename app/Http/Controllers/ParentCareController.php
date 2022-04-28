@@ -24,7 +24,7 @@ class ParentCareController extends Controller
     }
     public function getAllDataByParent(Request $request, $parent_id){
         $cond = "";
-        if($request->user()->hasRole('admin')){
+        if(!$request->user()->hasRole('admin')){
             $cond = "AND c.status=1";
         }
         $data = u::query("SELECT c.*, (SELECT CONCAT(name,' - ',hrm_id) FROM users WHERE id=c.creator_id) AS creator_name,
