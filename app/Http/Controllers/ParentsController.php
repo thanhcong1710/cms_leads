@@ -63,11 +63,11 @@ class ParentsController extends Controller
             $cond .= " AND p.next_care_date > '$start_date 00:00:00'";
         }
         //type_search=1
-        $cond_1 = " AND (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id)=0";
+        $cond_1 = " AND (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1)=0";
         //type_search=2
         $cond_2 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') = '".date('Y-m-d')."'";
         $cond_3 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') < '".date('Y-m-d')."' 
-            AND ( SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND care_date >= next_care_date )=0 AND p.status NOT IN (8,9,10,12)";
+            AND ( SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND care_date >= next_care_date AND status=1 )=0 AND p.status NOT IN (8,9,10,12)";
         $order_by = " ORDER BY p.id DESC ";
         $tmp_cond="";
         if($type_seach==1){
@@ -82,8 +82,8 @@ class ParentsController extends Controller
         $total = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $tmp_cond");
         $list = u::query("SELECT p.*, (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
                 (SELECT name FROM cms_source_detail WHERE id=p.source_detail_id) AS source_detail_name,
-                (SELECT note FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_care,
-                (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_time_care,
+                (SELECT note FROM cms_customer_care WHERE parent_id=p.id AND status=1 ORDER BY care_date DESC LIMIT 1) AS last_care,
+                (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND status=1 ORDER BY care_date DESC LIMIT 1) AS last_time_care,
                 (SELECT name FROM users WHERE id=p.owner_id) AS owner_name ,
                 (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 0,1) AS hs1_name,
                 (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 1,1) AS hs2_name
@@ -201,8 +201,8 @@ class ParentsController extends Controller
                 (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
                 (SELECT name FROM cms_source_detail WHERE id=p.source_detail_id) AS source_detail_name,
                 (SELECT title FROM cms_jobs WHERE id=p.job_id) AS job_name,
-                (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id) AS num_care,
-                (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id ORDER BY care_date DESC LIMIT 1) AS last_care
+                (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1) AS num_care,
+                (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id  AND status=1 ORDER BY care_date DESC LIMIT 1) AS last_care
             FROM cms_parents AS p WHERE id=$parent_id");
         if(!($request->user()->hasRole('admin') || $request->user()->hasRole('Salehub') || $request->user()->hasRole('Leader'))){
             $data->branch_id= $request->user()->branch_id;
