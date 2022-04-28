@@ -46,9 +46,9 @@ class ReportsController extends Controller
                 CONCAT(u.name,'-',u.hrm_id) AS owner_name,
                 b.name AS branch_name,
                 DATE_FORMAT(p.created_at,'%Y-%m-%d') AS created_date,
-                (SELECT DATE_FORMAT(care_date,'%Y-%m-%d') FROM cms_customer_care WHERE parent_id =p.id ORDER BY id DESC LIMIT 1) AS last_care_date,
-                (SELECT t.name FROM cms_customer_care AS c LEFT JOIN cms_contact_methods AS t ON t.id=c.method_id WHERE c.parent_id =p.id ORDER BY c.id DESC LIMIT 1) AS last_method,
-                (SELECT count(c.id) FROM cms_customer_care AS c WHERE c.parent_id =p.id ) AS total_care
+                (SELECT DATE_FORMAT(care_date,'%Y-%m-%d') FROM cms_customer_care WHERE parent_id =p.id AND status=1 ORDER BY id DESC LIMIT 1) AS last_care_date,
+                (SELECT t.name FROM cms_customer_care AS c LEFT JOIN cms_contact_methods AS t ON t.id=c.method_id WHERE c.parent_id =p.id AND c.status=1 ORDER BY c.id DESC LIMIT 1) AS last_method,
+                (SELECT count(c.id) FROM cms_customer_care AS c WHERE c.parent_id =p.id AND c.status=1 ) AS total_care
             FROM cms_parents AS p 
                 LEFT JOIN users AS u ON p.owner_id = u.id
                 LEFT JOIN cms_branches AS b ON b.id = u.branch_id
