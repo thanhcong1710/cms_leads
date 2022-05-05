@@ -185,6 +185,9 @@
                               <p>Trạng thái: <b>{{ item.status | genStudentStatus}}</b></p>
                               <p v-if="item.status>0">Trung tâm checkin: {{ item.checkin_branch_name}}</p>
                               <p v-if="item.status>0">Thời gian checkin: {{ item.checkin_at}}</p>
+                              <p v-if="item.status>0">Cập nhật checkin: 
+                                <button :disabled="disabled_action" v-if="item.status>0" class="btn btn-sm btn-success" @click="showModalUpdateCheckin(item)"> <i class="fa fa-edit"></i></button>
+                              </p>
                             </div>
                           </div>
                         </div>
@@ -995,7 +998,14 @@ export default {
       }else{
         this.modal_checkin.error_message = mess;
       }
-    }
+    },
+    showModalUpdateCheckin(item){
+      this.modal_checkin.show =true
+      this.modal_checkin.student_id = item.id
+      this.modal_checkin.branch_id = item.checkin_branch_id
+      this.modal_checkin.checkin_at = item.checkin_at
+      this.modal_checkin.error_message=""
+    },
   },
   filters: {
     genTextGender(item){
