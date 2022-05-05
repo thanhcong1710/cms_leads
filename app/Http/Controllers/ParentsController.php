@@ -157,6 +157,7 @@ class ParentsController extends Controller
         );
         $data = u::updateSimpleRow($data_update, array('id' => $parent_id), 'cms_parents');
         LogParents::logUpdateInfo($pre_parent_info,$data_update,Auth::user()->id);
+        StudentsController::updateParentCRM($parent_id);
         return response()->json($data);
     }
     public function assign(Request $request)
