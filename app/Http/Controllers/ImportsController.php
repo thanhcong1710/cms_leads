@@ -148,6 +148,8 @@ class ImportsController extends Controller
             'student_birthday_1'=>$student_birthday_1,
             'student_name_2'=>str_replace(array("'","]","\\"),"",$data[9]),
             'student_birthday_2'=>$student_birthday_2,
+            'checkin_branch_accounting_id'=>$data[12] ? $data[12] :NULL,
+            'checkin_at'=>$data[12] ? $data[12] :NULL
         );
         return $result;
     }
@@ -263,6 +265,7 @@ class ImportsController extends Controller
         u::query("UPDATE cms_import_parents SET status=6 WHERE import_id=$import_id AND status=1");
         u::query("UPDATE cms_imports SET status=1 WHERE id=$import_id ");
         u::query("UPDATE cms_students AS s LEFT JOIN cms_parents AS p ON s.gud_mobile_1 =p.mobile_1 SET s.parent_id=p.id WHERE s.parent_id IS NULL ");
+        u::query("UPDATE cms_students AS s LEFT JOIN cms_branches AS b ON s.checkin_branch_accounting_id =b.accounting_id SET s.checkin_branch_id=b.id WHERE s.checkin_branch_id IS NULL  AND s.checkin_branch_accounting_id IS NOT NULL");
         $data = u::first("SELECT (SELECT count(id) FROM cms_import_parents WHERE import_id=$import_id AND status=6) AS total_success,
             (SELECT count(id) FROM cms_import_parents WHERE import_id=$import_id AND status!=6) AS total_error");
         return response()->json($data);
@@ -271,7 +274,7 @@ class ImportsController extends Controller
         if ($list) {
             $created_at = date('Y-m-d H:i:s');
             $query = "INSERT INTO cms_parents (`name`,email,mobile_1,`address`,note,created_at,creator_id,`status`,source_id,source_detail_id,owner_id,mobile_2) VALUES ";
-            $query_student = "INSERT INTO cms_students (`name`,`birthday`,created_at,creator_id,gud_mobile_1) VALUES ";
+            $query_student = "INSERT INTO cms_students (`name`,`birthday`,created_at,creator_id,gud_mobile_1, checkin_at, checkin_branch_accounting_id) VALUES ";
             $check_import_student =0;
             if (count($list) > 10000) {
                 for($i = 0; $i < 10000; $i++) {
@@ -281,12 +284,16 @@ class ImportsController extends Controller
                     if($item->student_name_1){
                         $check_import_student =1;
                         $student_birthday_1 = $item->student_birthday_1 ? "'".$item->student_birthday_1."'" :NULL;
-                        $query_student.= "('$item->student_name_1',$student_birthday_1,'$created_at','$creator_id','$item->gud_mobile1'),";
+                        $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :NULL;
+                        $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :NULL;
+                        $query_student.= "('$item->student_name_1',$student_birthday_1,'$created_at','$creator_id','$item->gud_mobile1',$checkin_at,$checkin_branch_accounting_id),";
                     }
                     if($item->student_name_2){
                         $check_import_student =1;
                         $student_birthday_2 = $item->student_birthday_2 ? "'".$item->student_birthday_2."'" :NULL;
-                        $query_student.= "('$item->student_name_2',$student_birthday_2,'$created_at','$creator_id','$item->gud_mobile1'),";
+                        $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :NULL;
+                        $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :NULL;
+                        $query_student.= "('$item->student_name_2',$student_birthday_2,'$created_at','$creator_id','$item->gud_mobile1',$checkin_at,$checkin_branch_accounting_id),";
                     }
                     
                 }
@@ -304,12 +311,17 @@ class ImportsController extends Controller
                     $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$source_detail_id','$owner_id','$item->gud_mobile2'),";
                     if($item->student_name_1){
                         $check_import_student =1;
-                        $query_student.= "('$item->student_name_1',".($item->student_birthday_1 ? "'$item->student_birthday_1'":"NULL").",'$created_at','$creator_id','$item->gud_mobile1'),";
+                        $student_birthday_1 = $item->student_birthday_1 ? "'".$item->student_birthday_1."'" :NULL;
+                        $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :NULL;
+                        $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :NULL;
+                        $query_student.= "('$item->student_name_1',$student_birthday_1,'$created_at','$creator_id','$item->gud_mobile1',$checkin_at,$checkin_branch_accounting_id),";
                     }
                     if($item->student_name_2){
                         $check_import_student =1;
                         $student_birthday_2 = $item->student_birthday_2 ? "'".$item->student_birthday_2."'" :NULL;
-                        $query_student.= "('$item->student_name_2',".($item->student_birthday_2 ? "'$item->student_birthday_2'":"NULL").",'$created_at','$creator_id','$item->gud_mobile1'),";
+                        $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :NULL;
+                        $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :NULL;
+                        $query_student.= "('$item->student_name_2',$student_birthday_2,'$created_at','$creator_id','$item->gud_mobile1',$checkin_at,$checkin_branch_accounting_id),";
                     }
                 }
                 $query = substr($query, 0, -1);
@@ -320,5 +332,12 @@ class ImportsController extends Controller
                 }
             }
         }
+    }
+    public function processImportCheckin(){
+        $list_students = u::query("SELECT id,checkin_at,checkin_branch_id FROM cms_students WHERE crm_id IS NULL AND checkin_branch_id IS NOT NULL LIMIT 100");
+        foreach($list_students AS $student){
+            StudentsController::createCheckinCRM($student->id,$student->checkin_at,$student->checkin_branch_id);
+        }
+        return "ok";
     }
 }
