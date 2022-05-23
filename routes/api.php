@@ -29,6 +29,7 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::get('tools/gen_week', 'ToolsController@genWeek');
     Route::get('/export/import/{import_id}', 'ExportController@import');
     Route::get('/tools/report_salehub/{report_week_id}', 'ToolsController@processReportSaleHub');
+    Route::get('/import/process_import_checkin', 'ImportsController@processImportCheckin');
 
     Route::group(['middleware' => 'admin'], function ($router) {
         Route::resource('users', 'UsersController')->except( ['create', 'store'] );
