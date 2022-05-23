@@ -33,12 +33,11 @@ export default {
   },
   created() {
     this.showBC01 = true;
-    this.showBC02 = true;
     this.showBC03 = true;
-    // const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
-    // if(arr_role.indexOf("Supervisor")> -1){
-    //   this.disabled_action = true
-    // }
+    const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
+    if(arr_role.indexOf("admin")> -1){
+      this.showBC02 = true
+    }
   },
   methods: {
   }
