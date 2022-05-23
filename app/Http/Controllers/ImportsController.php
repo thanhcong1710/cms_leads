@@ -104,9 +104,11 @@ class ImportsController extends Controller
                     $error_message = $validate->message;
                     $gud_mobile1 = $item->gud_mobile1 ? $item->gud_mobile1 : $list[$i][1];
                     $gud_mobile2 = $item->gud_mobile2 ? $item->gud_mobile2 : $list[$i][2];
-                    $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :NULL;
-                    $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :NULL;
-                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message','$item->student_name_1','$item->student_name_2',".($item->student_birthday_1 ? "'$item->student_birthday_1'":"NULL").",".($item->student_birthday_2 ? "'$item->student_birthday_2'":"NULL").",'$item->owner_hrm','$gud_mobile2',$checkin_at,$checkin_branch_accounting_id),";
+                    $student_birthday_1 = $item->student_birthday_1 ? "'".$item->student_birthday_1."'" :'NULL';
+                    $student_birthday_2 = $item->student_birthday_2 ? "'".$item->student_birthday_2."'" :'NULL';
+                    $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :'NULL';
+                    $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :'NULL';
+                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message','$item->student_name_1','$item->student_name_2',$student_birthday_1,$student_birthday_2,'$item->owner_hrm','$gud_mobile2',$checkin_at,$checkin_branch_accounting_id),";
                     
                 }
                 $query = substr($query, 0, -1);
@@ -120,9 +122,11 @@ class ImportsController extends Controller
                     $error_message = $validate->message;
                     $gud_mobile1 = $item->gud_mobile1 ? $item->gud_mobile1 : $list[$i][1];
                     $gud_mobile2 = $item->gud_mobile2 ? $item->gud_mobile2 : $list[$i][2];
-                    $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :NULL;
-                    $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :NULL;
-                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message','$item->student_name_1','$item->student_name_2',".($item->student_birthday_1 ? "'$item->student_birthday_1'":"NULL").",".($item->student_birthday_2 ? "'$item->student_birthday_2'":"NULL").",'$item->owner_hrm','$gud_mobile2',$checkin_at,$checkin_branch_accounting_id),";
+                    $student_birthday_1 = $item->student_birthday_1 ? "'".$item->student_birthday_1."'" :'NULL';
+                    $student_birthday_2 = $item->student_birthday_2 ? "'".$item->student_birthday_2."'" :'NULL';
+                    $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :'NULL';
+                    $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :'NULL';
+                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message','$item->student_name_1','$item->student_name_2',$student_birthday_1,$student_birthday_2,'$item->owner_hrm','$gud_mobile2',$checkin_at,$checkin_branch_accounting_id),";
                 }
                 $query = substr($query, 0, -1);
                 u::query($query);
@@ -152,7 +156,7 @@ class ImportsController extends Controller
             'student_birthday_1'=>$student_birthday_1,
             'student_name_2'=>str_replace(array("'","]","\\"),"",$data[9]),
             'student_birthday_2'=>$student_birthday_2,
-            'checkin_branch_accounting_id'=>$data[12] ? $data[12] :NULL,
+            'checkin_branch_accounting_id'=>$data[11] ? $data[11] :NULL,
             'checkin_at'=>$data[12] ? $data[12] :NULL
         );
         return $result;
@@ -287,16 +291,16 @@ class ImportsController extends Controller
                     $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$source_detail_id','$owner_id','$item->gud_mobile2'),";
                     if($item->student_name_1){
                         $check_import_student =1;
-                        $student_birthday_1 = $item->student_birthday_1 ? "'".$item->student_birthday_1."'" :NULL;
-                        $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :NULL;
-                        $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :NULL;
+                        $student_birthday_1 = $item->student_birthday_1 ? "'".$item->student_birthday_1."'" :'NULL';
+                        $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :'NULL';
+                        $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :'NULL';
                         $query_student.= "('$item->student_name_1',$student_birthday_1,'$created_at','$creator_id','$item->gud_mobile1',$checkin_at,$checkin_branch_accounting_id),";
                     }
                     if($item->student_name_2){
                         $check_import_student =1;
-                        $student_birthday_2 = $item->student_birthday_2 ? "'".$item->student_birthday_2."'" :NULL;
-                        $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :NULL;
-                        $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :NULL;
+                        $student_birthday_2 = $item->student_birthday_2 ? "'".$item->student_birthday_2."'" :'NULL';
+                        $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :'NULL';
+                        $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :'NULL';
                         $query_student.= "('$item->student_name_2',$student_birthday_2,'$created_at','$creator_id','$item->gud_mobile1',$checkin_at,$checkin_branch_accounting_id),";
                     }
                     
@@ -315,16 +319,16 @@ class ImportsController extends Controller
                     $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$source_detail_id','$owner_id','$item->gud_mobile2'),";
                     if($item->student_name_1){
                         $check_import_student =1;
-                        $student_birthday_1 = $item->student_birthday_1 ? "'".$item->student_birthday_1."'" :NULL;
-                        $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :NULL;
-                        $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :NULL;
+                        $student_birthday_1 = $item->student_birthday_1 ? "'".$item->student_birthday_1."'" :'NULL';
+                        $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :'NULL';
+                        $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :'NULL';
                         $query_student.= "('$item->student_name_1',$student_birthday_1,'$created_at','$creator_id','$item->gud_mobile1',$checkin_at,$checkin_branch_accounting_id),";
                     }
                     if($item->student_name_2){
                         $check_import_student =1;
-                        $student_birthday_2 = $item->student_birthday_2 ? "'".$item->student_birthday_2."'" :NULL;
-                        $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :NULL;
-                        $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :NULL;
+                        $student_birthday_2 = $item->student_birthday_2 ? "'".$item->student_birthday_2."'" :'NULL';
+                        $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :'NULL';
+                        $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :'NULL';
                         $query_student.= "('$item->student_name_2',$student_birthday_2,'$created_at','$creator_id','$item->gud_mobile1',$checkin_at,$checkin_branch_accounting_id),";
                     }
                 }
