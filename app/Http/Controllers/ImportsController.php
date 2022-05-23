@@ -95,7 +95,7 @@ class ImportsController extends Controller
     public function addItemDataImport($list,$import_id,$creator_id) {
         if ($list) {
             $created_at = date('Y-m-d H:i:s');
-            $query = "INSERT INTO cms_import_parents (import_id,`name`,email,gud_mobile1,`address`,note,created_at,creator_id,`status`,error_message,student_name_1,student_name_2,student_birthday_1,student_birthday_2,owner_hrm,gud_mobile2) VALUES ";
+            $query = "INSERT INTO cms_import_parents (import_id,`name`,email,gud_mobile1,`address`,note,created_at,creator_id,`status`,error_message,student_name_1,student_name_2,student_birthday_1,student_birthday_2,owner_hrm,gud_mobile2, checkin_at, checkin_branch_accounting_id) VALUES ";
             if (count($list) > 10000) {
                 for($i = 0; $i < 10000; $i++) {
                     $item = $this->convertData($list[$i]);
@@ -104,7 +104,9 @@ class ImportsController extends Controller
                     $error_message = $validate->message;
                     $gud_mobile1 = $item->gud_mobile1 ? $item->gud_mobile1 : $list[$i][1];
                     $gud_mobile2 = $item->gud_mobile2 ? $item->gud_mobile2 : $list[$i][2];
-                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message','$item->student_name_1','$item->student_name_2',".($item->student_birthday_1 ? "'$item->student_birthday_1'":"NULL").",".($item->student_birthday_2 ? "'$item->student_birthday_2'":"NULL").",'$item->owner_hrm','$gud_mobile2'),";
+                    $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :NULL;
+                    $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :NULL;
+                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message','$item->student_name_1','$item->student_name_2',".($item->student_birthday_1 ? "'$item->student_birthday_1'":"NULL").",".($item->student_birthday_2 ? "'$item->student_birthday_2'":"NULL").",'$item->owner_hrm','$gud_mobile2',$checkin_at,$checkin_branch_accounting_id),";
                     
                 }
                 $query = substr($query, 0, -1);
@@ -118,7 +120,9 @@ class ImportsController extends Controller
                     $error_message = $validate->message;
                     $gud_mobile1 = $item->gud_mobile1 ? $item->gud_mobile1 : $list[$i][1];
                     $gud_mobile2 = $item->gud_mobile2 ? $item->gud_mobile2 : $list[$i][2];
-                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message','$item->student_name_1','$item->student_name_2',".($item->student_birthday_1 ? "'$item->student_birthday_1'":"NULL").",".($item->student_birthday_2 ? "'$item->student_birthday_2'":"NULL").",'$item->owner_hrm','$gud_mobile2'),";
+                    $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :NULL;
+                    $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :NULL;
+                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message','$item->student_name_1','$item->student_name_2',".($item->student_birthday_1 ? "'$item->student_birthday_1'":"NULL").",".($item->student_birthday_2 ? "'$item->student_birthday_2'":"NULL").",'$item->owner_hrm','$gud_mobile2',$checkin_at,$checkin_branch_accounting_id),";
                 }
                 $query = substr($query, 0, -1);
                 u::query($query);
