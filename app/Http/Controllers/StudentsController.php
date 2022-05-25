@@ -109,7 +109,7 @@ class StudentsController extends Controller
             'branch_id'=>$checkin_branch_id,
             'checkin_at'=>$checkin_at,
             'ec_hrm'=>$student_info->owner_hrm,
-            'creator_hrm' => Auth::user()->hrm_id,
+            'creator_hrm' => isset(Auth::user()->hrm_id) ? Auth::user()->hrm_id : $student_info->owner_hrm,
             'sibling_id' => $student_info->sibling_id ? $student_info->sibling_id : 0,
         );
         if(env('APP_ENV', 'staging')=='production'){
