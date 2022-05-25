@@ -344,7 +344,15 @@ class ImportsController extends Controller
     public function processImportCheckin(){
         $list_students = u::query("SELECT id,checkin_at,checkin_branch_id FROM cms_students WHERE crm_id IS NULL AND checkin_branch_id IS NOT NULL LIMIT 100");
         foreach($list_students AS $student){
-            StudentsController::createCheckinCRM($student->id,$student->checkin_at,$student->checkin_branch_id);
+            $crm_id= StudentsController::createCheckinCRM($student->id,$student->checkin_at,$student->checkin_branch_id);
+            if($crm_id){
+                $data_update = array(
+                    'status' => 1,
+                    'updated_at' => date('Y-m-d H:i:s'),
+                    'crm_id'=>$crm_id
+                );
+                u::updateSimpleRow($data_update,array('id'=>$student->id), 'cms_students');
+            }
         }
         return "ok";
     }
