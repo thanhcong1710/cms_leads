@@ -136,6 +136,14 @@ class ReportsController extends Controller
         if (!empty($request->branch_id)) {
             $cond .= " AND u.branch_id IN (".implode(",",$request->branch_id).")";
         }
+        if($request->from_date){
+            $request->type_date = 0;
+            $cond1 .= " AND start_time >= '".date('Y-m-d H:i:s',strtotime($request->from_date))."'";
+        }
+        if($request->to_date){
+            $request->type_date = 0;
+            $cond1 .= " AND start_time <= '".date('Y-m-d H:i:s',strtotime($request->to_date))."'";
+        }
         if($request->type_date == 1){
             $cond1 .= " AND start_time >= '".date('Y-m-d 00:00:00')."'";
         }elseif($request->type_date == 2){

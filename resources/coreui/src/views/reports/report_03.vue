@@ -9,6 +9,14 @@
           </div>
           <div class="card-body">
             <div class="row">
+              <div class="form-group col-sm-4">
+                <label for="name">Ngày giờ bắt đầu tìm kiếm</label>
+                <input class="form-control" type="datetime-local" value="" id="from_date">
+              </div>
+              <div class="form-group col-sm-4">
+                <label for="name">Ngày giờ kết thúc tìm kiếm</label>
+                <input class="form-control" type="datetime-local" value="" id="to_date">
+              </div>
               <div class="form-group col-sm-12 search_date_type">
                 <input type="radio" id="type1" name="type_date" v-model="searchData.type_date" value="1" @change="search()">
                 <label for="type1">Hôm nay</label>
@@ -177,9 +185,11 @@ export default {
         processing: false,
       },
       searchData: {
+        // from_date:"",
+        // to_date:"",
         type_status: "",
         branch_id:"",
-        type_date:5,
+        type_date:1,
         keyword: "",
         pagination: this.pagination
       },
@@ -229,6 +239,8 @@ export default {
         })
       }
       const data = {
+        from_date:document.getElementById('from_date').value,
+        to_date:document.getElementById('to_date').value,
         branch_id:ids_branch_id,
         type_date:this.searchData.type_date,
         type_status:ids_type_status,
@@ -296,6 +308,14 @@ export default {
       if (ids_branch_id){
         this.key += "branch_id,"
         this.value += ids_branch_id+","
+      }
+      if(document.getElementById('from_date').value){
+        this.key += "from_date,"
+        this.value += document.getElementById('from_date').value+","
+      }
+      if(document.getElementById('to_date').value){
+        this.key += "to_date,"
+        this.value += document.getElementById('to_date').value+","
       }
       this.key = this.key? this.key.substring(0, this.key.length - 1):'_'
       this.value = this.value? this.value.substring(0, this.value.length - 1) : "_"

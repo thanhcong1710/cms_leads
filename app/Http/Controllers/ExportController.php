@@ -333,7 +333,16 @@ class ExportController extends Controller
                     $cond1.=" AND ( $cond2 ) ";
                 }
             }
-            if($key=='type_date'){
+            $disabled_type_date = 0;
+            if($key=='from_date'){
+                $disabled_type_date = 1;
+                $cond1 .= " AND start_time >= '".date('Y-m-d H:i:s',$arr_value[$k])."'";
+            }
+            if($key=='to_date'){
+                $disabled_type_date = 1;
+                $cond1 .= " AND start_time <= '".date('Y-m-d H:i:s',$arr_value[$k])."'";
+            }
+            if($key=='type_date' && !$disabled_type_date){
                 if($arr_value[$k] == 1){
                     $cond1 .= " AND start_time >= '".date('Y-m-d 00:00:00')."'";
                 }elseif($arr_value[$k] == 2){

@@ -220,7 +220,7 @@ class ParentsController extends Controller
     }
     public function getLogs(Request $request, $parent_id){
         $check_role = 0 ;
-        if($request->user()->hasRole('admin')  || in_array($request->user()->id,[39,40])){
+        if($request->user()->hasRole('admin')  || in_array($request->user()->id,[39,40,152])){
             $check_role = 1 ;
         }
         $data = u::query("SELECT l.*,(SELECT name FROM users WHERE id=l.creator_id) AS creator_name

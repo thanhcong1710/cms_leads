@@ -24,7 +24,7 @@ class ParentCareController extends Controller
     }
     public function getAllDataByParent(Request $request, $parent_id){
         $cond = "";
-        if(! ($request->user()->hasRole('admin') || in_array($request->user()->id,[39,40])) ){
+        if(! ($request->user()->hasRole('admin') || in_array($request->user()->id,[39,40,152])) ){
             $cond = "AND c.status=1";
         }
         $is_leader = 0;
