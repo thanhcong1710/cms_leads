@@ -101,12 +101,12 @@ class ReportsController extends Controller
         u::query("UPDATE voip24h_data AS v
                 LEFT JOIN cms_parents AS p ON p.mobile_1 = v.phone 
                 LEFT JOIN users AS u ON u.sip_id = v.sip_id 
-                SET v.parent_id =p.id ,v.user_id=u.id
+                SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
             WHERE p.id IS NOT NULL  AND u.id IS NOT NULL AND v.parent_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
         u::query("UPDATE voip24h_data AS v
                 LEFT JOIN cms_parents AS p ON p.mobile_2 = v.phone 
                 LEFT JOIN users AS u ON u.sip_id = v.sip_id 
-                SET v.parent_id =p.id ,v.user_id=u.id
+                SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
             WHERE p.id IS NOT NULL  AND u.id IS NOT NULL AND v.parent_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
         $keyword = isset($request->keyword) ? $request->keyword : '';
         
@@ -178,6 +178,95 @@ class ReportsController extends Controller
             $list[$k]->duration_outbound = gmdate("H:i:s", ($row->total_outbound ? $row->total_duration_outbound/ $row->total_outbound :0));
             $list[$k]->total_duration_inbound = gmdate("H:i:s", $row->total_duration_inbound);
             $list[$k]->total_duration_outbound = gmdate("H:i:s", $row->total_duration_outbound);
+        }
+            
+        $data = u::makingPagination($list, $total->total, $page, $limit);
+        return response()->json($data);
+    }
+    public function report04(Request $request)
+    {
+        // call, talk_time
+        u::query("UPDATE voip24h_data AS v
+                LEFT JOIN cms_parents AS p ON p.mobile_1 = v.phone 
+                LEFT JOIN users AS u ON u.sip_id = v.sip_id 
+                SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
+            WHERE p.id IS NOT NULL  AND u.id IS NOT NULL AND v.parent_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
+        u::query("UPDATE voip24h_data AS v
+                LEFT JOIN cms_parents AS p ON p.mobile_2 = v.phone 
+                LEFT JOIN users AS u ON u.sip_id = v.sip_id 
+                SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
+            WHERE p.id IS NOT NULL  AND u.id IS NOT NULL AND v.parent_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
+        $keyword = isset($request->keyword) ? $request->keyword : '';
+        
+        $pagination = (object)$request->pagination;
+        $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
+        $limit = isset($pagination->limit) ? (int) $pagination->limit : 20;
+        $offset = $page == 1 ? 0 : $limit * ($page-1);
+        $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
+        $cond = "1";
+        $cond2 = "";
+        if($keyword!==''){
+            $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%')";
+        }
+        if(in_array(1,$request->type_status)){
+            $cond2 .= $cond2 ? " OR v.disposition = 'ANSWERED'" : "v.disposition = 'ANSWERED'";
+        }
+        if(in_array(2,$request->type_status)){
+            $cond2 .= $cond2 ? " OR v.disposition = 'NO ANSWER'" : "v.disposition = 'NO ANSWER'";
+        }
+        if(in_array(3,$request->type_status)){
+            $cond2 .= $cond2 ? " OR v.disposition = 'BUSY'" : "v.disposition = 'BUSY'";
+        }
+        if($cond2){
+            $cond.=" AND ( $cond2 ) ";
+        }
+        if (!empty($request->branch_id)) {
+            $cond.= " AND u.branch_id IN (".implode(",",$request->branch_id).")";
+        }
+        if($request->from_date){
+            $request->type_date = 0;
+            $cond .= " AND v.start_time >= '".date('Y-m-d H:i:s',strtotime($request->from_date))."'";
+        }
+        if($request->to_date){
+            $request->type_date = 0;
+            $cond .= " AND v.start_time <= '".date('Y-m-d H:i:s',strtotime($request->to_date))."'";
+        }
+        if($request->type_date == 1){
+            $cond .= " AND v.start_time >= '".date('Y-m-d 00:00:00')."'";
+        }elseif($request->type_date == 2){
+            $cond .= " AND v.start_time < '".date('Y-m-d 00:00:00')."' AND v.start_time >= '".date('Y-m-d 00:00:00',strtotime ( '-1 day' , time() ) )."'";
+        }elseif($request->type_date == 3){
+            $cond .= " AND v.start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday"))."'";
+        }elseif($request->type_date == 4){
+            $cond .= " AND v.start_time < '".date('Y-m-d 00:00:00',strtotime("last Monday"))."' AND v.start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday")-24*7*3600)."'";
+        }elseif($request->type_date == 5){
+            $cond .= " AND v.start_time >= '".date('Y-m-01 00:00:00')."'";
+        }elseif($request->type_date == 6){
+            $cond .= " AND v.start_time < '".date('Y-m-01 00:00:00')."' AND v.start_time >= '".date('Y-m-01 00:00:00',strtotime('-1 month'))."'";
+        }
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
+            $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
+        }
+        $total = u::first("SELECT count(v.id) AS total FROM voip24h_data AS v
+                LEFT JOIN users AS u ON u.id=v.user_id 
+            WHERE v.sip_id IS NOT NULL AND $cond  ");
+        $list = u::query("SELECT v.start_time,
+                IF(v.type='inbound',v.phone, CONCAT(v.sip_id,' - ',u.name,' - ',u.hrm_id)) AS phone_call,
+                IF(v.type='inbound',CONCAT(v.sip_id,' - ',u.name,' - ',u.hrm_id), v.phone) AS phone_rep,
+                v.duration, IF(v.type='inbound','Gọi vào','Gọi ra') AS phone_type, v.disposition AS phone_status,
+                (SELECT name FROM cms_branches WHERE id=v.branch_id) AS branch_name
+            FROM voip24h_data AS v
+                LEFT JOIN users AS u ON u.id=v.user_id 
+            WHERE v.sip_id IS NOT NULL AND $cond 
+            ORDER BY v.id DESC $limitation");
+        $arr_status = [
+            'NO ANSWER'=>'Không nghe máy',
+            'BUSY'=>'Máy bận',
+            'ANSWERED'=>'Nghe máy'
+        ];
+        foreach($list AS $k=>$row){
+            $list[$k]->duration = gmdate("H:i:s", $row->duration);
+            $list[$k]->phone_status = isset($arr_status[$list[$k]->phone_status]) ? $arr_status[$list[$k]->phone_status] : $list[$k]->phone_status;
         }
             
         $data = u::makingPagination($list, $total->total, $page, $limit);

@@ -58,12 +58,12 @@ class ToolsController extends Controller
         u::query("UPDATE voip24h_data AS v
                 LEFT JOIN cms_parents AS p ON p.mobile_1 = v.phone 
                 LEFT JOIN users AS u ON u.sip_id = v.sip_id 
-                SET v.parent_id =p.id ,v.user_id=u.id
+                SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
             WHERE p.id IS NOT NULL  AND u.id IS NOT NULL AND v.parent_id IS NULL AND v.created_at >'".$report_week_info->start_date." 00:00:00'");
         u::query("UPDATE voip24h_data AS v
                 LEFT JOIN cms_parents AS p ON p.mobile_2 = v.phone 
                 LEFT JOIN users AS u ON u.sip_id = v.sip_id 
-                SET v.parent_id =p.id ,v.user_id=u.id
+                SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
             WHERE p.id IS NOT NULL  AND u.id IS NOT NULL AND v.parent_id IS NULL AND v.created_at >'".$report_week_info->start_date." 00:00:00'");
         
         u::query("DELETE FROM cms_tmp_student WHERE report_week_id = $report_week_info->id");
