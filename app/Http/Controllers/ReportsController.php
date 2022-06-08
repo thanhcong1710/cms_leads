@@ -102,12 +102,12 @@ class ReportsController extends Controller
                 LEFT JOIN cms_parents AS p ON p.mobile_1 = v.phone 
                 LEFT JOIN users AS u ON u.sip_id = v.sip_id 
                 SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
-            WHERE p.id IS NOT NULL  AND u.id IS NOT NULL AND v.parent_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
+            WHERE v.user_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
         u::query("UPDATE voip24h_data AS v
                 LEFT JOIN cms_parents AS p ON p.mobile_2 = v.phone 
                 LEFT JOIN users AS u ON u.sip_id = v.sip_id 
                 SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
-            WHERE p.id IS NOT NULL  AND u.id IS NOT NULL AND v.parent_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
+            WHERE v.user_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
         $keyword = isset($request->keyword) ? $request->keyword : '';
         
         $pagination = (object)$request->pagination;
@@ -190,12 +190,12 @@ class ReportsController extends Controller
                 LEFT JOIN cms_parents AS p ON p.mobile_1 = v.phone 
                 LEFT JOIN users AS u ON u.sip_id = v.sip_id 
                 SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
-            WHERE p.id IS NOT NULL  AND u.id IS NOT NULL AND v.parent_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
+            WHERE v.user_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
         u::query("UPDATE voip24h_data AS v
                 LEFT JOIN cms_parents AS p ON p.mobile_2 = v.phone 
                 LEFT JOIN users AS u ON u.sip_id = v.sip_id 
                 SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
-            WHERE p.id IS NOT NULL  AND u.id IS NOT NULL AND v.parent_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
+            WHERE v.user_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
         $keyword = isset($request->keyword) ? $request->keyword : '';
         
         $pagination = (object)$request->pagination;
