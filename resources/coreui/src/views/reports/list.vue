@@ -36,10 +36,10 @@ export default {
   created() {
     this.showBC01 = true;
     this.showBC03 = true;
-    this.showBC04 = true;
     const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
     if(arr_role.indexOf("admin")> -1){
       this.showBC02 = true
+      this.showBC04 = true;
     }
   },
   methods: {
