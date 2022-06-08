@@ -57,19 +57,6 @@
                   placeholder="Tên mã nhân viên"
                 />
               </div>
-              <!-- <div class="form-group col-sm-3">
-                <label for="ccmonth">Ngày tạo</label>
-                  <date-picker
-                    style="width:100%;"
-                    v-model="searchData.dateRange"
-                    :clearable="true"
-                    :lang="datepickerOptions.lang"
-                    range
-                    format="YYYY-MM-DD"
-                    id="apax-date-range"
-                    placeholder="Chọn thời gian tìm kiếm từ ngày đến ngày"
-                  ></date-picker>
-              </div> -->
               <div class="form-group col-sm-4">
                 <label for="name">Trạng thái cuộc gọi</label>
                 <multiselect
@@ -107,14 +94,13 @@
               <thead>
                 <tr>
                   <th>#</th>
+                  <th>Ngày gọi</th>
+                  <th>Số gọi</th>
+                  <th>Số nhận</th>
+                  <th>Thời gian gọi</th>
+                  <th>Loại cuộc gọi</th>
+                  <th>Trạng thái cuộc gọi</th>
                   <th>Trung tâm</th>
-                  <th>Tên máy nhánh</th>
-                  <th>Tổng gọi vào</th>
-                  <th>Tổng gọi ra</th>
-                  <th>Thời gian gọi vào TB</th>
-                  <th>Thời gian gọi ra TB</th>
-                  <th>Tổng thời gian gọi vào</th>
-                  <th>Tổng thời gian gọi ra</th>
                 </tr>
               </thead>
               <tbody>
@@ -122,14 +108,13 @@
                   <td>
                     {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
                   </td>
-                  <td>{{ item.branch_name }}</td> 
-                  <td>{{ item.sip_name }}</td>
-                  <td>{{ item.total_inbound }}</td>
-                  <td>{{ item.total_outbound }}</td>
-                  <td>{{ item.duration_inbound}}</td>
-                  <td>{{ item.duration_outbound }}</td>
-                  <td>{{ item.total_duration_inbound}}</td>
-                  <td>{{ item.total_duration_outbound}}</td>
+                  <td>{{ item.start_time }}</td> 
+                  <td>{{ item.phone_call }}</td>
+                  <td>{{ item.phone_rep }}</td>
+                  <td>{{ item.duration }}</td>
+                  <td>{{ item.phone_type}}</td>
+                  <td>{{ item.phone_status }}</td>
+                  <td>{{ item.branch_name}}</td>
                 </tr>
               </tbody>
             </table>
@@ -195,7 +180,7 @@ export default {
       },
       imports: [],
       pagination: {
-        url: "/api/reports/03",
+        url: "/api/reports/04",
         id: "",
         style: "line",
         class: "",
@@ -247,7 +232,7 @@ export default {
         keyword: this.searchData.keyword,
         pagination:this.pagination,
       };
-      const link = "/api/reports/03";
+      const link = "/api/reports/04";
 
       this.loading.processing = true;
       u.p(link, data)
@@ -290,7 +275,7 @@ export default {
          ids_type_status += ids_type_status ? '-'+item.id : item.id
         })
       }
-      var url = `/api/export/report03/`;
+      var url = `/api/export/report04/`;
       this.key ='';
       this.value = ''
       if (this.searchData.keyword){

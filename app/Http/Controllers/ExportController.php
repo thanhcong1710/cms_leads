@@ -426,4 +426,125 @@ class ExportController extends Controller
             throw $exception;
         }
     }
+    public function report04(Request $request , $key,$value) {
+        set_time_limit(300);
+        ini_set('memory_limit', '-1');
+        $cond = "1";
+        $arr_key =explode(',',$key);
+        $arr_value =explode(',',$value);
+        foreach($arr_key AS $k=>$key){
+            if($key=='keyword'){
+                $keyword = $arr_value[$k];
+                $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%')";;
+            }
+            if($key=='type_status'){
+                $arr_type_status = explode('-',$arr_value[$k]);
+                $cond2 ="";
+                if(in_array(1,$arr_type_status)){
+                    $cond2 .= $cond2 ? " OR disposition = 'ANSWERED'" : "disposition = 'ANSWERED'";
+                }
+                if(in_array(2,$arr_type_status)){
+                    $cond2 .= $cond2 ? " OR disposition = 'NO ANSWER'" : "disposition = 'NO ANSWER'";
+                }
+                if(in_array(3,$arr_type_status)){
+                    $cond2 .= $cond2 ? " OR disposition = 'BUSY'" : "disposition = 'BUSY'";
+                }
+                if($cond2){
+                    $cond.=" AND ( $cond2 ) ";
+                }
+            }
+            $disabled_type_date = 0;
+            if($key=='from_date'){
+                $disabled_type_date = 1;
+                $cond .= " AND start_time >= '".date('Y-m-d H:i:s',$arr_value[$k])."'";
+            }
+            if($key=='to_date'){
+                $disabled_type_date = 1;
+                $cond .= " AND start_time <= '".date('Y-m-d H:i:s',$arr_value[$k])."'";
+            }
+            if($key=='type_date' && !$disabled_type_date){
+                if($arr_value[$k] == 1){
+                    $cond .= " AND start_time >= '".date('Y-m-d 00:00:00')."'";
+                }elseif($arr_value[$k] == 2){
+                    $cond .= " AND start_time < '".date('Y-m-d 00:00:00')."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime ( '-1 day' , time() ) )."'";
+                }elseif($arr_value[$k] == 3){
+                    $cond .= " AND start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday"))."'";
+                }elseif($arr_value[$k] == 4){
+                    $cond .= " AND start_time < '".date('Y-m-d 00:00:00',strtotime("last Monday"))."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday")-24*7*3600)."'";
+                }elseif($arr_value[$k] == 5){
+                    $cond .= " AND start_time >= '".date('Y-m-01 00:00:00')."'";
+                }elseif($arr_value[$k] == 6){
+                    $cond .= " AND start_time < '".date('Y-m-01 00:00:00')."' AND start_time >= '".date('Y-m-01 00:00:00',strtotime('-1 month'))."'";
+                }
+            }
+            if($key=='branch_id'){
+                $cond .= " AND u.branch_id IN (".str_replace("-",",", $arr_value[$k]).")";
+            }
+        }
+        
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
+            $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
+        }
+        $list = u::query("SELECT v.start_time,
+                    IF(v.type='inbound',v.phone, CONCAT(v.sip_id,' - ',u.name,' - ',u.hrm_id)) AS phone_call,
+                    IF(v.type='inbound',CONCAT(v.sip_id,' - ',u.name,' - ',u.hrm_id), v.phone) AS phone_rep,
+                    v.duration, IF(v.type='inbound','Gọi vào','Gọi ra') AS phone_type, v.disposition AS phone_status,
+                    (SELECT name FROM cms_branches WHERE id=v.branch_id) AS branch_name
+                FROM voip24h_data AS v
+                    LEFT JOIN users AS u ON u.id=v.user_id 
+                WHERE v.sip_id IS NOT NULL AND $cond 
+                ORDER BY v.id DESC ");
+        $arr_status = [
+            'NO ANSWER'=>'Không nghe máy',
+            'BUSY'=>'Máy bận',
+            'ANSWERED'=>'Nghe máy'
+        ];
+        foreach($list AS $k=>$row){
+            $list[$k]->duration = gmdate("H:i:s", $row->duration);
+            $list[$k]->phone_status = isset($arr_status[$list[$k]->phone_status]) ? $arr_status[$list[$k]->phone_status] : $list[$k]->phone_status;
+        }
+            
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'STT');
+        $sheet->setCellValue('B1', 'Ngày gọi');
+        $sheet->setCellValue('C1', 'Số gọi');
+        $sheet->setCellValue('D1', 'Số nhận');
+        $sheet->setCellValue('E1', 'Thời gian gọi');
+        $sheet->setCellValue('F1', 'Loại cuộc gọi');
+        $sheet->setCellValue('G1', 'Trạng thái cuộc gọi');
+        $sheet->setCellValue('H1', 'Trung tâm');
+
+        $sheet->getColumnDimension("A")->setWidth(10);
+        $sheet->getColumnDimension("B")->setWidth(20);
+        $sheet->getColumnDimension("C")->setWidth(20);
+        $sheet->getColumnDimension("D")->setWidth(20);
+        $sheet->getColumnDimension("E")->setWidth(20);
+        $sheet->getColumnDimension("F")->setWidth(20);
+        $sheet->getColumnDimension("G")->setWidth(20);
+        $sheet->getColumnDimension("H")->setWidth(20);
+        for ($i = 0; $i < count($list) ; $i++) {
+            $x = $i + 2;
+            $sheet->setCellValue('A' . $x, $i+1);
+            $sheet->setCellValue('B' . $x, $list[$i]->start_time);
+            $sheet->setCellValue('C' . $x, $list[$i]->phone_call) ;
+            $sheet->setCellValue('D' . $x, $list[$i]->phone_rep );
+            $sheet->setCellValue('E' . $x, $list[$i]->duration);
+            $sheet->setCellValue('F' . $x, $list[$i]->phone_type);
+            $sheet->setCellValue('G' . $x, $list[$i]->phone_status);
+            $sheet->setCellValue('H' . $x, $list[$i]->branch_name);
+            
+            $sheet->getRowDimension($x)->setRowHeight(23);
+
+        }
+        $writer = new Xlsx($spreadsheet);
+        try {
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="Báo cáo chi tiết cuộc gọi.xlsx"');
+            header('Cache-Control: max-age=0');
+            $writer->save("php://output");
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
 }
