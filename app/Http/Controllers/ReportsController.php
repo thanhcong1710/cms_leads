@@ -254,7 +254,7 @@ class ReportsController extends Controller
                 IF(v.type='inbound',v.phone, CONCAT(v.sip_id,' - ',u.name,' - ',u.hrm_id)) AS phone_call,
                 IF(v.type='inbound',CONCAT(v.sip_id,' - ',u.name,' - ',u.hrm_id), v.phone) AS phone_rep,
                 v.duration, IF(v.type='inbound','Gọi vào','Gọi ra') AS phone_type, v.disposition AS phone_status,
-                (SELECT name FROM cms_branches WHERE id=v.branch_id) AS branch_name
+                (SELECT name FROM cms_branches WHERE id=v.branch_id) AS branch_name, v.link_record
             FROM voip24h_data AS v
                 LEFT JOIN users AS u ON u.id=v.user_id 
             WHERE v.sip_id IS NOT NULL AND $cond 

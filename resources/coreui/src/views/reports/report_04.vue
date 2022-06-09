@@ -101,6 +101,7 @@
                   <th>Loại cuộc gọi</th>
                   <th>Trạng thái cuộc gọi</th>
                   <th>Trung tâm</th>
+                  <th>File cuộc gọi</th>
                 </tr>
               </thead>
               <tbody>
@@ -115,6 +116,13 @@
                   <td>{{ item.phone_type}}</td>
                   <td>{{ item.phone_status }}</td>
                   <td>{{ item.branch_name}}</td>
+                  <td>
+                    <p v-if="item.link_record">
+                      <audio controls style="height: 40px; width: 256px; border: 1px solid #ccc;">
+                        <source :src="item.link_record" type="audio/x-wav">
+                      </audio>
+                    </p>
+                  </td>
                 </tr>
               </tbody>
             </table>
