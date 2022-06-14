@@ -54,7 +54,7 @@
                   class="form-control"
                   v-model="searchData.keyword"
                   type="text"
-                  placeholder="Tên mã nhân viên"
+                  placeholder="Tên mã nhân viên, SDT"
                 />
               </div>
               <div class="form-group col-sm-4">
@@ -73,6 +73,14 @@
                 >
                   <span slot="noResult">Không tìm thấy dữ liệu</span>
                 </multiselect>
+              </div>
+               <div class="form-group col-sm-4">
+                <label for="name">Loại cuộc gọi</label>
+                <selection class="form-control"  v-model="searchData.type_call">
+                  <option value="">Chọn loại cuộc gọi</option>
+                  <option value="1">Gọi ra</option>
+                  <option value="2">Gọi vào </option>
+                </selection>
               </div>
               <div class="form-group col-sm-12">
                 <button class="btn btn-success" @click="exportExcel()">
@@ -184,6 +192,7 @@ export default {
         branch_id:"",
         type_date:1,
         keyword: "",
+        type_call:"",
         pagination: this.pagination
       },
       imports: [],
@@ -236,6 +245,7 @@ export default {
         to_date:a ? document.getElementById('to_date').value : "",
         branch_id:ids_branch_id,
         type_date:this.searchData.type_date,
+        type_call:this.searchData.type_call,
         type_status:ids_type_status,
         keyword: this.searchData.keyword,
         pagination:this.pagination,
@@ -293,6 +303,10 @@ export default {
       if (ids_type_status){
         this.key += "type_status,"
         this.value += ids_type_status+","
+      }
+       if (this.searchData.type_call){
+        this.key += "type_call,"
+        this.value += this.searchData.type_call+","
       }
       if (this.searchData.type_date){
         this.key += "type_date,"

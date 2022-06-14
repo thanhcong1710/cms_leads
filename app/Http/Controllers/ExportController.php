@@ -435,7 +435,7 @@ class ExportController extends Controller
         foreach($arr_key AS $k=>$key){
             if($key=='keyword'){
                 $keyword = $arr_value[$k];
-                $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%')";;
+                $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%'OR v.phone LIKE '%$keyword%' OR v.phone LIKE '%$keyword%' )";;
             }
             if($key=='type_status'){
                 $arr_type_status = explode('-',$arr_value[$k]);
@@ -461,6 +461,9 @@ class ExportController extends Controller
             if($key=='to_date'){
                 $disabled_type_date = 1;
                 $cond .= " AND start_time <= '".date('Y-m-d H:i:s',$arr_value[$k])."'";
+            }
+            if($key=='type_call'){
+                $cond.=$arr_value[$k] ==2 ? " AND v.type='inbound' " : "v.type='outbound'";
             }
             if($key=='type_date' && !$disabled_type_date){
                 if($arr_value[$k] == 1){
