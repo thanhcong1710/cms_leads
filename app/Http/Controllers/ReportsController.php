@@ -206,7 +206,7 @@ class ReportsController extends Controller
         $cond = "1";
         $cond2 = "";
         if($keyword!==''){
-            $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%')";
+            $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%' OR v.phone LIKE '%$keyword%')";
         }
         if(in_array(1,$request->type_status)){
             $cond2 .= $cond2 ? " OR v.disposition = 'ANSWERED'" : "v.disposition = 'ANSWERED'";
@@ -222,6 +222,9 @@ class ReportsController extends Controller
         }
         if (!empty($request->branch_id)) {
             $cond.= " AND u.branch_id IN (".implode(",",$request->branch_id).")";
+        }
+        if($request->type_call){
+            $cond.=$request->type_call ==2 ? " AND v.type='inbound' " : "v.type='outbound'";
         }
         if($request->from_date){
             $request->type_date = 0;
