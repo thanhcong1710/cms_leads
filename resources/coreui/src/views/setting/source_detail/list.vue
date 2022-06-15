@@ -48,6 +48,7 @@
                   <th>STT</th>
                   <th>Nguồn chi tiết</th>
                   <th>Trạng thái</th>
+                  <th>Trung tâm</th>
                   <th>Thao tác</th>
                 </tr>
               </thead>
@@ -58,6 +59,7 @@
                   </td>
                   <td>{{ item.name }}</td>
                   <td>{{ item.status | getStatusName}}</td>
+                  <td>{{ item.branch_name }}</td>
                   <td>
                     <router-link
                       class="btn btn-sm btn-success"
