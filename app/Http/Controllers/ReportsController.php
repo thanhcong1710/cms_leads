@@ -108,6 +108,9 @@ class ReportsController extends Controller
                 LEFT JOIN users AS u ON u.sip_id = v.sip_id 
                 SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
             WHERE v.user_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
+        u::query("UPDATE voip24h_data AS v
+            LEFT JOIN cms_customer_care AS c ON c.data_id = v.id 
+            SET v.STATUS = c.STATUS WHERe v.status!=c.status");
         $keyword = isset($request->keyword) ? $request->keyword : '';
         
         $pagination = (object)$request->pagination;
@@ -164,10 +167,10 @@ class ReportsController extends Controller
             WHERE u.status=1 AND $cond ");
         $list = u::query("SELECT CONCAT(u.sip_id,' - ',u.name,' - ',u.hrm_id) AS sip_name,
                 (SELECT name FROM cms_branches WHERE id=u.branch_id) AS branch_name,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND $cond1) AS total_inbound,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND $cond1) AS total_outbound,
-                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND $cond1) AS total_duration_inbound,
-                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND $cond1) AS total_duration_outbound,
+                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND status=1 AND $cond1) AS total_inbound,
+                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND status=1 AND $cond1) AS total_outbound,
+                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND status=1 AND $cond1) AS total_duration_inbound,
+                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND status=1 AND $cond1) AS total_duration_outbound,
                 0 As duration_inbound,
                 0 AS duration_outbound
             FROM users AS u 
@@ -196,6 +199,9 @@ class ReportsController extends Controller
                 LEFT JOIN users AS u ON u.sip_id = v.sip_id 
                 SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
             WHERE v.user_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
+        u::query("UPDATE voip24h_data AS v
+            LEFT JOIN cms_customer_care AS c ON c.data_id = v.id 
+            SET v.STATUS = c.STATUS WHERe v.status!=c.status");
         $keyword = isset($request->keyword) ? $request->keyword : '';
         
         $pagination = (object)$request->pagination;
@@ -223,8 +229,8 @@ class ReportsController extends Controller
         if (!empty($request->branch_id)) {
             $cond.= " AND u.branch_id IN (".implode(",",$request->branch_id).")";
         }
-        if($request->type_call){
-            $cond.=$request->type_call ==2 ? " AND v.type='inbound' " : "v.type='outbound'";
+        if($request->type_call ){
+            $cond.=$request->type_call ==2 ? " AND v.type='inbound' " : " AND v.type='outbound'";
         }
         if($request->from_date){
             $request->type_date = 0;
@@ -251,16 +257,16 @@ class ReportsController extends Controller
             $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
         }
         $total = u::first("SELECT count(v.id) AS total FROM voip24h_data AS v
-                LEFT JOIN users AS u ON u.id=v.user_id 
-            WHERE v.sip_id IS NOT NULL AND $cond  ");
+                LEFT JOIN users AS u ON u.id=v.user_id  
+            WHERE v.status=1 AND v.sip_id IS NOT NULL AND $cond  ");
         $list = u::query("SELECT v.start_time,
                 IF(v.type='inbound',v.phone, CONCAT(v.sip_id,' - ',u.name,' - ',u.hrm_id)) AS phone_call,
                 IF(v.type='inbound',CONCAT(v.sip_id,' - ',u.name,' - ',u.hrm_id), v.phone) AS phone_rep,
                 v.duration, IF(v.type='inbound','Gọi vào','Gọi ra') AS phone_type, v.disposition AS phone_status,
                 (SELECT name FROM cms_branches WHERE id=v.branch_id) AS branch_name, v.link_record
             FROM voip24h_data AS v
-                LEFT JOIN users AS u ON u.id=v.user_id 
-            WHERE v.sip_id IS NOT NULL AND $cond 
+                LEFT JOIN users AS u ON u.id=v.user_id
+            WHERE v.status=1 AND v.sip_id IS NOT NULL AND $cond 
             ORDER BY v.id DESC $limitation");
         $arr_status = [
             'NO ANSWER'=>'Không nghe máy',

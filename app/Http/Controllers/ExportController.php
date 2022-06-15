@@ -367,10 +367,10 @@ class ExportController extends Controller
         }
         $list = u::query("SELECT CONCAT(u.sip_id,' - ',u.name,' - ',u.hrm_id) AS sip_name,
                 (SELECT name FROM cms_branches WHERE id=u.branch_id) AS branch_name,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND $cond1) AS total_inbound,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND $cond1) AS total_outbound,
-                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND $cond1) AS total_duration_inbound,
-                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND $cond1) AS total_duration_outbound,
+                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND v.status=1 AND `type`='inbound' AND $cond1) AS total_inbound,
+                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND v.status=1 AND `type`='outbound' AND $cond1) AS total_outbound,
+                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND v.status=1 AND `type`='inbound' AND $cond1) AS total_duration_inbound,
+                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND v.status=1 AND `type`='outbound' AND $cond1) AS total_duration_outbound,
                 0 As duration_inbound,
                 0 AS duration_outbound
             FROM users AS u 
@@ -495,7 +495,7 @@ class ExportController extends Controller
                     (SELECT name FROM cms_branches WHERE id=v.branch_id) AS branch_name
                 FROM voip24h_data AS v
                     LEFT JOIN users AS u ON u.id=v.user_id 
-                WHERE v.sip_id IS NOT NULL AND $cond 
+                WHERE v.status=1 AND v.sip_id IS NOT NULL AND $cond 
                 ORDER BY v.id DESC ");
         $arr_status = [
             'NO ANSWER'=>'Không nghe máy',
