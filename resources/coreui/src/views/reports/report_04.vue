@@ -76,11 +76,11 @@
               </div>
                <div class="form-group col-sm-4">
                 <label for="name">Loại cuộc gọi</label>
-                <selection class="form-control"  v-model="searchData.type_call">
+                <select class="form-control"  v-model="searchData.type_call">
                   <option value="">Chọn loại cuộc gọi</option>
                   <option value="1">Gọi ra</option>
                   <option value="2">Gọi vào </option>
-                </selection>
+                </select>
               </div>
               <div class="form-group col-sm-12">
                 <button class="btn btn-success" @click="exportExcel()">
