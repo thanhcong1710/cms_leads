@@ -505,6 +505,12 @@ class ExportController extends Controller
         foreach($list AS $k=>$row){
             $list[$k]->duration = gmdate("H:i:s", $row->duration);
             $list[$k]->phone_status = isset($arr_status[$list[$k]->phone_status]) ? $arr_status[$list[$k]->phone_status] : $list[$k]->phone_status;
+            if(!$request->user()->hasRole('admin') && $row->phone_type =='Gọi vào'){
+                $list[$k]->phone_call = substr($list[$k]->phone_call,0,4)."xxx".substr($list[$k]->phone_call,7);
+            }
+            if(!$request->user()->hasRole('admin') && $row->phone_type =='Gọi ra'){
+                $list[$k]->phone_rep = substr($list[$k]->phone_rep,0,4)."xxx".substr($list[$k]->phone_rep,7);
+            }
         }
             
         $spreadsheet = new Spreadsheet();
