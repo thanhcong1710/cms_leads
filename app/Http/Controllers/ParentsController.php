@@ -63,7 +63,7 @@ class ParentsController extends Controller
             $cond .= " AND p.next_care_date > '$start_date 00:00:00'";
         }
         //type_search=1
-        $cond_1 = " AND (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1)=0";
+        $cond_1 = " AND (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1)=0 AND p.status != 8 ";
         //type_search=2
         $cond_2 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') = '".date('Y-m-d')."'";
         $cond_3 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') < '".date('Y-m-d')."' 
