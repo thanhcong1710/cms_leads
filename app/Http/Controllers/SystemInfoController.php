@@ -28,8 +28,9 @@ class SystemInfoController extends Controller
         $data = u::query("SELECT * FROM cms_sources WHERE status=1");
         return response()->json($data);
     }
-    public function getAllSourceDetail(){
-        $data = u::query("SELECT * FROM cms_source_detail WHERE status=1");
+    public function getAllSourceDetail(Request $request){
+        $cond= $request->user()->branch_id && !$request->user()->hasRole('admin') ? " AND (branch_id =".$request->user()->branch_id." OR branch_id IS NULL)" :"";
+        $data = u::query("SELECT * FROM cms_source_detail WHERE status=1 $cond");
         return response()->json($data);
     }
     public function getAllMethods(){
@@ -91,23 +92,26 @@ class SystemInfoController extends Controller
             $cond .= " AND s.name LIKE '%$keyword%'";
         }
         if(!$request->user()->hasRole('admin')){
-            $edit = "IF(".$request->user()->id." = s.creator_id,1,0) AS can_edit";
+            $edit = "IF(".$request->user()->branch_id." = s.branch_id,1,0) AS can_edit";
+            $cond .= " AND ( s.branch_id =".$request->user()->branch_id." OR s.branch_id IS NULL)";
         }else{
             $edit = "1 AS can_edit";
         }
         $total = u::first("SELECT count(id) AS total FROM cms_source_detail AS s WHERE $cond ");
-        $list = u::query("SELECT s.*,$edit 
+        $list = u::query("SELECT s.*,$edit ,(SELECT name FROM cms_branches WHERE id =s.branch_id) AS branch_name
             FROM cms_source_detail AS s WHERE $cond ORDER BY s.id DESC $limitation");
         $data = u::makingPagination($list, $total->total, $page, $limit);
         return response()->json($data);
     }
     public function addSourceDetail(Request $request)
     {
+        $branch_id = !$request->user()->hasRole('admin') ? $request->user()->branch_id : NULL;
         $id = u::insertSimpleRow(array(
             'name'=>$request->name,
             'created_at' => date('Y-m-d H:i:s'),
             'creator_id' => Auth::user()->id,
             'status'=>$request->status,
+            'branch_id'=>$branch_id
         ), 'cms_source_detail');
         return response()->json($id);
     }
