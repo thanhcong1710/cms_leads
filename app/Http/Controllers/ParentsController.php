@@ -196,7 +196,7 @@ class ParentsController extends Controller
     }
     public function show(Request $request,$parent_id)
     {
-        $cond .="";
+        $cond="";
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
