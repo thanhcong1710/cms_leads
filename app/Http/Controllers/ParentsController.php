@@ -196,6 +196,10 @@ class ParentsController extends Controller
     }
     public function show(Request $request,$parent_id)
     {
+        $cond .="";
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
+            $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
+        }
         $data = u::first("SELECT p.*,(SELECT name FROM users WHERE id=p.creator_id) AS creator_name,
                 (SELECT name FROM cms_districts WHERE id=p.district_id) AS district_name,
                 (SELECT name FROM cms_provinces WHERE id=p.province_id) AS province_name,
@@ -204,7 +208,7 @@ class ParentsController extends Controller
                 (SELECT title FROM cms_jobs WHERE id=p.job_id) AS job_name,
                 (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1) AS num_care,
                 (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id  AND status=1 ORDER BY care_date DESC LIMIT 1) AS last_care
-            FROM cms_parents AS p WHERE id=$parent_id");
+            FROM cms_parents AS p WHERE id=$parent_id  $cond");
         if(!($request->user()->hasRole('admin') || $request->user()->hasRole('Salehub') || $request->user()->hasRole('Leader'))){
             $data->branch_id= $request->user()->branch_id;
         }else{
