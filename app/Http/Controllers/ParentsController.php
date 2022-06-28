@@ -209,12 +209,14 @@ class ParentsController extends Controller
                 (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1) AS num_care,
                 (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id  AND status=1 ORDER BY care_date DESC LIMIT 1) AS last_care
             FROM cms_parents AS p WHERE id=$parent_id  $cond");
-        if(!($request->user()->hasRole('admin') || $request->user()->hasRole('Salehub') || $request->user()->hasRole('Leader'))){
-            $data->branch_id= $request->user()->branch_id;
-        }else{
-            $data->branch_id=0;
+        if($data){
+            if(!($request->user()->hasRole('admin') || $request->user()->hasRole('Salehub') || $request->user()->hasRole('Leader'))){
+                $data->branch_id= $request->user()->branch_id;
+            }else{
+                $data->branch_id=0;
+            }
+            $data->next_care_date =  $data->next_care_date ? date("Y-m-d\TH:i", strtotime($data->next_care_date)): $data->next_care_date;
         }
-        $data->next_care_date =  $data->next_care_date ? date("Y-m-d\TH:i", strtotime($data->next_care_date)): $data->next_care_date;
         return response()->json($data);
     }
     public function delete($parent_id)

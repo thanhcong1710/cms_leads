@@ -612,12 +612,16 @@ export default {
       u.g(`/api/parents/show/${this.$route.params.id}`)
         .then(response => {
         this.loading.processing = false;
-        this.parent = response.data
-        this.tmp_owner_id = response.data.owner_id
-        this.tmp_status = response.data.status
-        if(this.parent.branch_id!=0){
-          this.modal_checkin.branch_id = this.parent.branch_id
-          this.modal_checkin.disabled =true
+        if(response.data.length !== 0){
+          this.parent = response.data
+          this.tmp_owner_id = response.data.owner_id
+          this.tmp_status = response.data.status
+          if(this.parent.branch_id!=0){
+            this.modal_checkin.branch_id = this.parent.branch_id
+            this.modal_checkin.disabled =true
+          }
+        }else{
+          this.$router.push({ path: `/parents` });
         }
       })
     },
