@@ -243,9 +243,16 @@ class ParentsController extends Controller
             'message'=>''
         );
         if($parent_id){
-            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  WHERE (p.mobile_1='$phone' OR p.mobile_2='$phone') AND p.id!='$parent_id'");
+            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name, 
+                    (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND status=1 ORDER BY care_date DESC LIMIT 1) AS care_date,
+                    (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1 ) AS total_care
+                FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  
+                WHERE (p.mobile_1='$phone' OR p.mobile_2='$phone') AND p.id!='$parent_id'");
             if($duplicate_info){
                 $result->status = 0;
+                if($duplicate_info->total_care>0){
+                    
+                }
                 $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name";
             }
             // $parent_info = u::first("SELECT mobile_1,mobile_2 FROM cms_parents WHERE id=$parent_id");
@@ -261,7 +268,10 @@ class ParentsController extends Controller
             //     }
             // }
         }else{
-            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  WHERE (p.mobile_1='$phone' OR p.mobile_2='$phone') ");
+            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name,
+                    (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND status=1 ORDER BY care_date DESC LIMIT 1) AS care_date,
+                    (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1 ) AS total_care
+                FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  WHERE (p.mobile_1='$phone' OR p.mobile_2='$phone') ");
             if($duplicate_info){
                 if($duplicate_info->is_lock==0){
                     $result->status = 2;
