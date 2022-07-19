@@ -120,6 +120,7 @@ class ParentsController extends Controller
             'note' => $request->note,
             'created_at' => date('Y-m-d H:i:s'),
             'creator_id' => Auth::user()->id,
+            'last_assign_date' => date('Y-m-d H:i:s'),
             'owner_id'=>$request->owner_id,
             'status'=>$request->status,
             'c2c_mobile'=>$request->c2c_mobile,
@@ -152,6 +153,7 @@ class ParentsController extends Controller
             'updated_at' => date('Y-m-d H:i:s'),
             'updator_id' => Auth::user()->id,
             'owner_id'=>$request->owner_id,
+            'last_assign_date'=>$request->owner_id != $pre_parent_info->owner_id ? date('Y-m-d H:i:s') : $pre_parent_info->last_assign_date,
             'status'=>$request->status,
             'c2c_mobile'=>$request->c2c_mobile,
         );
@@ -162,11 +164,12 @@ class ParentsController extends Controller
     }
     public function assign(Request $request)
     {
-        $pre_parent_info = u::first("SELECT owner_id FROM cms_parents WHERE id=$request->parent_id");
+        $pre_parent_info = u::first("SELECT owner_id,last_assign_date FROM cms_parents WHERE id=$request->parent_id");
         $data = u::updateSimpleRow(array(
             'updated_at' => date('Y-m-d H:i:s'),
             'updator_id' => Auth::user()->id,
             'owner_id'=>$request->owner_id,
+            'last_assign_date'=>$request->owner_id != $pre_parent_info->owner_id ? date('Y-m-d H:i:s') : $pre_parent_info->last_assign_date,
         ), array('id' => $request->parent_id), 'cms_parents');
         LogParents::logAssign($request->parent_id,$pre_parent_info->owner_id,$request->owner_id,Auth::user()->id);
         return response()->json($data);
@@ -175,10 +178,11 @@ class ParentsController extends Controller
     {
         $cond = implode(",",$request->parents);
         $arr_owner = $request->owners;
-        $list_parent_info = u::query("SELECT p.id AS parent_id,p.owner_id,(SELECT CONCAT(name,' (',hrm_id,')') FROM users WHERE id= p.owner_id) AS pre_owner FROM cms_parents AS p WHERE p.id IN ($cond)");
+        $list_parent_info = u::query("SELECT p.id AS parent_id,p.owner_id,(SELECT CONCAT(name,' (',hrm_id,')') FROM users WHERE id= p.owner_id) AS pre_owner,p.last_assign_date FROM cms_parents AS p WHERE p.id IN ($cond)");
         foreach($list_parent_info AS $k=>$row){
             $owner_id =  $arr_owner[$k%count($arr_owner)];
-            u::query("UPDATE cms_parents SET owner_id= $owner_id WHERE id =$row->parent_id");
+            $last_assign_date = $owner_id != $row->owner_id ? date('Y-m-d H:i:s') : $row->last_assign_date;
+            u::query("UPDATE cms_parents SET owner_id= $owner_id,last_assign_date='$last_assign_date' WHERE id =$row->parent_id");
             LogParents::logAssign($row->parent_id,$row->owner_id,$owner_id,Auth::user()->id);
         }
         return response()->json("ok");
@@ -245,14 +249,11 @@ class ParentsController extends Controller
         if($parent_id){
             $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name, 
                     (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND status=1 ORDER BY care_date DESC LIMIT 1) AS care_date,
-                    (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1 ) AS total_care
+                    (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1 ) AS total_care, p.last_assign_date
                 FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  
                 WHERE (p.mobile_1='$phone' OR p.mobile_2='$phone') AND p.id!='$parent_id'");
             if($duplicate_info){
                 $result->status = 0;
-                if($duplicate_info->total_care>0){
-                    
-                }
                 $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name";
             }
             // $parent_info = u::first("SELECT mobile_1,mobile_2 FROM cms_parents WHERE id=$parent_id");
@@ -268,9 +269,9 @@ class ParentsController extends Controller
             //     }
             // }
         }else{
-            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name,
-                    (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND status=1 ORDER BY care_date DESC LIMIT 1) AS care_date,
-                    (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1 ) AS total_care
+            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name,p.status,
+                    (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND status=1 AND creator_id=p.owner_id ORDER BY care_date DESC LIMIT 1) AS care_date,
+                    (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1  AND creator_id=p.owner_id) AS total_care, p.last_assign_date
                 FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  WHERE (p.mobile_1='$phone' OR p.mobile_2='$phone') ");
             if($duplicate_info){
                 if($duplicate_info->is_lock==0){
@@ -278,7 +279,18 @@ class ParentsController extends Controller
                     $result->message = "Khách hàng có SĐT: $phone đã tồn tại trên hệ thống, bạn có muốn chăm sóc?";
                 }else{
                     $result->status = 0;
-                    $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name";
+                    $text = "";
+                    if($duplicate_info->total_care>0){
+                        $thoi_gian_con = 60 - ceil((time() - strtotime($duplicate_info->care_date))/(3600*24));
+                        $text.="<br> Thời gian chăm sóc gần nhất: $duplicate_info->care_date <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
+                    }else{
+                        $thoi_gian_con = 15 - ceil((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
+                        $text.="<br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
+                    }
+                    if(in_array($duplicate_info->status,[12,8,9,10])){
+                        $text.="<br> Khách hàng thuộc các trường hợp không được phép ghi đè";
+                    }
+                    $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name .".$text;
                 }
             }
             // $connection = DB::connection('mysql_crm');
@@ -301,6 +313,7 @@ class ParentsController extends Controller
                 'updated_at' => date('Y-m-d H:i:s'),
                 'updator_id' => Auth::user()->id,
                 'owner_id'=>Auth::user()->id,
+                'last_assign_date'=> date('Y-m-d H:i:s'),
             ), array('id' => $parent_info->id), 'cms_parents');
             u::insertSimpleRow(array(
                 'parent_id'=>$parent_info->id,
@@ -442,5 +455,20 @@ class ParentsController extends Controller
             'total_ra_duration' =>$total_ra_duration->duration,
         );
         return response()->json($data);
+    }
+    public function processParentLock(){
+        u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id ORDER BY id DESC LIMIT 1) WHERE p.is_lock=1 AND p.status NOT IN(12,9,8,10)");
+        u::query("UPDATE cms_parents SET is_lock = 0 
+            WHERE last_care_date IS NULL 
+                AND last_assign_date IS NOT NULL 
+                AND is_lock=1 AND status NOT IN(12,9,8,10)
+                AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
+        u::query("UPDATE cms_parents SET is_lock = 0 
+            WHERE
+                last_care_date IS NOT NULL 
+                AND last_assign_date IS NOT NULL 
+                AND is_lock=1 AND status NOT IN(12,9,8,10)
+                AND DATEDIFF( CURRENT_DATE, last_care_date )> 60");
+        return "ok";
     }
 }

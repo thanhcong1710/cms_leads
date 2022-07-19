@@ -15,6 +15,8 @@ class Kernel extends ConsoleKernel
     protected $commands = [
         '\App\Console\Commands\JobsDownloadVoip',
         '\App\Console\Commands\JobsProcessReport',
+        '\App\Console\Commands\JobsProcessImportCheckin',
+        '\App\Console\Commands\JobsProcessLockParent',
     ];
 
     /**
@@ -28,6 +30,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('jobsDownloadVoip:command')->cron('*/15 * * * *');
         $schedule->command('jobsProcessReport:command')->everySixHours();
         $schedule->command('jobsProcessImportCheckin:command')->cron('*/3 * * * *');
+        $schedule->command('jobsProcessLockParent:command')->cron('0 0 * * *');
     }
 
     /**
