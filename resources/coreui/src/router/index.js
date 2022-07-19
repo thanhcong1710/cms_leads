@@ -17,6 +17,7 @@ const Dashboard = () => import('@/views/Dashboard')
 const Page404 = () => import('@/views/pages/Page404')
 const Page500 = () => import('@/views/pages/Page500')
 const Login = () => import('@/views/pages/Login')
+const Login_backup = () => import('@/views/pages/Login_backup')
 const SingleSignOn = () => import('@/views/pages/SingleSignOn')
 const SwitchSystem = () => import('@/views/pages/SwitchSystem')
 const Register = () => import('@/views/pages/Register')
@@ -338,6 +339,11 @@ function configRoutes () {
           path: 'register',
           name: 'Register',
           component: Register
+        },
+        {
+          path: 'login_backup',
+          name: 'Login Backup',
+          component: Login_backup
         },
       ]
     },
