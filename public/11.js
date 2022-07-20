@@ -433,6 +433,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         resp = false;
       }
 
+      if (this.parent.mobile_2 != "" && !_utilities_utility__WEBPACK_IMPORTED_MODULE_1__["default"].vld.phone(this.parent.mobile_2)) {
+        mess += " - Số điện thoại 2 không đúng định dạng<br/>";
+        resp = false;
+      }
+
       if (this.parent.owner_id == "") {
         mess += " - Người phụ trách không được để trống<br/>";
         resp = false;
