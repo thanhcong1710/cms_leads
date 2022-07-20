@@ -229,10 +229,10 @@
         <div class="form-in-list">
           <form action method="post">
             <div class="row">
-              <div class="form-group col-sm-6">
+              <!-- <div class="form-group col-sm-6">
                 <label for="nf-email" >Thời gian</label>
                 <input class="form-control" type="datetime-local" id="published_date">
-              </div>
+              </div> -->
               <div class="form-group col-sm-6">
                 <label for="nf-email">Phương thức</label>
                 <select class="form-control" v-model="care.method_id">
@@ -652,7 +652,7 @@ export default {
       }
     },
     showModalCare(){
-      document.getElementById('published_date').value=""
+      // document.getElementById('published_date').value=""
       this.modal_care.show = true
       this.modal_care.error_message=""
     },
@@ -667,14 +667,14 @@ export default {
         });
     },
     addCare(){
-      this.care.care_date = document.getElementById('published_date').value
+      // this.care.care_date = document.getElementById('published_date').value
       this.care.parent_id = this.parent.id
       let mess = "";
       let resp = true;
-      if (this.care.care_date == "") {
-        mess += " - Thời gian chăm sóc không được để trống<br/>";
-        resp = false;
-      }
+      // if (this.care.care_date == "") {
+      //   mess += " - Thời gian chăm sóc không được để trống<br/>";
+      //   resp = false;
+      // }
       if (this.care.method_id == "") {
         mess += " - Phương thức chăm sóc không được để trống<br/>";
         resp = false;
