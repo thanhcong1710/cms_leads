@@ -39,7 +39,7 @@ class ReportsController extends Controller
         $total = u::first("SELECT count(p.id) AS total FROM cms_parents AS p 
                     LEFT JOIN users AS u ON p.owner_id = u.id
                     LEFT JOIN cms_branches AS b ON b.id = u.branch_id WHERE $cond ");
-        $list = u::query("SELECT p.id, p.name AS parent_name,p.status,
+        $list = u::query("SELECT p.id, p.name AS parent_name,p.status,p.mobile_1,p.last_assign_date,
                 (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 1) AS student_name,
                 (SELECT DATE_FORMAT(birthday,'%Y') FROM cms_students WHERE parent_id=p.id  LIMIT 1) AS student_year,
                 (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
@@ -53,6 +53,13 @@ class ReportsController extends Controller
                 LEFT JOIN users AS u ON p.owner_id = u.id
                 LEFT JOIN cms_branches AS b ON b.id = u.branch_id
             WHERE $cond ORDER BY p.id DESC $limitation");
+        foreach($list AS $k=>$row){
+            if($row->last_care_date){
+                $list[$k]->day_no_care = ceil((time()-strtotime($row->last_care_date))/(24*3600));
+            }else{
+                $list[$k]->day_no_care = ceil((time()-strtotime($row->last_assign_date))/(24*3600));
+            }
+        }
             
         $data = u::makingPagination($list, $total->total, $page, $limit);
         return response()->json($data);

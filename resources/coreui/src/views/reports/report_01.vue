@@ -53,6 +53,7 @@
                   <th>#</th>
                   <th>Mã KH</th>
                   <th>Tên KH</th>
+                  <th>SĐT</th>
                   <th>Tên HS</th>
                   <th>Năm sinh</th>
                   <th>Nguồn</th>
@@ -63,6 +64,7 @@
                   <th>Ngày chăm sóc gần nhất</th>
                   <th>Hình thức chăm sóc gần nhất</th>
                   <th>Tổng số lần tương tác</th>
+                  <th>Thời gian chưa chăm sóc</th>
                 </tr>
               </thead>
               <tbody>
@@ -72,6 +74,7 @@
                   </td>
                   <td>{{item.id}}</td>
                   <td>{{ item.parent_name }}</td>
+                  <td>{{ item.mobile_1 }}</td>
                   <td>{{ item.student_name }}</td>
                   <td>{{ item.student_year }}</td>
                   <td>{{ item.source_name }}</td>
@@ -82,6 +85,7 @@
                   <td>{{ item.last_care_date}}</td>
                   <td>{{ item.last_method}}</td>
                   <td>{{ item.total_care}}</td>
+                  <td>{{ item.day_no_care}}</td>
                 </tr>
               </tbody>
             </table>
