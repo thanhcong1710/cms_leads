@@ -485,6 +485,21 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -609,25 +624,37 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         description: '',
         show_input_note: false,
         care_id: '',
-        note: ''
+        note: '',
+        select_note: ''
       },
       sms: {
         content: '',
         show: false,
         title: 'Gửi tin nhắn SMS',
         phone: ''
-      }
+      },
+      template_note: [],
+      disabled_action: false
     };
   },
   created: function created() {
     var _this = this;
 
-    this.$socket.emit('userConnected', localStorage.getItem("user_id"));
+    var arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
+
+    if (arr_role.indexOf("Supervisor") > -1) {
+      this.disabled_action = true;
+    } // this.$socket.emit('userConnected', localStorage.getItem("user_id"));
+
+
     _utilities_utility__WEBPACK_IMPORTED_MODULE_1__["default"].g("/api/user/get-users-manager").then(function (response) {
       _this.users_manager = response.data;
     });
     _utilities_utility__WEBPACK_IMPORTED_MODULE_1__["default"].g("/api/methods").then(function (response) {
       _this.methods = response.data;
+    });
+    _utilities_utility__WEBPACK_IMPORTED_MODULE_1__["default"].g("/api/template_note").then(function (response) {
+      _this.template_note = response.data;
     });
     this.loadCares(this.$route.params.id);
     this.loadStudents(this.$route.params.id);
@@ -643,13 +670,20 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.loading.processing = true;
       _utilities_utility__WEBPACK_IMPORTED_MODULE_1__["default"].g("/api/parents/show/".concat(this.$route.params.id)).then(function (response) {
         _this2.loading.processing = false;
-        _this2.parent = response.data;
-        _this2.tmp_owner_id = response.data.owner_id;
-        _this2.tmp_status = response.data.status;
 
-        if (_this2.parent.branch_id != 0) {
-          _this2.modal_checkin.branch_id = _this2.parent.branch_id;
-          _this2.modal_checkin.disabled = true;
+        if (response.data.length !== 0) {
+          _this2.parent = response.data;
+          _this2.tmp_owner_id = response.data.owner_id;
+          _this2.tmp_status = response.data.status;
+
+          if (_this2.parent.branch_id != 0) {
+            _this2.modal_checkin.branch_id = _this2.parent.branch_id;
+            _this2.modal_checkin.disabled = true;
+          }
+        } else {
+          _this2.$router.push({
+            path: "/parents"
+          });
         }
       });
     },
@@ -681,7 +715,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       }
     },
     showModalCare: function showModalCare() {
-      document.getElementById('published_date').value = "";
+      // document.getElementById('published_date').value=""
       this.modal_care.show = true;
       this.modal_care.error_message = "";
     },
@@ -697,15 +731,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
     addCare: function addCare() {
       var _this4 = this;
 
-      this.care.care_date = document.getElementById('published_date').value;
+      // this.care.care_date = document.getElementById('published_date').value
       this.care.parent_id = this.parent.id;
       var mess = "";
-      var resp = true;
-
-      if (this.care.care_date == "") {
-        mess += " - Thời gian chăm sóc không được để trống<br/>";
-        resp = false;
-      }
+      var resp = true; // if (this.care.care_date == "") {
+      //   mess += " - Thời gian chăm sóc không được để trống<br/>";
+      //   resp = false;
+      // }
 
       if (this.care.method_id == "") {
         mess += " - Phương thức chăm sóc không được để trống<br/>";
@@ -984,7 +1016,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
           break;
 
         default:
-          resp = '';
+          resp = text;
           break;
       }
 
@@ -1041,6 +1073,13 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       } else {
         this.modal_checkin.error_message = mess;
       }
+    },
+    showModalUpdateCheckin: function showModalUpdateCheckin(item) {
+      this.modal_checkin.show = true;
+      this.modal_checkin.student_id = item.id;
+      this.modal_checkin.branch_id = item.checkin_branch_id;
+      this.modal_checkin.checkin_at = item.checkin_at;
+      this.modal_checkin.error_message = "";
     }
   },
   filters: {
@@ -1074,7 +1113,11 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       console.log('socket to notification channel connected');
     },
     call_end: function call_end(data) {
-      this.getInfoCall(data);
+      console.log(data);
+
+      if (data.user_id == localStorage.getItem("user_id")) {
+        this.getInfoCall(data);
+      }
     }
   }
 });
@@ -1271,17 +1314,20 @@ var render = function() {
                               _vm._s(_vm.parent.name) +
                                 " \n                    "
                             ),
-                            _c(
-                              "router-link",
-                              {
-                                staticClass: "btn btn-sm btn-outline-primary",
-                                staticStyle: { padding: "2px 6px" },
-                                attrs: {
-                                  to: "/parents/" + _vm.parent.id + "/edit"
-                                }
-                              },
-                              [_c("i", { staticClass: "fa fa-edit" })]
-                            )
+                            !_vm.disabled_action
+                              ? _c(
+                                  "router-link",
+                                  {
+                                    staticClass:
+                                      "btn btn-sm btn-outline-primary",
+                                    staticStyle: { padding: "2px 6px" },
+                                    attrs: {
+                                      to: "/parents/" + _vm.parent.id + "/edit"
+                                    }
+                                  },
+                                  [_c("i", { staticClass: "fa fa-edit" })]
+                                )
+                              : _vm._e()
                           ],
                           1
                         ),
@@ -1296,6 +1342,7 @@ var render = function() {
                             {
                               staticClass: "btn btn-sm btn-outline-primary",
                               staticStyle: { padding: "2px 6px" },
+                              attrs: { disabled: _vm.disabled_action },
                               on: {
                                 click: function($event) {
                                   return _vm.callPhone(_vm.parent.mobile_1)
@@ -1310,6 +1357,7 @@ var render = function() {
                             {
                               staticClass: "btn btn-sm btn-outline-primary",
                               staticStyle: { padding: "2px 6px" },
+                              attrs: { disabled: _vm.disabled_action },
                               on: {
                                 click: function($event) {
                                   return _vm.showSendSms(_vm.parent.mobile_1)
@@ -1331,6 +1379,7 @@ var render = function() {
                                 {
                                   staticClass: "btn btn-sm btn-outline-primary",
                                   staticStyle: { padding: "2px 6px" },
+                                  attrs: { disabled: _vm.disabled_action },
                                   on: {
                                     click: function($event) {
                                       return _vm.callPhone(_vm.parent.mobile_2)
@@ -1345,6 +1394,7 @@ var render = function() {
                                 {
                                   staticClass: "btn btn-sm btn-outline-primary",
                                   staticStyle: { padding: "2px 6px" },
+                                  attrs: { disabled: _vm.disabled_action },
                                   on: {
                                     click: function($event) {
                                       return _vm.showSendSms(
@@ -1396,6 +1446,7 @@ var render = function() {
                               }
                             ],
                             staticClass: "form-control",
+                            attrs: { disabled: _vm.disabled_action },
                             on: {
                               change: [
                                 function($event) {
@@ -1418,35 +1469,51 @@ var render = function() {
                           },
                           [
                             _c("option", { attrs: { value: "1" } }, [
-                              _vm._v("Data")
+                              _vm._v("KH mới")
                             ]),
                             _vm._v(" "),
                             _c("option", { attrs: { value: "2" } }, [
-                              _vm._v("Khai thác")
+                              _vm._v("KH tiềm năng")
                             ]),
                             _vm._v(" "),
                             _c("option", { attrs: { value: "3" } }, [
-                              _vm._v("Đồng ý đặt lịch")
+                              _vm._v("KH tiềm năng cần follow up")
                             ]),
                             _vm._v(" "),
                             _c("option", { attrs: { value: "4" } }, [
-                              _vm._v("Checkin")
+                              _vm._v("KH bận gọi lại sau")
                             ]),
                             _vm._v(" "),
                             _c("option", { attrs: { value: "5" } }, [
-                              _vm._v("Đăng ký mua")
+                              _vm._v("KH không nghe máy")
                             ]),
                             _vm._v(" "),
                             _c("option", { attrs: { value: "6" } }, [
-                              _vm._v("Tái tục")
+                              _vm._v("KH đồng ý đặt lịch checkin")
                             ]),
                             _vm._v(" "),
                             _c("option", { attrs: { value: "7" } }, [
-                              _vm._v("Không tiềm năng")
+                              _vm._v("KH đã đến checkin")
                             ]),
                             _vm._v(" "),
                             _c("option", { attrs: { value: "8" } }, [
-                              _vm._v("Black list")
+                              _vm._v("KH đã mua gói phí")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "9" } }, [
+                              _vm._v("KH không có nhu cầu")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "10" } }, [
+                              _vm._v("KH không tiềm năng")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "11" } }, [
+                              _vm._v("KH đến hạn tái tục")
+                            ]),
+                            _vm._v(" "),
+                            _c("option", { attrs: { value: "12" } }, [
+                              _vm._v("Danh sách đen")
                             ])
                           ]
                         )
@@ -1470,6 +1537,7 @@ var render = function() {
                             }
                           ],
                           staticClass: "form-control",
+                          attrs: { disabled: _vm.disabled_action },
                           on: {
                             change: [
                               function($event) {
@@ -1520,7 +1588,8 @@ var render = function() {
                           staticClass: "form-control",
                           attrs: {
                             type: "datetime-local",
-                            id: "next_care_date"
+                            id: "next_care_date",
+                            disabled: _vm.disabled_action
                           },
                           domProps: { value: _vm.parent.next_care_date },
                           on: { change: _vm.updateNextCareDate }
@@ -1598,6 +1667,13 @@ var render = function() {
                         _vm._v("Nguồn: "),
                         _c("span", { staticClass: "fl-right" }, [
                           _vm._v(_vm._s(_vm.parent.source_name))
+                        ])
+                      ]),
+                      _vm._v(" "),
+                      _c("p", [
+                        _vm._v("Nguồn chi tiết: "),
+                        _c("span", { staticClass: "fl-right" }, [
+                          _vm._v(_vm._s(_vm.parent.source_detail_name))
                         ])
                       ]),
                       _vm._v(" "),
@@ -1754,6 +1830,70 @@ var render = function() {
                             }),
                             _vm._v(" "),
                             _c("div", [
+                              _c(
+                                "select",
+                                {
+                                  directives: [
+                                    {
+                                      name: "model",
+                                      rawName: "v-model",
+                                      value: _vm.phone.select_note,
+                                      expression: "phone.select_note"
+                                    }
+                                  ],
+                                  staticClass: "form-control",
+                                  on: {
+                                    change: [
+                                      function($event) {
+                                        var $$selectedVal = Array.prototype.filter
+                                          .call($event.target.options, function(
+                                            o
+                                          ) {
+                                            return o.selected
+                                          })
+                                          .map(function(o) {
+                                            var val =
+                                              "_value" in o ? o._value : o.value
+                                            return val
+                                          })
+                                        _vm.$set(
+                                          _vm.phone,
+                                          "select_note",
+                                          $event.target.multiple
+                                            ? $$selectedVal
+                                            : $$selectedVal[0]
+                                        )
+                                      },
+                                      function($event) {
+                                        _vm.phone.note = _vm.phone.select_note
+                                      }
+                                    ]
+                                  }
+                                },
+                                [
+                                  _c("option", { attrs: { value: "" } }, [
+                                    _vm._v("Sử dụng mẫu trả lời")
+                                  ]),
+                                  _vm._v(" "),
+                                  _vm._l(_vm.template_note, function(
+                                    item,
+                                    index
+                                  ) {
+                                    return _c(
+                                      "option",
+                                      {
+                                        key: index,
+                                        domProps: { value: item.title }
+                                      },
+                                      [_vm._v(_vm._s(item.title))]
+                                    )
+                                  })
+                                ],
+                                2
+                              ),
+                              _vm._v(" "),
+                              _c("br"),
+                              _vm._v(" "),
                               _c("textarea", {
                                 directives: [
                                   {
@@ -1780,7 +1920,7 @@ var render = function() {
                                 }
                               }),
                               _vm._v(" "),
-                              _vm.phone.show_input_note
+                              _vm.phone.show_input_note || 1 == 1
                                 ? _c(
                                     "div",
                                     {
@@ -1801,24 +1941,6 @@ var render = function() {
                                             staticClass: "fa fa-save"
                                           }),
                                           _vm._v(" Lưu")
-                                        ]
-                                      ),
-                                      _vm._v(" "),
-                                      _c(
-                                        "button",
-                                        {
-                                          staticClass: "btn btn-secondary",
-                                          on: {
-                                            click: function($event) {
-                                              _vm.phone.show = false
-                                            }
-                                          }
-                                        },
-                                        [
-                                          _c("i", {
-                                            staticClass: "fa fa-times"
-                                          }),
-                                          _vm._v(" Đóng")
                                         ]
                                       )
                                     ]
@@ -1907,6 +2029,7 @@ var render = function() {
                                 "button",
                                 {
                                   staticClass: "btn btn-success",
+                                  attrs: { disabled: _vm.disabled_action },
                                   on: { click: _vm.showModalCare }
                                 },
                                 [
@@ -1938,6 +2061,10 @@ var render = function() {
                                         ]),
                                         _vm._v(" "),
                                         _c("td", { attrs: { width: "10%" } }, [
+                                          _vm._v(_vm._s(item.branch_name))
+                                        ]),
+                                        _vm._v(" "),
+                                        _c("td", { attrs: { width: "10%" } }, [
                                           _vm._v(
                                             _vm._s(item.method_name) +
                                               _vm._s(
@@ -1952,8 +2079,13 @@ var render = function() {
                                           _vm._v(
                                             _vm._s(
                                               _vm.genStateCall(item.data_state)
-                                            )
-                                          )
+                                            ) + " "
+                                          ),
+                                          item.status == 0
+                                            ? _c("span", [
+                                                _vm._v(" - Không kích hoạt")
+                                              ])
+                                            : _vm._e()
                                         ]),
                                         _vm._v(" "),
                                         _c("td", { attrs: { width: "25%" } }, [
@@ -2010,6 +2142,7 @@ var render = function() {
                                 "button",
                                 {
                                   staticClass: "btn btn-success",
+                                  attrs: { disabled: _vm.disabled_action },
                                   on: {
                                     click: function($event) {
                                       return _vm.showModalStudent(0)
@@ -2048,6 +2181,9 @@ var render = function() {
                                               {
                                                 staticClass:
                                                   "btn btn-sm btn-success",
+                                                attrs: {
+                                                  disabled: _vm.disabled_action
+                                                },
                                                 on: {
                                                   click: function($event) {
                                                     return _vm.showModalStudent(
@@ -2069,6 +2205,10 @@ var render = function() {
                                                   {
                                                     staticClass:
                                                       "btn btn-sm btn-danger",
+                                                    attrs: {
+                                                      disabled:
+                                                        _vm.disabled_action
+                                                    },
                                                     on: {
                                                       click: function($event) {
                                                         return _vm.showModalCheckin(
@@ -2160,6 +2300,42 @@ var render = function() {
                                                     "Thời gian checkin: " +
                                                       _vm._s(item.checkin_at)
                                                   )
+                                                ])
+                                              : _vm._e(),
+                                            _vm._v(" "),
+                                            item.status > 0
+                                              ? _c("p", [
+                                                  _vm._v(
+                                                    "Cập nhật checkin: \n                              "
+                                                  ),
+                                                  item.status > 0
+                                                    ? _c(
+                                                        "button",
+                                                        {
+                                                          staticClass:
+                                                            "btn btn-sm btn-success",
+                                                          attrs: {
+                                                            disabled:
+                                                              _vm.disabled_action
+                                                          },
+                                                          on: {
+                                                            click: function(
+                                                              $event
+                                                            ) {
+                                                              return _vm.showModalUpdateCheckin(
+                                                                item
+                                                              )
+                                                            }
+                                                          }
+                                                        },
+                                                        [
+                                                          _c("i", {
+                                                            staticClass:
+                                                              "fa fa-edit"
+                                                          })
+                                                        ]
+                                                      )
+                                                    : _vm._e()
                                                 ])
                                               : _vm._e()
                                           ]
@@ -2285,17 +2461,6 @@ var render = function() {
             _c("div", { staticClass: "form-in-list" }, [
               _c("form", { attrs: { action: "", method: "post" } }, [
                 _c("div", { staticClass: "row" }, [
-                  _c("div", { staticClass: "form-group col-sm-6" }, [
-                    _c("label", { attrs: { for: "nf-email" } }, [
-                      _vm._v("Thời gian")
-                    ]),
-                    _vm._v(" "),
-                    _c("input", {
-                      staticClass: "form-control",
-                      attrs: { type: "datetime-local", id: "published_date" }
-                    })
-                  ]),
-                  _vm._v(" "),
                   _c("div", { staticClass: "form-group col-sm-6" }, [
                     _c("label", { attrs: { for: "nf-email" } }, [
                       _vm._v("Phương thức")
@@ -2941,6 +3106,8 @@ var staticRenderFns = [
         _vm._v(" "),
         _c("th", { attrs: { width: "10%" } }, [_vm._v("Phụ trách")]),
         _vm._v(" "),
+        _c("th", { attrs: { width: "10%" } }, [_vm._v("Trung tâm")]),
+        _vm._v(" "),
         _c("th", { attrs: { width: "10%" } }, [_vm._v("Phương thức")]),
         _vm._v(" "),
         _c("th", { attrs: { width: "10%" } }, [_vm._v("Trạng thái")]),
@@ -3003,8 +3170,6 @@ var map = {
 	"./bm": "./resources/coreui/node_modules/moment/locale/bm.js",
 	"./bm.js": "./resources/coreui/node_modules/moment/locale/bm.js",
 	"./bn": "./resources/coreui/node_modules/moment/locale/bn.js",
-	"./bn-bd": "./resources/coreui/node_modules/moment/locale/bn-bd.js",
-	"./bn-bd.js": "./resources/coreui/node_modules/moment/locale/bn-bd.js",
 	"./bn.js": "./resources/coreui/node_modules/moment/locale/bn.js",
 	"./bo": "./resources/coreui/node_modules/moment/locale/bo.js",
 	"./bo.js": "./resources/coreui/node_modules/moment/locale/bo.js",
@@ -3032,6 +3197,8 @@ var map = {
 	"./dv.js": "./resources/coreui/node_modules/moment/locale/dv.js",
 	"./el": "./resources/coreui/node_modules/moment/locale/el.js",
 	"./el.js": "./resources/coreui/node_modules/moment/locale/el.js",
+	"./en-SG": "./resources/coreui/node_modules/moment/locale/en-SG.js",
+	"./en-SG.js": "./resources/coreui/node_modules/moment/locale/en-SG.js",
 	"./en-au": "./resources/coreui/node_modules/moment/locale/en-au.js",
 	"./en-au.js": "./resources/coreui/node_modules/moment/locale/en-au.js",
 	"./en-ca": "./resources/coreui/node_modules/moment/locale/en-ca.js",
@@ -3042,19 +3209,13 @@ var map = {
 	"./en-ie.js": "./resources/coreui/node_modules/moment/locale/en-ie.js",
 	"./en-il": "./resources/coreui/node_modules/moment/locale/en-il.js",
 	"./en-il.js": "./resources/coreui/node_modules/moment/locale/en-il.js",
-	"./en-in": "./resources/coreui/node_modules/moment/locale/en-in.js",
-	"./en-in.js": "./resources/coreui/node_modules/moment/locale/en-in.js",
 	"./en-nz": "./resources/coreui/node_modules/moment/locale/en-nz.js",
 	"./en-nz.js": "./resources/coreui/node_modules/moment/locale/en-nz.js",
-	"./en-sg": "./resources/coreui/node_modules/moment/locale/en-sg.js",
-	"./en-sg.js": "./resources/coreui/node_modules/moment/locale/en-sg.js",
 	"./eo": "./resources/coreui/node_modules/moment/locale/eo.js",
 	"./eo.js": "./resources/coreui/node_modules/moment/locale/eo.js",
 	"./es": "./resources/coreui/node_modules/moment/locale/es.js",
 	"./es-do": "./resources/coreui/node_modules/moment/locale/es-do.js",
 	"./es-do.js": "./resources/coreui/node_modules/moment/locale/es-do.js",
-	"./es-mx": "./resources/coreui/node_modules/moment/locale/es-mx.js",
-	"./es-mx.js": "./resources/coreui/node_modules/moment/locale/es-mx.js",
 	"./es-us": "./resources/coreui/node_modules/moment/locale/es-us.js",
 	"./es-us.js": "./resources/coreui/node_modules/moment/locale/es-us.js",
 	"./es.js": "./resources/coreui/node_modules/moment/locale/es.js",
@@ -3066,8 +3227,6 @@ var map = {
 	"./fa.js": "./resources/coreui/node_modules/moment/locale/fa.js",
 	"./fi": "./resources/coreui/node_modules/moment/locale/fi.js",
 	"./fi.js": "./resources/coreui/node_modules/moment/locale/fi.js",
-	"./fil": "./resources/coreui/node_modules/moment/locale/fil.js",
-	"./fil.js": "./resources/coreui/node_modules/moment/locale/fil.js",
 	"./fo": "./resources/coreui/node_modules/moment/locale/fo.js",
 	"./fo.js": "./resources/coreui/node_modules/moment/locale/fo.js",
 	"./fr": "./resources/coreui/node_modules/moment/locale/fr.js",
@@ -3084,8 +3243,6 @@ var map = {
 	"./gd.js": "./resources/coreui/node_modules/moment/locale/gd.js",
 	"./gl": "./resources/coreui/node_modules/moment/locale/gl.js",
 	"./gl.js": "./resources/coreui/node_modules/moment/locale/gl.js",
-	"./gom-deva": "./resources/coreui/node_modules/moment/locale/gom-deva.js",
-	"./gom-deva.js": "./resources/coreui/node_modules/moment/locale/gom-deva.js",
 	"./gom-latn": "./resources/coreui/node_modules/moment/locale/gom-latn.js",
 	"./gom-latn.js": "./resources/coreui/node_modules/moment/locale/gom-latn.js",
 	"./gu": "./resources/coreui/node_modules/moment/locale/gu.js",
@@ -3164,8 +3321,6 @@ var map = {
 	"./nl.js": "./resources/coreui/node_modules/moment/locale/nl.js",
 	"./nn": "./resources/coreui/node_modules/moment/locale/nn.js",
 	"./nn.js": "./resources/coreui/node_modules/moment/locale/nn.js",
-	"./oc-lnc": "./resources/coreui/node_modules/moment/locale/oc-lnc.js",
-	"./oc-lnc.js": "./resources/coreui/node_modules/moment/locale/oc-lnc.js",
 	"./pa-in": "./resources/coreui/node_modules/moment/locale/pa-in.js",
 	"./pa-in.js": "./resources/coreui/node_modules/moment/locale/pa-in.js",
 	"./pl": "./resources/coreui/node_modules/moment/locale/pl.js",
@@ -3210,8 +3365,6 @@ var map = {
 	"./tg.js": "./resources/coreui/node_modules/moment/locale/tg.js",
 	"./th": "./resources/coreui/node_modules/moment/locale/th.js",
 	"./th.js": "./resources/coreui/node_modules/moment/locale/th.js",
-	"./tk": "./resources/coreui/node_modules/moment/locale/tk.js",
-	"./tk.js": "./resources/coreui/node_modules/moment/locale/tk.js",
 	"./tl-ph": "./resources/coreui/node_modules/moment/locale/tl-ph.js",
 	"./tl-ph.js": "./resources/coreui/node_modules/moment/locale/tl-ph.js",
 	"./tlh": "./resources/coreui/node_modules/moment/locale/tlh.js",
@@ -3244,8 +3397,6 @@ var map = {
 	"./zh-cn.js": "./resources/coreui/node_modules/moment/locale/zh-cn.js",
 	"./zh-hk": "./resources/coreui/node_modules/moment/locale/zh-hk.js",
 	"./zh-hk.js": "./resources/coreui/node_modules/moment/locale/zh-hk.js",
-	"./zh-mo": "./resources/coreui/node_modules/moment/locale/zh-mo.js",
-	"./zh-mo.js": "./resources/coreui/node_modules/moment/locale/zh-mo.js",
 	"./zh-tw": "./resources/coreui/node_modules/moment/locale/zh-tw.js",
 	"./zh-tw.js": "./resources/coreui/node_modules/moment/locale/zh-tw.js"
 };

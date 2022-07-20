@@ -19302,6 +19302,12 @@ fieldset[disabled] .multiselect {
   left: 1px;
 }
 
+.table thead th,
+.table td {
+  border-right: 1px solid #d8dbe0;
+  text-align: center;
+}
+
 var map = {
 	"./af": "./resources/coreui/node_modules/moment/locale/af.js",
 	"./af.js": "./resources/coreui/node_modules/moment/locale/af.js",
@@ -19328,8 +19334,6 @@ var map = {
 	"./bm": "./resources/coreui/node_modules/moment/locale/bm.js",
 	"./bm.js": "./resources/coreui/node_modules/moment/locale/bm.js",
 	"./bn": "./resources/coreui/node_modules/moment/locale/bn.js",
-	"./bn-bd": "./resources/coreui/node_modules/moment/locale/bn-bd.js",
-	"./bn-bd.js": "./resources/coreui/node_modules/moment/locale/bn-bd.js",
 	"./bn.js": "./resources/coreui/node_modules/moment/locale/bn.js",
 	"./bo": "./resources/coreui/node_modules/moment/locale/bo.js",
 	"./bo.js": "./resources/coreui/node_modules/moment/locale/bo.js",
@@ -19357,6 +19361,8 @@ var map = {
 	"./dv.js": "./resources/coreui/node_modules/moment/locale/dv.js",
 	"./el": "./resources/coreui/node_modules/moment/locale/el.js",
 	"./el.js": "./resources/coreui/node_modules/moment/locale/el.js",
+	"./en-SG": "./resources/coreui/node_modules/moment/locale/en-SG.js",
+	"./en-SG.js": "./resources/coreui/node_modules/moment/locale/en-SG.js",
 	"./en-au": "./resources/coreui/node_modules/moment/locale/en-au.js",
 	"./en-au.js": "./resources/coreui/node_modules/moment/locale/en-au.js",
 	"./en-ca": "./resources/coreui/node_modules/moment/locale/en-ca.js",
@@ -19367,19 +19373,13 @@ var map = {
 	"./en-ie.js": "./resources/coreui/node_modules/moment/locale/en-ie.js",
 	"./en-il": "./resources/coreui/node_modules/moment/locale/en-il.js",
 	"./en-il.js": "./resources/coreui/node_modules/moment/locale/en-il.js",
-	"./en-in": "./resources/coreui/node_modules/moment/locale/en-in.js",
-	"./en-in.js": "./resources/coreui/node_modules/moment/locale/en-in.js",
 	"./en-nz": "./resources/coreui/node_modules/moment/locale/en-nz.js",
 	"./en-nz.js": "./resources/coreui/node_modules/moment/locale/en-nz.js",
-	"./en-sg": "./resources/coreui/node_modules/moment/locale/en-sg.js",
-	"./en-sg.js": "./resources/coreui/node_modules/moment/locale/en-sg.js",
 	"./eo": "./resources/coreui/node_modules/moment/locale/eo.js",
 	"./eo.js": "./resources/coreui/node_modules/moment/locale/eo.js",
 	"./es": "./resources/coreui/node_modules/moment/locale/es.js",
 	"./es-do": "./resources/coreui/node_modules/moment/locale/es-do.js",
 	"./es-do.js": "./resources/coreui/node_modules/moment/locale/es-do.js",
-	"./es-mx": "./resources/coreui/node_modules/moment/locale/es-mx.js",
-	"./es-mx.js": "./resources/coreui/node_modules/moment/locale/es-mx.js",
 	"./es-us": "./resources/coreui/node_modules/moment/locale/es-us.js",
 	"./es-us.js": "./resources/coreui/node_modules/moment/locale/es-us.js",
 	"./es.js": "./resources/coreui/node_modules/moment/locale/es.js",
@@ -19391,8 +19391,6 @@ var map = {
 	"./fa.js": "./resources/coreui/node_modules/moment/locale/fa.js",
 	"./fi": "./resources/coreui/node_modules/moment/locale/fi.js",
 	"./fi.js": "./resources/coreui/node_modules/moment/locale/fi.js",
-	"./fil": "./resources/coreui/node_modules/moment/locale/fil.js",
-	"./fil.js": "./resources/coreui/node_modules/moment/locale/fil.js",
 	"./fo": "./resources/coreui/node_modules/moment/locale/fo.js",
 	"./fo.js": "./resources/coreui/node_modules/moment/locale/fo.js",
 	"./fr": "./resources/coreui/node_modules/moment/locale/fr.js",
@@ -19409,8 +19407,6 @@ var map = {
 	"./gd.js": "./resources/coreui/node_modules/moment/locale/gd.js",
 	"./gl": "./resources/coreui/node_modules/moment/locale/gl.js",
 	"./gl.js": "./resources/coreui/node_modules/moment/locale/gl.js",
-	"./gom-deva": "./resources/coreui/node_modules/moment/locale/gom-deva.js",
-	"./gom-deva.js": "./resources/coreui/node_modules/moment/locale/gom-deva.js",
 	"./gom-latn": "./resources/coreui/node_modules/moment/locale/gom-latn.js",
 	"./gom-latn.js": "./resources/coreui/node_modules/moment/locale/gom-latn.js",
 	"./gu": "./resources/coreui/node_modules/moment/locale/gu.js",
@@ -19489,8 +19485,6 @@ var map = {
 	"./nl.js": "./resources/coreui/node_modules/moment/locale/nl.js",
 	"./nn": "./resources/coreui/node_modules/moment/locale/nn.js",
 	"./nn.js": "./resources/coreui/node_modules/moment/locale/nn.js",
-	"./oc-lnc": "./resources/coreui/node_modules/moment/locale/oc-lnc.js",
-	"./oc-lnc.js": "./resources/coreui/node_modules/moment/locale/oc-lnc.js",
 	"./pa-in": "./resources/coreui/node_modules/moment/locale/pa-in.js",
 	"./pa-in.js": "./resources/coreui/node_modules/moment/locale/pa-in.js",
 	"./pl": "./resources/coreui/node_modules/moment/locale/pl.js",
@@ -19535,8 +19529,6 @@ var map = {
 	"./tg.js": "./resources/coreui/node_modules/moment/locale/tg.js",
 	"./th": "./resources/coreui/node_modules/moment/locale/th.js",
 	"./th.js": "./resources/coreui/node_modules/moment/locale/th.js",
-	"./tk": "./resources/coreui/node_modules/moment/locale/tk.js",
-	"./tk.js": "./resources/coreui/node_modules/moment/locale/tk.js",
 	"./tl-ph": "./resources/coreui/node_modules/moment/locale/tl-ph.js",
 	"./tl-ph.js": "./resources/coreui/node_modules/moment/locale/tl-ph.js",
 	"./tlh": "./resources/coreui/node_modules/moment/locale/tlh.js",
@@ -19569,8 +19561,6 @@ var map = {
 	"./zh-cn.js": "./resources/coreui/node_modules/moment/locale/zh-cn.js",
 	"./zh-hk": "./resources/coreui/node_modules/moment/locale/zh-hk.js",
 	"./zh-hk.js": "./resources/coreui/node_modules/moment/locale/zh-hk.js",
-	"./zh-mo": "./resources/coreui/node_modules/moment/locale/zh-mo.js",
-	"./zh-mo.js": "./resources/coreui/node_modules/moment/locale/zh-mo.js",
 	"./zh-tw": "./resources/coreui/node_modules/moment/locale/zh-tw.js",
 	"./zh-tw.js": "./resources/coreui/node_modules/moment/locale/zh-tw.js"
 };

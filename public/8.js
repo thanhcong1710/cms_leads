@@ -323,7 +323,7 @@ __webpack_require__.r(__webpack_exports__);
         title: "CUỘC GỌI ĐẾN TỪ KHÁCH HÀNG",
         show: false,
         color: "success",
-        closeOnBackdrop: true,
+        closeOnBackdrop: false,
         error_message: "",
         parent_id: '',
         name: '',
@@ -331,8 +331,7 @@ __webpack_require__.r(__webpack_exports__);
       }
     };
   },
-  created: function created() {
-    this.$socket.emit('userConnected', localStorage.getItem("user_id"));
+  created: function created() {// this.$socket.emit('userConnected', localStorage.getItem("user_id"));
   },
   methods: {
     changeLanguage: function changeLanguage() {
@@ -365,10 +364,14 @@ __webpack_require__.r(__webpack_exports__);
   },
   sockets: {
     inbound: function inbound(data) {
-      this.showModalInbound(data);
+      if (data.user_id == localStorage.getItem("user_id")) {
+        this.showModalInbound(data);
+      }
     },
     call_end: function call_end(data) {
-      this.changeModalInbound(data);
+      if (data.user_id == localStorage.getItem("user_id")) {
+        this.changeModalInbound(data);
+      }
     }
   }
 });
@@ -846,107 +849,7 @@ var render = function() {
       _c(
         "CHeaderNav",
         { staticClass: "mr-4" },
-        [
-          _c(
-            "CHeaderNavItem",
-            { staticClass: "d-md-down-none mx-2" },
-            [
-              _c("CHeaderNavLink", [
-                _c(
-                  "select",
-                  {
-                    directives: [
-                      {
-                        name: "model",
-                        rawName: "v-model",
-                        value: _vm.language,
-                        expression: "language"
-                      }
-                    ],
-                    on: {
-                      change: [
-                        function($event) {
-                          var $$selectedVal = Array.prototype.filter
-                            .call($event.target.options, function(o) {
-                              return o.selected
-                            })
-                            .map(function(o) {
-                              var val = "_value" in o ? o._value : o.value
-                              return val
-                            })
-                          _vm.language = $event.target.multiple
-                            ? $$selectedVal
-                            : $$selectedVal[0]
-                        },
-                        _vm.changeLanguage
-                      ]
-                    }
-                  },
-                  [
-                    _c("option", { attrs: { value: "vi" } }, [_vm._v("VI")]),
-                    _vm._v(" "),
-                    _c("option", { attrs: { value: "en" } }, [_vm._v("EN")])
-                  ]
-                )
-              ])
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "CHeaderNavItem",
-            { staticClass: "d-md-down-none mx-2" },
-            [
-              _c(
-                "CHeaderNavLink",
-                [_c("CIcon", { attrs: { name: "cil-envelope-open" } })],
-                1
-              )
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "CHeaderNavItem",
-            { staticClass: "d-md-down-none mx-2" },
-            [
-              _c(
-                "CHeaderNavLink",
-                [_c("CIcon", { attrs: { name: "cil-bell" } })],
-                1
-              )
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "CHeaderNavItem",
-            { staticClass: "d-md-down-none mx-2" },
-            [
-              _c(
-                "CHeaderNavLink",
-                [_c("CIcon", { attrs: { name: "cil-list" } })],
-                1
-              )
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c(
-            "CHeaderNavItem",
-            { staticClass: "d-md-down-none mx-2" },
-            [
-              _c(
-                "CHeaderNavLink",
-                [_c("CIcon", { attrs: { name: "cil-envelope-open" } })],
-                1
-              )
-            ],
-            1
-          ),
-          _vm._v(" "),
-          _c("TheHeaderDropdownAccnt")
-        ],
+        [_c("TheHeaderDropdownAccnt")],
         1
       ),
       _vm._v(" "),
@@ -1075,7 +978,7 @@ var render = function() {
                 _c("div", { staticClass: "c-avatar" }, [
                   _c("img", {
                     staticClass: "c-avatar-img ",
-                    attrs: { src: "img/avatars/6.jpg" }
+                    attrs: { src: "img/avatars/avatar.png" }
                   })
                 ])
               ])
@@ -1091,118 +994,6 @@ var render = function() {
         "CDropdownHeader",
         { staticClass: "text-center", attrs: { tag: "div", color: "light" } },
         [_c("strong", [_vm._v("Account")])]
-      ),
-      _vm._v(" "),
-      _c(
-        "CDropdownItem",
-        [
-          _c("CIcon", { attrs: { name: "cil-bell" } }),
-          _vm._v(" Updates\n    "),
-          _c("CBadge", { staticClass: "ml-auto", attrs: { color: "info" } }, [
-            _vm._v(_vm._s(_vm.itemsCount))
-          ])
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c(
-        "CDropdownItem",
-        [
-          _c("CIcon", { attrs: { name: "cil-envelope-open" } }),
-          _vm._v(" Messages\n    "),
-          _c(
-            "CBadge",
-            { staticClass: "ml-auto", attrs: { color: "success" } },
-            [_vm._v(_vm._s(_vm.itemsCount))]
-          )
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c(
-        "CDropdownItem",
-        [
-          _c("CIcon", { attrs: { name: "cil-task" } }),
-          _vm._v(" Tasks\n    "),
-          _c("CBadge", { staticClass: "ml-auto", attrs: { color: "danger" } }, [
-            _vm._v(_vm._s(_vm.itemsCount))
-          ])
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c(
-        "CDropdownItem",
-        [
-          _c("CIcon", { attrs: { name: "cil-comment-square" } }),
-          _vm._v(" Comments\n    "),
-          _c(
-            "CBadge",
-            { staticClass: "ml-auto", attrs: { color: "warning" } },
-            [_vm._v(_vm._s(_vm.itemsCount))]
-          )
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c(
-        "CDropdownHeader",
-        { staticClass: "text-center", attrs: { tag: "div", color: "light" } },
-        [_c("strong", [_vm._v("Settings")])]
-      ),
-      _vm._v(" "),
-      _c(
-        "CDropdownItem",
-        [_c("CIcon", { attrs: { name: "cil-user" } }), _vm._v(" Profile\n  ")],
-        1
-      ),
-      _vm._v(" "),
-      _c(
-        "CDropdownItem",
-        [
-          _c("CIcon", { attrs: { name: "cil-settings" } }),
-          _vm._v(" Settings\n  ")
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c(
-        "CDropdownItem",
-        [
-          _c("CIcon", { attrs: { name: "cil-dollar" } }),
-          _vm._v(" Payments\n    "),
-          _c(
-            "CBadge",
-            { staticClass: "ml-auto", attrs: { color: "secondary" } },
-            [_vm._v(_vm._s(_vm.itemsCount))]
-          )
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c(
-        "CDropdownItem",
-        [
-          _c("CIcon", { attrs: { name: "cil-file" } }),
-          _vm._v(" Projects\n    "),
-          _c(
-            "CBadge",
-            { staticClass: "ml-auto", attrs: { color: "primary" } },
-            [_vm._v(_vm._s(_vm.itemsCount))]
-          )
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c("CDropdownDivider"),
-      _vm._v(" "),
-      _c(
-        "CDropdownItem",
-        [
-          _c("CIcon", { attrs: { name: "cil-shield-alt" } }),
-          _vm._v(" Lock Account\n  ")
-        ],
-        1
       ),
       _vm._v(" "),
       _c(
