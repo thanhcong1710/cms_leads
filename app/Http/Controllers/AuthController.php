@@ -20,7 +20,7 @@ class AuthController extends Controller
     }
   
     /**
-     * Register new user.
+     * Register new user
      *
      * @return \Illuminate\Http\JsonResponse
      */
