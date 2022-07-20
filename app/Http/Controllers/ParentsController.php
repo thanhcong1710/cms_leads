@@ -280,12 +280,12 @@ class ParentsController extends Controller
                 }else{
                     $result->status = 0;
                     $text = "";
-                    if($duplicate_info->total_care>0){
+                    if(in_array($duplicate_info->branch_id,[5,9])){
+                        $thoi_gian_con = 60;
+                        $text.="<br> Thời gian chăm sóc gần nhất: ".date('Y-m-d H:i:s',time()-4800)." <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
+                    }elseif($duplicate_info->total_care>0){
                         $thoi_gian_con = 60 - ceil((time() - strtotime($duplicate_info->care_date))/(3600*24));
                         $text.="<br> Thời gian chăm sóc gần nhất: $duplicate_info->care_date <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
-                    }elseif(in_array($duplicate_info->branch_id,[5,9])){
-                        $thoi_gian_con = 60 - ceil((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
-                        $text.="<br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }else{
                         $thoi_gian_con = 15 - ceil((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
                         $text.="<br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
@@ -470,15 +470,11 @@ class ParentsController extends Controller
                 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE
-                (last_care_date IS NOT NULL 
+                last_care_date IS NOT NULL 
                 AND last_assign_date IS NOT NULL 
+                AND tmp_branch_id NOT IN (5,9)
                 AND is_lock=1 AND status NOT IN(12,9,8,10)
-                AND DATEDIFF( CURRENT_DATE, last_care_date )> 60) 
-                OR (last_care_date IS NULL 
-                    AND last_assign_date IS NOT NULL
-                    AND is_lock=1 AND status NOT IN(12,9,8,10)
-                    AND tmp_branch_id IN(5,9)
-                    AND DATEDIFF( CURRENT_DATE, last_assign_date )> 60)");
+                AND DATEDIFF( CURRENT_DATE, last_care_date )> 60");
         return "ok";
     }
 }
