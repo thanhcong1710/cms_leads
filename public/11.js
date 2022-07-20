@@ -282,6 +282,22 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -333,6 +349,10 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         source: {
           item: '',
           list: []
+        },
+        source_detail: {
+          item: '',
+          list: []
         }
       },
       parent: {
@@ -349,6 +369,8 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
         job_id: "",
         source_id: "",
         source: "",
+        source_detail_id: "",
+        source_detail: "",
         job: "",
         province: "",
         district: "",
@@ -374,6 +396,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     });
     _utilities_utility__WEBPACK_IMPORTED_MODULE_1__["default"].g("/api/sources").then(function (response) {
       _this.html.source.list = response.data;
+    });
+    _utilities_utility__WEBPACK_IMPORTED_MODULE_1__["default"].g("/api/source_detail").then(function (response) {
+      _this.html.source_detail.list = response.data;
     });
   },
   methods: {
@@ -410,6 +435,11 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 
       if (this.parent.owner_id == "") {
         mess += " - Người phụ trách không được để trống<br/>";
+        resp = false;
+      }
+
+      if (this.parent.source_id == "") {
+        mess += " - Nguồn không được để trống<br/>";
         resp = false;
       }
 
@@ -502,6 +532,18 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       } else {
         this.parent.source = "";
         this.parent.source_id = "";
+      }
+    },
+    saveSourceDetail: function saveSourceDetail() {
+      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      if (data && _typeof(data) === 'object') {
+        var source_id = data.id;
+        this.parent.source_detail = data;
+        this.parent.source_detail_id = source_id;
+      } else {
+        this.parent.source_detail = "";
+        this.parent.source_detail_id = "";
       }
     },
     validatePhone: function validatePhone() {
@@ -1145,9 +1187,7 @@ var render = function() {
                           "div",
                           { staticClass: "form-group col-sm-6" },
                           [
-                            _c("label", { attrs: { for: "nf-email" } }, [
-                              _vm._v("Nguồn")
-                            ]),
+                            _vm._m(5),
                             _vm._v(" "),
                             _c("vue-select", {
                               attrs: {
@@ -1164,6 +1204,35 @@ var render = function() {
                                   _vm.$set(_vm.parent, "source", $$v)
                                 },
                                 expression: "parent.source"
+                              }
+                            })
+                          ],
+                          1
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          { staticClass: "form-group col-sm-6" },
+                          [
+                            _c("label", { attrs: { for: "nf-email" } }, [
+                              _vm._v("Nguồn chi tiết")
+                            ]),
+                            _vm._v(" "),
+                            _c("vue-select", {
+                              attrs: {
+                                label: "name",
+                                placeholder: "Chọn nguồn chi tiết",
+                                options: _vm.html.source_detail.list,
+                                searchable: true,
+                                language: "tv-VN",
+                                onChange: _vm.saveSourceDetail
+                              },
+                              model: {
+                                value: _vm.parent.source_detail,
+                                callback: function($$v) {
+                                  _vm.$set(_vm.parent, "source_detail", $$v)
+                                },
+                                expression: "parent.source_detail"
                               }
                             })
                           ],
@@ -1210,35 +1279,51 @@ var render = function() {
                             },
                             [
                               _c("option", { attrs: { value: "1" } }, [
-                                _vm._v("Data")
+                                _vm._v("KH mới")
                               ]),
                               _vm._v(" "),
                               _c("option", { attrs: { value: "2" } }, [
-                                _vm._v("Khai thác")
+                                _vm._v("KH tiềm năng")
                               ]),
                               _vm._v(" "),
                               _c("option", { attrs: { value: "3" } }, [
-                                _vm._v("Đồng ý đặt lịch")
+                                _vm._v("KH tiềm năng cần follow up")
                               ]),
                               _vm._v(" "),
                               _c("option", { attrs: { value: "4" } }, [
-                                _vm._v("Checkin")
+                                _vm._v("KH bận gọi lại sau")
                               ]),
                               _vm._v(" "),
                               _c("option", { attrs: { value: "5" } }, [
-                                _vm._v("Đăng ký mua")
+                                _vm._v("KH không nghe máy")
                               ]),
                               _vm._v(" "),
                               _c("option", { attrs: { value: "6" } }, [
-                                _vm._v("Tái tục")
+                                _vm._v("KH đồng ý đặt lịch checkin")
                               ]),
                               _vm._v(" "),
                               _c("option", { attrs: { value: "7" } }, [
-                                _vm._v("Không tiềm năng")
+                                _vm._v("KH đã đến checkin")
                               ]),
                               _vm._v(" "),
                               _c("option", { attrs: { value: "8" } }, [
-                                _vm._v("Black list")
+                                _vm._v("KH đã mua gói phí")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "9" } }, [
+                                _vm._v("KH không có nhu cầu")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "10" } }, [
+                                _vm._v("KH không tiềm năng")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "11" } }, [
+                                _vm._v("KH đến hạn tái tục")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "12" } }, [
+                                _vm._v("Danh sách đen")
                               ])
                             ]
                           )
@@ -1485,6 +1570,15 @@ var staticRenderFns = [
       _vm._v("Người phụ trách "),
       _c("span", { staticClass: "text-danger" }, [_vm._v(" (*)")])
     ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("label", { attrs: { for: "nf-email" } }, [
+      _vm._v("Nguồn  "),
+      _c("span", { staticClass: "text-danger" }, [_vm._v(" (*)")])
+    ])
   }
 ]
 render._withStripped = true
@@ -1526,8 +1620,6 @@ var map = {
 	"./bm": "./resources/coreui/node_modules/moment/locale/bm.js",
 	"./bm.js": "./resources/coreui/node_modules/moment/locale/bm.js",
 	"./bn": "./resources/coreui/node_modules/moment/locale/bn.js",
-	"./bn-bd": "./resources/coreui/node_modules/moment/locale/bn-bd.js",
-	"./bn-bd.js": "./resources/coreui/node_modules/moment/locale/bn-bd.js",
 	"./bn.js": "./resources/coreui/node_modules/moment/locale/bn.js",
 	"./bo": "./resources/coreui/node_modules/moment/locale/bo.js",
 	"./bo.js": "./resources/coreui/node_modules/moment/locale/bo.js",
@@ -1555,6 +1647,8 @@ var map = {
 	"./dv.js": "./resources/coreui/node_modules/moment/locale/dv.js",
 	"./el": "./resources/coreui/node_modules/moment/locale/el.js",
 	"./el.js": "./resources/coreui/node_modules/moment/locale/el.js",
+	"./en-SG": "./resources/coreui/node_modules/moment/locale/en-SG.js",
+	"./en-SG.js": "./resources/coreui/node_modules/moment/locale/en-SG.js",
 	"./en-au": "./resources/coreui/node_modules/moment/locale/en-au.js",
 	"./en-au.js": "./resources/coreui/node_modules/moment/locale/en-au.js",
 	"./en-ca": "./resources/coreui/node_modules/moment/locale/en-ca.js",
@@ -1565,19 +1659,13 @@ var map = {
 	"./en-ie.js": "./resources/coreui/node_modules/moment/locale/en-ie.js",
 	"./en-il": "./resources/coreui/node_modules/moment/locale/en-il.js",
 	"./en-il.js": "./resources/coreui/node_modules/moment/locale/en-il.js",
-	"./en-in": "./resources/coreui/node_modules/moment/locale/en-in.js",
-	"./en-in.js": "./resources/coreui/node_modules/moment/locale/en-in.js",
 	"./en-nz": "./resources/coreui/node_modules/moment/locale/en-nz.js",
 	"./en-nz.js": "./resources/coreui/node_modules/moment/locale/en-nz.js",
-	"./en-sg": "./resources/coreui/node_modules/moment/locale/en-sg.js",
-	"./en-sg.js": "./resources/coreui/node_modules/moment/locale/en-sg.js",
 	"./eo": "./resources/coreui/node_modules/moment/locale/eo.js",
 	"./eo.js": "./resources/coreui/node_modules/moment/locale/eo.js",
 	"./es": "./resources/coreui/node_modules/moment/locale/es.js",
 	"./es-do": "./resources/coreui/node_modules/moment/locale/es-do.js",
 	"./es-do.js": "./resources/coreui/node_modules/moment/locale/es-do.js",
-	"./es-mx": "./resources/coreui/node_modules/moment/locale/es-mx.js",
-	"./es-mx.js": "./resources/coreui/node_modules/moment/locale/es-mx.js",
 	"./es-us": "./resources/coreui/node_modules/moment/locale/es-us.js",
 	"./es-us.js": "./resources/coreui/node_modules/moment/locale/es-us.js",
 	"./es.js": "./resources/coreui/node_modules/moment/locale/es.js",
@@ -1589,8 +1677,6 @@ var map = {
 	"./fa.js": "./resources/coreui/node_modules/moment/locale/fa.js",
 	"./fi": "./resources/coreui/node_modules/moment/locale/fi.js",
 	"./fi.js": "./resources/coreui/node_modules/moment/locale/fi.js",
-	"./fil": "./resources/coreui/node_modules/moment/locale/fil.js",
-	"./fil.js": "./resources/coreui/node_modules/moment/locale/fil.js",
 	"./fo": "./resources/coreui/node_modules/moment/locale/fo.js",
 	"./fo.js": "./resources/coreui/node_modules/moment/locale/fo.js",
 	"./fr": "./resources/coreui/node_modules/moment/locale/fr.js",
@@ -1607,8 +1693,6 @@ var map = {
 	"./gd.js": "./resources/coreui/node_modules/moment/locale/gd.js",
 	"./gl": "./resources/coreui/node_modules/moment/locale/gl.js",
 	"./gl.js": "./resources/coreui/node_modules/moment/locale/gl.js",
-	"./gom-deva": "./resources/coreui/node_modules/moment/locale/gom-deva.js",
-	"./gom-deva.js": "./resources/coreui/node_modules/moment/locale/gom-deva.js",
 	"./gom-latn": "./resources/coreui/node_modules/moment/locale/gom-latn.js",
 	"./gom-latn.js": "./resources/coreui/node_modules/moment/locale/gom-latn.js",
 	"./gu": "./resources/coreui/node_modules/moment/locale/gu.js",
@@ -1687,8 +1771,6 @@ var map = {
 	"./nl.js": "./resources/coreui/node_modules/moment/locale/nl.js",
 	"./nn": "./resources/coreui/node_modules/moment/locale/nn.js",
 	"./nn.js": "./resources/coreui/node_modules/moment/locale/nn.js",
-	"./oc-lnc": "./resources/coreui/node_modules/moment/locale/oc-lnc.js",
-	"./oc-lnc.js": "./resources/coreui/node_modules/moment/locale/oc-lnc.js",
 	"./pa-in": "./resources/coreui/node_modules/moment/locale/pa-in.js",
 	"./pa-in.js": "./resources/coreui/node_modules/moment/locale/pa-in.js",
 	"./pl": "./resources/coreui/node_modules/moment/locale/pl.js",
@@ -1733,8 +1815,6 @@ var map = {
 	"./tg.js": "./resources/coreui/node_modules/moment/locale/tg.js",
 	"./th": "./resources/coreui/node_modules/moment/locale/th.js",
 	"./th.js": "./resources/coreui/node_modules/moment/locale/th.js",
-	"./tk": "./resources/coreui/node_modules/moment/locale/tk.js",
-	"./tk.js": "./resources/coreui/node_modules/moment/locale/tk.js",
 	"./tl-ph": "./resources/coreui/node_modules/moment/locale/tl-ph.js",
 	"./tl-ph.js": "./resources/coreui/node_modules/moment/locale/tl-ph.js",
 	"./tlh": "./resources/coreui/node_modules/moment/locale/tlh.js",
@@ -1767,8 +1847,6 @@ var map = {
 	"./zh-cn.js": "./resources/coreui/node_modules/moment/locale/zh-cn.js",
 	"./zh-hk": "./resources/coreui/node_modules/moment/locale/zh-hk.js",
 	"./zh-hk.js": "./resources/coreui/node_modules/moment/locale/zh-hk.js",
-	"./zh-mo": "./resources/coreui/node_modules/moment/locale/zh-mo.js",
-	"./zh-mo.js": "./resources/coreui/node_modules/moment/locale/zh-mo.js",
 	"./zh-tw": "./resources/coreui/node_modules/moment/locale/zh-tw.js",
 	"./zh-tw.js": "./resources/coreui/node_modules/moment/locale/zh-tw.js"
 };

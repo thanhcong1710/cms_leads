@@ -317,6 +317,7 @@ class ParentsController extends Controller
                 'updator_id' => Auth::user()->id,
                 'owner_id'=>Auth::user()->id,
                 'last_assign_date'=> date('Y-m-d H:i:s'),
+                'is_lock'=>1,
             ), array('id' => $parent_info->id), 'cms_parents');
             u::insertSimpleRow(array(
                 'parent_id'=>$parent_info->id,
