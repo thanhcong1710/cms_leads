@@ -15,7 +15,7 @@ class ParentCareController extends Controller
             'parent_id'=>$request->parent_id,
             'note'=>$request->note,
             'method_id' => $request->method_id,
-            'care_date' => date('Y-m-d H:i:s',strtotime($request->care_date)),
+            'care_date' => date('Y-m-d H:i:s'),
             'created_at' => date('Y-m-d H:i:s'),
             'creator_id' => Auth::user()->id,
             'branch_id' => Auth::user()->branch_id,
