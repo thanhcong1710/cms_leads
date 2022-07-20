@@ -1,9 +1,9 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[25],{
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/menuElements/CreateMenuElement.vue?vue&type=script&lang=js&":
-/*!********************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/coreui/src/views/menuElements/CreateMenuElement.vue?vue&type=script&lang=js& ***!
-  \********************************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/roles/Roles.vue?vue&type=script&lang=js&":
+/*!*************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/coreui/src/views/roles/Roles.vue?vue&type=script&lang=js& ***!
+  \*************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -68,131 +68,97 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  name: 'CreateMenuElement',
+  name: 'Roles',
   data: function data() {
     return {
-      role: [],
-      menulist: [],
-      parents: [],
-      types: [{
-        label: 'Link',
-        value: 'link'
-      }, {
-        label: 'Title',
-        value: 'title'
-      }, {
-        label: 'Dropdown',
-        value: 'dropdown'
-      }],
-      menuelement: {
-        menu: 0,
-        name: '',
-        role: [],
-        type: 'link',
-        href: '',
-        icon: '',
-        parent: 0
-      },
+      items: [],
+      fields: ['name', 'hierarchy', 'move-up', 'move-down', 'actions'],
+      currentPage: 1,
+      perPage: 5,
+      totalRows: 0,
+      you: null,
       message: '',
+      showMessage: false,
       dismissSecs: 7,
       dismissCountDown: 0,
-      showDismissibleAlert: false,
-      divHref: false,
-      divDropdownParent: false,
-      divIcon: false
+      showDismissibleAlert: false
     };
   },
+  computed: {},
   methods: {
-    goBack: function goBack() {
-      this.$router.go(-1); // this.$router.replace({path: '/users'})
+    getRowCount: function getRowCount(items) {
+      return items.length;
     },
-    selectRadioSelectRole: function selectRadioSelectRole(role) {
-      var temp = this.menuelement.role.indexOf(role);
-
-      if (temp > -1) {
-        this.menuelement.role.splice(temp, 1);
-      } else {
-        this.menuelement.role.push(role);
-      }
+    roleLink: function roleLink(id) {
+      return "roles/".concat(id.toString());
     },
-    changeType: function changeType() {
-      var temp = this.menuelement.type;
-
-      if (temp == 'title') {
-        this.divHref = false;
-        this.divDropdownParent = false;
-        this.divIcon = false;
-      } else if (temp == 'link') {
-        this.divHref = true;
-        this.divDropdownParent = true;
-        this.divIcon = true;
-      } else {
-        this.divHref = false;
-        this.divDropdownParent = true;
-        this.divIcon = true;
-      }
+    editLink: function editLink(id) {
+      return "roles/".concat(id.toString(), "/edit");
     },
-    updateSelectParent: function updateSelectParent() {
+    showRole: function showRole(id) {
+      var roleLink = this.roleLink(id);
+      this.$router.push({
+        path: roleLink
+      });
+    },
+    editRole: function editRole(id) {
+      var editLink = this.editLink(id);
+      this.$router.push({
+        path: editLink
+      });
+    },
+    deleteRole: function deleteRole(id) {
       var self = this;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/menu/element/get-parents?token=' + localStorage.getItem("api_token") + '&menu=' + self.menuelement.menu).then(function (response) {
-        self.parents = [{
-          label: 'Has no parent',
-          value: 'none'
-        }];
-
-        for (var i = 0; i < response.data.length; i++) {
-          self.parents.push(response.data[i]);
+      var noteId = id;
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/roles/' + id + '?token=' + localStorage.getItem("api_token"), {
+        _method: 'DELETE'
+      }).then(function (response) {
+        if (response.data.status === 'success') {
+          self.message = 'Successfully deleted role.';
+          self.showAlert();
+          self.getRoles();
+        } else if (response.data.status === 'rejected') {
+          self.message = "Can't delete. Role has assigned one or more menu elements.";
+          self.showAlert();
         }
       })["catch"](function (error) {
         console.log(error);
         self.$router.push({
-          path: 'login'
+          path: '/login'
         });
       });
     },
-    store: function store() {
+    moveUp: function moveUp(id) {
       var self = this;
-      console.log(self.menuelement);
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/menu/element/store?token=' + localStorage.getItem("api_token"), self.menuelement).then(function (response) {
-        self.name = '';
-        self.message = 'Successfully created menu element.';
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/roles/move/move-up?id=' + id + '&token=' + localStorage.getItem("api_token")).then(function (response) {
+        self.message = 'Successfully move role.';
         self.showAlert();
+        self.getRoles();
       })["catch"](function (error) {
-        if (error.response.data.message == 'The given data was invalid.') {
-          self.message = '';
-
-          for (var key in error.response.data.errors) {
-            if (error.response.data.errors.hasOwnProperty(key)) {
-              self.message += error.response.data.errors[key][0] + '  ';
-            }
-          }
-
-          self.showAlert();
-        } else {
-          console.log(error);
-          self.$router.push({
-            path: 'login'
-          });
-        }
+        console.log(error);
+        self.$router.push({
+          path: '/login'
+        });
+      });
+    },
+    moveDown: function moveDown(id) {
+      var self = this;
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/roles/move/move-down?id=' + id + '&token=' + localStorage.getItem("api_token")).then(function (response) {
+        self.message = 'Successfully move role.';
+        self.showAlert();
+        self.getRoles();
+      })["catch"](function (error) {
+        console.log(error);
+        self.$router.push({
+          path: '/login'
+        });
+      });
+    },
+    createRole: function createRole() {
+      this.$router.push({
+        path: 'roles/create'
       });
     },
     countDownChanged: function countDownChanged(dismissCountDown) {
@@ -201,11 +167,10 @@ __webpack_require__.r(__webpack_exports__);
     showAlert: function showAlert() {
       this.dismissCountDown = this.dismissSecs;
     },
-    getData: function getData() {
+    getRoles: function getRoles() {
       var self = this;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/menu/element/create?token=' + localStorage.getItem("api_token") + '&id=' + self.$route.params.menu).then(function (response) {
-        self.role = response.data.roles;
-        self.menulist = response.data.menulist;
+      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/roles?token=' + localStorage.getItem("api_token")).then(function (response) {
+        self.items = response.data;
       })["catch"](function (error) {
         console.log(error);
         self.$router.push({
@@ -215,19 +180,65 @@ __webpack_require__.r(__webpack_exports__);
     }
   },
   mounted: function mounted() {
-    this.getData();
-    this.menuelement.menu = this.$route.params.menu;
-    this.updateSelectParent();
-    this.changeType();
+    this.getRoles();
   }
 });
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/menuElements/CreateMenuElement.vue?vue&type=template&id=6e0f2fb0&":
-/*!************************************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/coreui/src/views/menuElements/CreateMenuElement.vue?vue&type=template&id=6e0f2fb0& ***!
-  \************************************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/roles/Roles.vue?vue&type=style&index=0&id=1d5830db&scoped=true&lang=css&":
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/coreui/src/views/roles/Roles.vue?vue&type=style&index=0&id=1d5830db&scoped=true&lang=css& ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(/*! ../../../../../node_modules/css-loader/lib/css-base.js */ "./node_modules/css-loader/lib/css-base.js")(false);
+// imports
+
+
+// module
+exports.push([module.i, "\n.card-body[data-v-1d5830db] table > tbody > tr > td {\n  cursor: pointer;\n}\n", ""]);
+
+// exports
+
+
+/***/ }),
+
+/***/ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/roles/Roles.vue?vue&type=style&index=0&id=1d5830db&scoped=true&lang=css&":
+/*!************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/style-loader!./node_modules/css-loader??ref--6-1!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src??ref--6-2!./node_modules/vue-loader/lib??vue-loader-options!./resources/coreui/src/views/roles/Roles.vue?vue&type=style&index=0&id=1d5830db&scoped=true&lang=css& ***!
+  \************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+var content = __webpack_require__(/*! !../../../../../node_modules/css-loader??ref--6-1!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/src??ref--6-2!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Roles.vue?vue&type=style&index=0&id=1d5830db&scoped=true&lang=css& */ "./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/roles/Roles.vue?vue&type=style&index=0&id=1d5830db&scoped=true&lang=css&");
+
+if(typeof content === 'string') content = [[module.i, content, '']];
+
+var transform;
+var insertInto;
+
+
+
+var options = {"hmr":true}
+
+options.transform = transform
+options.insertInto = undefined;
+
+var update = __webpack_require__(/*! ../../../../../node_modules/style-loader/lib/addStyles.js */ "./node_modules/style-loader/lib/addStyles.js")(content, options);
+
+if(content.locals) module.exports = content.locals;
+
+if(false) {}
+
+/***/ }),
+
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/roles/Roles.vue?vue&type=template&id=1d5830db&scoped=true&":
+/*!*****************************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/coreui/src/views/roles/Roles.vue?vue&type=template&id=1d5830db&scoped=true& ***!
+  \*****************************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -244,224 +255,197 @@ var render = function() {
     [
       _c(
         "CCol",
-        { attrs: { col: "12", lg: "6" } },
+        { attrs: { col: "12", xl: "12" } },
         [
           _c(
-            "CCard",
-            { attrs: { "no-header": "" } },
+            "transition",
+            { attrs: { name: "slide" } },
             [
               _c(
-                "CCardBody",
+                "CCard",
                 [
-                  _c("h3", [
-                    _vm._v("\n          Create Menu Element\n        ")
-                  ]),
-                  _vm._v(" "),
                   _c(
-                    "CAlert",
-                    {
-                      attrs: {
-                        show: _vm.dismissCountDown,
-                        color: "primary",
-                        fade: ""
-                      },
-                      on: {
-                        "update:show": function($event) {
-                          _vm.dismissCountDown = $event
-                        }
-                      }
-                    },
+                    "CCardBody",
                     [
-                      _vm._v(
-                        "\n          (" +
-                          _vm._s(_vm.dismissCountDown) +
-                          ") " +
-                          _vm._s(_vm.message) +
-                          "\n        "
-                      )
-                    ]
-                  ),
-                  _vm._v(" "),
-                  _c("CSelect", {
-                    attrs: {
-                      label: "Menu",
-                      value: _vm.menuelement.menu,
-                      plain: true,
-                      options: _vm.menulist
-                    },
-                    on: {
-                      "update:value": [
-                        function($event) {
-                          return _vm.$set(_vm.menuelement, "menu", $event)
-                        },
-                        function($event) {
-                          return _vm.updateSelectParent()
-                        }
-                      ]
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("p", [_vm._v("Roles")]),
-                  _vm._v(" "),
-                  _c(
-                    "div",
-                    { staticClass: "m-3" },
-                    _vm._l(_vm.role, function(rol) {
-                      return _c("CInputCheckbox", {
-                        key: rol,
-                        attrs: { label: rol, name: "selectRoles" },
-                        on: {
-                          "update:checked": function($event) {
-                            return _vm.selectRadioSelectRole(rol)
+                      _c("h4", [_vm._v("Danh sách Roles")]),
+                      _vm._v(" "),
+                      _c(
+                        "CButton",
+                        {
+                          attrs: { color: "primary" },
+                          on: {
+                            click: function($event) {
+                              return _vm.createRole()
+                            }
                           }
-                        }
-                      })
-                    }),
-                    1
-                  ),
-                  _vm._v(" "),
-                  _c("CInput", {
-                    attrs: { label: "Name", type: "text", placeholder: "Name" },
-                    model: {
-                      value: _vm.menuelement.name,
-                      callback: function($$v) {
-                        _vm.$set(_vm.menuelement, "name", $$v)
-                      },
-                      expression: "menuelement.name"
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("CSelect", {
-                    attrs: {
-                      label: "Type",
-                      value: _vm.menuelement.type,
-                      plain: true,
-                      options: _vm.types
-                    },
-                    on: {
-                      "update:value": [
-                        function($event) {
-                          return _vm.$set(_vm.menuelement, "type", $event)
                         },
-                        function($event) {
-                          return _vm.changeType()
-                        }
-                      ]
-                    }
-                  }),
-                  _vm._v(" "),
-                  _c("p", [_vm._v("Other")]),
-                  _vm._v(" "),
-                  _vm.divHref
-                    ? _c(
-                        "div",
-                        [
-                          _c("CInput", {
-                            attrs: {
-                              label: "Href",
-                              type: "text",
-                              placeholder: "Href"
-                            },
-                            model: {
-                              value: _vm.menuelement.href,
-                              callback: function($$v) {
-                                _vm.$set(_vm.menuelement, "href", $$v)
-                              },
-                              expression: "menuelement.href"
+                        [_vm._v("Create Role")]
+                      ),
+                      _vm._v(" "),
+                      _c(
+                        "CAlert",
+                        {
+                          attrs: {
+                            show: _vm.dismissCountDown,
+                            color: "primary",
+                            fade: ""
+                          },
+                          on: {
+                            "update:show": function($event) {
+                              _vm.dismissCountDown = $event
                             }
-                          })
-                        ],
-                        1
-                      )
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.divDropdownParent
-                    ? _c(
-                        "div",
-                        [
-                          _c("CSelect", {
-                            attrs: {
-                              label: "Dropdown parent",
-                              value: _vm.menuelement.parent,
-                              plain: true,
-                              options: _vm.parents
-                            },
-                            on: {
-                              "update:value": function($event) {
-                                return _vm.$set(
-                                  _vm.menuelement,
-                                  "parent",
-                                  $event
-                                )
-                              }
-                            }
-                          })
-                        ],
-                        1
-                      )
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _vm.divIcon
-                    ? _c(
-                        "div",
+                          }
+                        },
                         [
                           _vm._v(
-                            "\n            Icon - Find icon class in: \n            "
-                          ),
-                          _c(
-                            "a",
-                            {
-                              attrs: {
-                                href:
-                                  "https://coreui.io/docs/icons/icons-list/#coreui-icons-free-502-icons",
-                                target: "_blank"
-                              }
-                            },
-                            [
-                              _vm._v(
-                                "\n              CoreUI icons documentation\n            "
-                              )
-                            ]
-                          ),
-                          _vm._v(" "),
-                          _c("br"),
-                          _vm._v(" "),
-                          _c("CInput", {
-                            attrs: {
-                              type: "text",
-                              placeholder:
-                                "CoreUI Icon class - example: cil-bell"
-                            },
-                            model: {
-                              value: _vm.menuelement.icon,
-                              callback: function($$v) {
-                                _vm.$set(_vm.menuelement, "icon", $$v)
-                              },
-                              expression: "menuelement.icon"
+                            "\n            (" +
+                              _vm._s(_vm.dismissCountDown) +
+                              ") " +
+                              _vm._s(_vm.message) +
+                              "\n          "
+                          )
+                        ]
+                      ),
+                      _vm._v(" "),
+                      _c("CDataTable", {
+                        attrs: {
+                          hover: "",
+                          items: _vm.items,
+                          fields: _vm.fields,
+                          "items-per-page": 10,
+                          pagination: ""
+                        },
+                        scopedSlots: _vm._u([
+                          {
+                            key: "name",
+                            fn: function(ref) {
+                              var item = ref.item
+                              return [
+                                _c("td", [
+                                  _c("strong", [_vm._v(_vm._s(item.name))])
+                                ])
+                              ]
                             }
-                          })
-                        ],
-                        1
-                      )
-                    : _vm._e(),
-                  _vm._v(" "),
-                  _c(
-                    "CButton",
-                    {
-                      attrs: { color: "primary" },
-                      on: {
-                        click: function($event) {
-                          return _vm.store()
-                        }
-                      }
-                    },
-                    [_vm._v("Create")]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "CButton",
-                    { attrs: { color: "primary" }, on: { click: _vm.goBack } },
-                    [_vm._v("Back")]
+                          },
+                          {
+                            key: "hierarchy",
+                            fn: function(ref) {
+                              var item = ref.item
+                              return [
+                                _c("td", [
+                                  _c("strong", [_vm._v(_vm._s(item.hierarchy))])
+                                ])
+                              ]
+                            }
+                          },
+                          {
+                            key: "move-up",
+                            fn: function(ref) {
+                              var item = ref.item
+                              return [
+                                _c(
+                                  "td",
+                                  [
+                                    _c(
+                                      "CButton",
+                                      {
+                                        attrs: { color: "primary" },
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.moveUp(item.id)
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Move Up")]
+                                    )
+                                  ],
+                                  1
+                                )
+                              ]
+                            }
+                          },
+                          {
+                            key: "move-down",
+                            fn: function(ref) {
+                              var item = ref.item
+                              return [
+                                _c(
+                                  "td",
+                                  [
+                                    _c(
+                                      "CButton",
+                                      {
+                                        attrs: { color: "primary" },
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.moveDown(item.id)
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Move Down")]
+                                    )
+                                  ],
+                                  1
+                                )
+                              ]
+                            }
+                          },
+                          {
+                            key: "actions",
+                            fn: function(ref) {
+                              var item = ref.item
+                              return [
+                                _c(
+                                  "td",
+                                  [
+                                    _c(
+                                      "CButton",
+                                      {
+                                        attrs: { color: "primary" },
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.showRole(item.id)
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Show")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "CButton",
+                                      {
+                                        attrs: { color: "success" },
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.editRole(item.id)
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Edit")]
+                                    ),
+                                    _vm._v(" "),
+                                    _c(
+                                      "CButton",
+                                      {
+                                        attrs: { color: "danger" },
+                                        on: {
+                                          click: function($event) {
+                                            return _vm.deleteRole(item.id)
+                                          }
+                                        }
+                                      },
+                                      [_vm._v("Delete")]
+                                    )
+                                  ],
+                                  1
+                                )
+                              ]
+                            }
+                          }
+                        ])
+                      })
+                    ],
+                    1
                   )
                 ],
                 1
@@ -483,18 +467,20 @@ render._withStripped = true
 
 /***/ }),
 
-/***/ "./resources/coreui/src/views/menuElements/CreateMenuElement.vue":
-/*!***********************************************************************!*\
-  !*** ./resources/coreui/src/views/menuElements/CreateMenuElement.vue ***!
-  \***********************************************************************/
+/***/ "./resources/coreui/src/views/roles/Roles.vue":
+/*!****************************************************!*\
+  !*** ./resources/coreui/src/views/roles/Roles.vue ***!
+  \****************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _CreateMenuElement_vue_vue_type_template_id_6e0f2fb0___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./CreateMenuElement.vue?vue&type=template&id=6e0f2fb0& */ "./resources/coreui/src/views/menuElements/CreateMenuElement.vue?vue&type=template&id=6e0f2fb0&");
-/* harmony import */ var _CreateMenuElement_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./CreateMenuElement.vue?vue&type=script&lang=js& */ "./resources/coreui/src/views/menuElements/CreateMenuElement.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+/* harmony import */ var _Roles_vue_vue_type_template_id_1d5830db_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Roles.vue?vue&type=template&id=1d5830db&scoped=true& */ "./resources/coreui/src/views/roles/Roles.vue?vue&type=template&id=1d5830db&scoped=true&");
+/* harmony import */ var _Roles_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Roles.vue?vue&type=script&lang=js& */ "./resources/coreui/src/views/roles/Roles.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport *//* harmony import */ var _Roles_vue_vue_type_style_index_0_id_1d5830db_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./Roles.vue?vue&type=style&index=0&id=1d5830db&scoped=true&lang=css& */ "./resources/coreui/src/views/roles/Roles.vue?vue&type=style&index=0&id=1d5830db&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
+
 
 
 
@@ -502,51 +488,67 @@ __webpack_require__.r(__webpack_exports__);
 
 /* normalize component */
 
-var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _CreateMenuElement_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _CreateMenuElement_vue_vue_type_template_id_6e0f2fb0___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _CreateMenuElement_vue_vue_type_template_id_6e0f2fb0___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_3__["default"])(
+  _Roles_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _Roles_vue_vue_type_template_id_1d5830db_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _Roles_vue_vue_type_template_id_1d5830db_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
-  null,
+  "1d5830db",
   null
   
 )
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/coreui/src/views/menuElements/CreateMenuElement.vue"
+component.options.__file = "resources/coreui/src/views/roles/Roles.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/coreui/src/views/menuElements/CreateMenuElement.vue?vue&type=script&lang=js&":
-/*!************************************************************************************************!*\
-  !*** ./resources/coreui/src/views/menuElements/CreateMenuElement.vue?vue&type=script&lang=js& ***!
-  \************************************************************************************************/
+/***/ "./resources/coreui/src/views/roles/Roles.vue?vue&type=script&lang=js&":
+/*!*****************************************************************************!*\
+  !*** ./resources/coreui/src/views/roles/Roles.vue?vue&type=script&lang=js& ***!
+  \*****************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CreateMenuElement_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./CreateMenuElement.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/menuElements/CreateMenuElement.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_CreateMenuElement_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Roles_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Roles.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/roles/Roles.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Roles_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/coreui/src/views/menuElements/CreateMenuElement.vue?vue&type=template&id=6e0f2fb0&":
-/*!******************************************************************************************************!*\
-  !*** ./resources/coreui/src/views/menuElements/CreateMenuElement.vue?vue&type=template&id=6e0f2fb0& ***!
-  \******************************************************************************************************/
+/***/ "./resources/coreui/src/views/roles/Roles.vue?vue&type=style&index=0&id=1d5830db&scoped=true&lang=css&":
+/*!*************************************************************************************************************!*\
+  !*** ./resources/coreui/src/views/roles/Roles.vue?vue&type=style&index=0&id=1d5830db&scoped=true&lang=css& ***!
+  \*************************************************************************************************************/
+/*! no static exports found */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Roles_vue_vue_type_style_index_0_id_1d5830db_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/style-loader!../../../../../node_modules/css-loader??ref--6-1!../../../../../node_modules/vue-loader/lib/loaders/stylePostLoader.js!../../../../../node_modules/postcss-loader/src??ref--6-2!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Roles.vue?vue&type=style&index=0&id=1d5830db&scoped=true&lang=css& */ "./node_modules/style-loader/index.js!./node_modules/css-loader/index.js?!./node_modules/vue-loader/lib/loaders/stylePostLoader.js!./node_modules/postcss-loader/src/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/roles/Roles.vue?vue&type=style&index=0&id=1d5830db&scoped=true&lang=css&");
+/* harmony import */ var _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Roles_vue_vue_type_style_index_0_id_1d5830db_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Roles_vue_vue_type_style_index_0_id_1d5830db_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__);
+/* harmony reexport (unknown) */ for(var __WEBPACK_IMPORT_KEY__ in _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Roles_vue_vue_type_style_index_0_id_1d5830db_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__) if(["default"].indexOf(__WEBPACK_IMPORT_KEY__) < 0) (function(key) { __webpack_require__.d(__webpack_exports__, key, function() { return _node_modules_style_loader_index_js_node_modules_css_loader_index_js_ref_6_1_node_modules_vue_loader_lib_loaders_stylePostLoader_js_node_modules_postcss_loader_src_index_js_ref_6_2_node_modules_vue_loader_lib_index_js_vue_loader_options_Roles_vue_vue_type_style_index_0_id_1d5830db_scoped_true_lang_css___WEBPACK_IMPORTED_MODULE_0__[key]; }) }(__WEBPACK_IMPORT_KEY__));
+
+
+/***/ }),
+
+/***/ "./resources/coreui/src/views/roles/Roles.vue?vue&type=template&id=1d5830db&scoped=true&":
+/*!***********************************************************************************************!*\
+  !*** ./resources/coreui/src/views/roles/Roles.vue?vue&type=template&id=1d5830db&scoped=true& ***!
+  \***********************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CreateMenuElement_vue_vue_type_template_id_6e0f2fb0___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./CreateMenuElement.vue?vue&type=template&id=6e0f2fb0& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/menuElements/CreateMenuElement.vue?vue&type=template&id=6e0f2fb0&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CreateMenuElement_vue_vue_type_template_id_6e0f2fb0___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Roles_vue_vue_type_template_id_1d5830db_scoped_true___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Roles.vue?vue&type=template&id=1d5830db&scoped=true& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/roles/Roles.vue?vue&type=template&id=1d5830db&scoped=true&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Roles_vue_vue_type_template_id_1d5830db_scoped_true___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_CreateMenuElement_vue_vue_type_template_id_6e0f2fb0___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Roles_vue_vue_type_template_id_1d5830db_scoped_true___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

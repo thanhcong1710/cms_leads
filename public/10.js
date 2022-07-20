@@ -249,6 +249,18 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -277,11 +289,14 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       total_validate: 0,
       list_owner: [],
       list_source: [],
+      list_source_detail: [],
       data_assign: {
         owners: "",
         import_id: "",
         source: "",
         source_id: "",
+        source_detail: "",
+        source_detail_id: "",
         owners_id: "",
         error_message: ""
       },
@@ -297,6 +312,9 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
     });
     _utilities_utility__WEBPACK_IMPORTED_MODULE_0__["default"].g("/api/sources").then(function (response) {
       _this.list_source = response.data;
+    });
+    _utilities_utility__WEBPACK_IMPORTED_MODULE_0__["default"].g("/api/source_detail").then(function (response) {
+      _this.list_source_detail = response.data;
     });
   },
   methods: {
@@ -357,6 +375,18 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       } else {
         this.data_assign.source = "";
         this.data_assign.source_id = "";
+      }
+    },
+    selectSourceDetail: function selectSourceDetail() {
+      var data = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
+
+      if (data && _typeof(data) === 'object') {
+        var source_id = data.id;
+        this.data_assign.source_detail = data;
+        this.data_assign.source_detail_id = source_id;
+      } else {
+        this.data_assign.source_detail = "";
+        this.data_assign.source_detail_id = "";
       }
     },
     assginContact: function assginContact() {
@@ -435,7 +465,7 @@ exports = module.exports = __webpack_require__(/*! ../../../../../../node_module
 
 
 // module
-exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/*Form Wizard*/\n.bs-wizard {border-bottom: solid 1px #e0e0e0; padding: 0 0 10px 0;}\n.bs-wizard > .bs-wizard-step {padding: 0; position: relative;}\n.bs-wizard > .bs-wizard-step .bs-wizard-stepnum {color: #595959; font-size: 16px; margin-bottom: 5px;}\n.bs-wizard > .bs-wizard-step .bs-wizard-info {color: #999; font-size: 14px;}\n.bs-wizard > .bs-wizard-step > .bs-wizard-dot {position: absolute; width: 30px; height: 30px; display: block; background: #fbe8aa; top: 45px; left: 50%; margin-top: -15px; margin-left: -15px; border-radius: 50%;}\n.bs-wizard > .bs-wizard-step > .bs-wizard-dot:after {content: ' '; width: 14px; height: 14px; background: #fbbd19; border-radius: 50px; position: absolute; top: 8px; left: 8px;\n}\n.bs-wizard > .bs-wizard-step > .progress {position: relative; border-radius: 0px; height: 8px; -webkit-box-shadow: none; box-shadow: none; margin: 20px 0;}\n.bs-wizard > .bs-wizard-step > .progress > .progress-bar {width:0px; -webkit-box-shadow: none; box-shadow: none; background: #fbe8aa;}\n.bs-wizard > .bs-wizard-step.complete > .progress > .progress-bar {width:100%;}\n.bs-wizard > .bs-wizard-step.active > .progress > .progress-bar {width:50%;}\n.bs-wizard > .bs-wizard-step:first-child.active > .progress > .progress-bar {width:0%;}\n.bs-wizard > .bs-wizard-step:last-child.active > .progress > .progress-bar {width: 100%;}\n.bs-wizard > .bs-wizard-step.disabled > .bs-wizard-dot {background-color: #f5f5f5;}\n.bs-wizard > .bs-wizard-step.disabled > .bs-wizard-dot:after {opacity: 0;}\n.bs-wizard > .bs-wizard-step:first-child  > .progress {left: 50%; width: 50%;}\n.bs-wizard > .bs-wizard-step:last-child  > .progress {width: 50%;}\n.bs-wizard > .bs-wizard-step.disabled a.bs-wizard-dot{ pointer-events: none;\n}\n.fl-right{\n  float: right;\n  margin-left:10px;\n}\n", ""]);
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n/*Form Wizard*/\n.bs-wizard {border-bottom: solid 1px #e0e0e0; padding: 0 0 10px 0;}\n.bs-wizard > .bs-wizard-step {padding: 0; position: relative;}\n.bs-wizard > .bs-wizard-step .bs-wizard-stepnum {color: #595959; font-size: 16px; margin-bottom: 5px;}\n.bs-wizard > .bs-wizard-step .bs-wizard-info {color: #999; font-size: 14px;}\n.bs-wizard > .bs-wizard-step > .bs-wizard-dot {position: absolute; width: 30px; height: 30px; display: block; background: #fbe8aa; top: 45px; left: 50%; margin-top: -15px; margin-left: -15px; border-radius: 50%;}\n.bs-wizard > .bs-wizard-step > .bs-wizard-dot:after {content: ' '; width: 14px; height: 14px; background: #fbbd19; border-radius: 50px; position: absolute; top: 8px; left: 8px;\n}\n.bs-wizard > .bs-wizard-step > .progress {position: relative; border-radius: 0px; height: 8px; -webkit-box-shadow: none; box-shadow: none; margin: 20px 0;}\n.bs-wizard > .bs-wizard-step > .progress > .progress-bar {width:0px; -webkit-box-shadow: none; box-shadow: none; background: #fbe8aa;}\n.bs-wizard > .bs-wizard-step.complete > .progress > .progress-bar {width:100%;}\n.bs-wizard > .bs-wizard-step.active > .progress > .progress-bar {width:50%;}\n.bs-wizard > .bs-wizard-step:first-child.active > .progress > .progress-bar {width:0%;}\n.bs-wizard > .bs-wizard-step:last-child.active > .progress > .progress-bar {width: 100%;}\n.bs-wizard > .bs-wizard-step.disabled > .bs-wizard-dot {background-color: #f5f5f5;}\n.bs-wizard > .bs-wizard-step.disabled > .bs-wizard-dot:after {opacity: 0;}\n.bs-wizard > .bs-wizard-step:first-child  > .progress {left: 50%; width: 50%;}\n.bs-wizard > .bs-wizard-step:last-child  > .progress {width: 50%;}\n.bs-wizard > .bs-wizard-step.disabled a.bs-wizard-dot{ pointer-events: none;\n}\n.fl-right{\n  float: right;\n  margin-left:10px;\n}\n", ""]);
 
 // exports
 
@@ -958,6 +988,39 @@ var render = function() {
                                   _vm.$set(_vm.data_assign, "source", $$v)
                                 },
                                 expression: "data_assign.source"
+                              }
+                            })
+                          ],
+                          1
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "div",
+                          { staticClass: "form-group col-sm-6" },
+                          [
+                            _c("label", { attrs: { for: "nf-email" } }, [
+                              _vm._v("Chọn nguồn chi tiết")
+                            ]),
+                            _vm._v(" "),
+                            _c("vue-select", {
+                              attrs: {
+                                label: "name",
+                                placeholder: "Chọn nguồn chi tiết",
+                                options: _vm.list_source_detail,
+                                searchable: true,
+                                language: "tv-VN",
+                                onChange: _vm.selectSourceDetail
+                              },
+                              model: {
+                                value: _vm.data_assign.source_detail,
+                                callback: function($$v) {
+                                  _vm.$set(
+                                    _vm.data_assign,
+                                    "source_detail",
+                                    $$v
+                                  )
+                                },
+                                expression: "data_assign.source_detail"
                               }
                             })
                           ],
