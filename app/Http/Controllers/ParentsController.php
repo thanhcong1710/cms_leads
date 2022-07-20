@@ -269,7 +269,7 @@ class ParentsController extends Controller
             //     }
             // }
         }else{
-            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name,p.status,
+            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name,p.status,u.branch_id,
                     (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND status=1 AND creator_id=p.owner_id ORDER BY care_date DESC LIMIT 1) AS care_date,
                     (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1  AND creator_id=p.owner_id) AS total_care, p.last_assign_date
                 FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  WHERE (p.mobile_1='$phone' OR p.mobile_2='$phone') ");
@@ -283,6 +283,9 @@ class ParentsController extends Controller
                     if($duplicate_info->total_care>0){
                         $thoi_gian_con = 60 - ceil((time() - strtotime($duplicate_info->care_date))/(3600*24));
                         $text.="<br> Thời gian chăm sóc gần nhất: $duplicate_info->care_date <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
+                    }elseif(in_array($duplicate_info->branch_id,[5,9])){
+                        $thoi_gian_con = 60 - ceil((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
+                        $text.="<br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }else{
                         $thoi_gian_con = 15 - ceil((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
                         $text.="<br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
@@ -457,18 +460,25 @@ class ParentsController extends Controller
         return response()->json($data);
     }
     public function processParentLock(){
+        u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id");
         u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id ORDER BY id DESC LIMIT 1) WHERE p.is_lock=1 AND p.status NOT IN(12,9,8,10)");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE last_care_date IS NULL 
                 AND last_assign_date IS NOT NULL 
                 AND is_lock=1 AND status NOT IN(12,9,8,10)
+                AND tmp_branch_id NOT IN (5,9)
                 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE
-                last_care_date IS NOT NULL 
+                (last_care_date IS NOT NULL 
                 AND last_assign_date IS NOT NULL 
                 AND is_lock=1 AND status NOT IN(12,9,8,10)
-                AND DATEDIFF( CURRENT_DATE, last_care_date )> 60");
+                AND DATEDIFF( CURRENT_DATE, last_care_date )> 60) 
+                OR (last_care_date IS NULL 
+                    AND last_assign_date IS NOT NULL
+                    AND is_lock=1 AND status NOT IN(12,9,8,10)
+                    AND tmp_branch_id IN(5,9)
+                    AND DATEDIFF( CURRENT_DATE, last_assign_date )> 60)");
         return "ok";
     }
 }
