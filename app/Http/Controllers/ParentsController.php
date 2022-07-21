@@ -44,7 +44,7 @@ class ParentsController extends Controller
             $cond .= " AND p.status IN (".implode(",",$status).")";
         }
         if (!empty($owner_id)) {
-            $cond .= " AND p.owner_id IN (".implode(",",$owner_id).")";
+            $cond .= " AND p.owner_id IN (".implode(",",$owner_id).")" ;
         }
         if (!empty($source_id)) {
             $cond .= " AND p.source_id IN (".implode(",",$source_id).")";
