@@ -149,7 +149,7 @@ const vld = {
           '095': 'SFone'
         }    
         const reg = /^(^0[1|3|5|7|8|9])+([0-9]{7,9})$/
-        let resu = isNaN(n.toString()) ? '' : 'ok'
+        let resu = !n || isNaN(n.toString()) ? '' : 'ok'
         resu = (reg.test(n)) ? resu : ''
         resu = n.length >= 11 ? '' : n.length <= 9 ? '' : resu
         resu = n.substr(0, 1) === '0' ? resu : ''
