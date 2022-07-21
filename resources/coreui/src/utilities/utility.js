@@ -149,15 +149,19 @@ const vld = {
           '095': 'SFone'
         }    
         const reg = /^(^0[1|3|5|7|8|9])+([0-9]{7,9})$/
-        let resu = isNaN(n.toString()) ? '' : 'ok'
-        resu = (reg.test(n)) ? resu : ''
-        resu = n.length >= 11 ? '' : n.length <= 9 ? '' : resu
-        resu = n.substr(0, 1) === '0' ? resu : ''
-        const pr = n.substring(0,3)
-        if (carriers.hasOwnProperty(pr)) {
-          resu = resu == 'ok' ? carriers[pr] : ''
+        if(!n){
+          return ''
+        }else{
+          let resu = isNaN(n.toString()) ? '' : 'ok'
+          resu = (reg.test(n)) ? resu : ''
+          resu = n.length >= 11 ? '' : n.length <= 9 ? '' : resu
+          resu = n.substr(0, 1) === '0' ? resu : ''
+          const pr = n.substring(0,3)
+          if (carriers.hasOwnProperty(pr)) {
+            resu = resu == 'ok' ? carriers[pr] : ''
+          }
+          return resu
         }
-        return resu
     }
 }
 function fmc (input) {

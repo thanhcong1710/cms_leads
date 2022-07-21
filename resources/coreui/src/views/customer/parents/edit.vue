@@ -351,7 +351,7 @@ export default {
         mess += " - Số điện thoại không đúng định dạng<br/>";
         resp = false;
       }
-      if (this.parent.mobile_2 != "" && !u.vld.phone(this.parent.mobile_2)) {
+      if (this.parent.mobile_2 && !u.vld.phone(this.parent.mobile_2)) {
         mess += " - Số điện thoại 2 không đúng định dạng<br/>";
         resp = false;
       }
