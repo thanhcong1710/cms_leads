@@ -269,7 +269,7 @@ class ParentsController extends Controller
             //     }
             // }
         }else{
-            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name,p.status,u.branch_id,
+            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name,p.status,u.branch_id,p.id AS parent_id,p.owner_id,
                     (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND status=1 AND creator_id=p.owner_id ORDER BY care_date DESC LIMIT 1) AS care_date,
                     (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1  AND creator_id=p.owner_id) AS total_care, p.last_assign_date
                 FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  WHERE (p.mobile_1='$phone' OR p.mobile_2='$phone') ");
@@ -281,8 +281,11 @@ class ParentsController extends Controller
                     $result->status = 0;
                     $text = "";
                     if(in_array($duplicate_info->branch_id,[5,9])){
+                        $tmp_created_at = date('Y-m-d H:i:s',time()-4800);
+                        u::query("INSERT INTO cms_customer_care (parent_id,note,created_at,creator_id,method_id,care_date,status) VALUES (
+                            '$duplicate_info->parent_id','Khách hàng bận gọi lại sau','$tmp_created_at','$duplicate_info->owner_id','1','$tmp_created_at',1)");
                         $thoi_gian_con = 60;
-                        $text.="<br> Thời gian chăm sóc gần nhất: ".date('Y-m-d H:i:s',time()-4800)." <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
+                        $text.="<br> Thời gian chăm sóc gần nhất: ".$tmp_created_at." <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }elseif($duplicate_info->total_care>0){
                         $thoi_gian_con = 60 - ceil((time() - strtotime($duplicate_info->care_date))/(3600*24));
                         $text.="<br> Thời gian chăm sóc gần nhất: $duplicate_info->care_date <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
