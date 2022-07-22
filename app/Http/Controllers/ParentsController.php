@@ -291,7 +291,7 @@ class ParentsController extends Controller
                         $text.="<br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }
                     if(in_array($duplicate_info->status,[12,8,9,10])){
-                        $text.="<br> Khách hàng thuộc các trường hợp không được phép ghi đè";
+                        $text.="<br> Khách hàng thuộc các trường hợp không được phép ghi đè - ".u::getStatus($duplicate_info->status);
                     }
                     $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name .".$text;
                 }
