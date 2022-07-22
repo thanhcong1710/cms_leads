@@ -282,8 +282,8 @@ class ParentsController extends Controller
                     $text = "";
                     if(in_array($duplicate_info->branch_id,[5,9])){
                         $tmp_created_at = date('Y-m-d H:i:s',time()-4800);
-                        u::query("INSERT INTO cms_customer_care (parent_id,note,created_at,creator_id,method_id,care_date,status) VALUES (
-                            '$duplicate_info->parent_id','Khách hàng bận gọi lại sau','$tmp_created_at','$duplicate_info->owner_id','1','$tmp_created_at',1)");
+                        u::query("INSERT INTO cms_customer_care (parent_id,note,created_at,creator_id,method_id,care_date,status,branch_id) VALUES (
+                            '$duplicate_info->parent_id','Khách hàng bận gọi lại sau','$tmp_created_at','$duplicate_info->owner_id','1','$tmp_created_at',1,'$duplicate_info->branch_id')");
                         $thoi_gian_con = 60;
                         $text.="<br> Thời gian chăm sóc gần nhất: ".$tmp_created_at." <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }elseif($duplicate_info->total_care>0){
