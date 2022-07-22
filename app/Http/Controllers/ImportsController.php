@@ -281,14 +281,14 @@ class ImportsController extends Controller
     public function addItemDataParent($list,$arr_owner,$source_id,$creator_id,$source_detail_id) {
         if ($list) {
             $created_at = date('Y-m-d H:i:s');
-            $query = "INSERT INTO cms_parents (`name`,email,mobile_1,`address`,note,created_at,creator_id,`status`,source_id,source_detail_id,owner_id,mobile_2) VALUES ";
+            $query = "INSERT INTO cms_parents (`name`,email,mobile_1,`address`,note,created_at,creator_id,`status`,source_id,source_detail_id,owner_id,mobile_2,last_assign_date) VALUES ";
             $query_student = "INSERT INTO cms_students (`name`,`birthday`,created_at,creator_id,gud_mobile_1, checkin_at, checkin_branch_accounting_id) VALUES ";
             $check_import_student =0;
             if (count($list) > 10000) {
                 for($i = 0; $i < 10000; $i++) {
                     $item = (object)$list[$i];
                     $owner_id = $item->owner_id? $item->owner_id : $arr_owner[$i%count($arr_owner)];
-                    $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$source_detail_id','$owner_id','$item->gud_mobile2'),";
+                    $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$source_detail_id','$owner_id','$item->gud_mobile2',''$created_at''),";
                     if($item->student_name_1){
                         $check_import_student =1;
                         $student_birthday_1 = $item->student_birthday_1 ? "'".$item->student_birthday_1."'" :'NULL';
@@ -316,7 +316,7 @@ class ImportsController extends Controller
                 foreach($list as $i=>$item) {
                     $item = (object)$item;
                     $owner_id = $item->owner_id? $item->owner_id : $arr_owner[$i%count($arr_owner)];
-                    $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$source_detail_id','$owner_id','$item->gud_mobile2'),";
+                    $query.= "('$item->name','$item->email','$item->gud_mobile1','$item->address','$item->note','$created_at','$creator_id',1,'$source_id','$source_detail_id','$owner_id','$item->gud_mobile2','$created_at'),";
                     if($item->student_name_1){
                         $check_import_student =1;
                         $student_birthday_1 = $item->student_birthday_1 ? "'".$item->student_birthday_1."'" :'NULL';
