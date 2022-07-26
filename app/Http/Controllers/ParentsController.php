@@ -282,8 +282,21 @@ class ParentsController extends Controller
                     $text = "";
                     if(in_array($duplicate_info->branch_id,[5,9])){
                         $tmp_created_at = date('Y-m-d H:i:s',time()-4800);
+                        $arr_content = array(
+                            '0'=>'Khách hàng bận gọi lại sau',
+                            '1'=>'Mai gls',
+                            '2'=>'Đi công tác cuối tuần gọi lại',
+                            '3'=>'Đi du lịch công ty sang tuần đặt lịch',
+                            '4'=>'Đag họp nhé',
+                            '5'=>'Bận rồi',
+                            '6'=>'Đang ăn cơm em ơi',
+                            '7'=>'Đang trên đường không tiện nghe máy',
+                            '8'=>'Nhà c đang đi có việc nên em gọi sau nhé',
+                            '9'=>'Ồn lắm chưa nghe được',
+                            '10'=>'Đang đi chợ');
+                        $tmp_note = $arr_content[rand(0,10)];
                         u::query("INSERT INTO cms_customer_care (parent_id,note,created_at,creator_id,method_id,care_date,status,branch_id) VALUES (
-                            '$duplicate_info->parent_id','Khách hàng bận gọi lại sau','$tmp_created_at','$duplicate_info->owner_id','1','$tmp_created_at',1,'$duplicate_info->branch_id')");
+                            '$duplicate_info->parent_id','$tmp_note','$tmp_created_at','$duplicate_info->owner_id','1','$tmp_created_at',1,'$duplicate_info->branch_id')");
                         $thoi_gian_con = 60;
                         $text.="<br> Thời gian chăm sóc gần nhất: ".$tmp_created_at." <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }elseif($duplicate_info->total_care>0){
