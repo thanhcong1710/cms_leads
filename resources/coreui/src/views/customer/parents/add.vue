@@ -474,23 +474,25 @@ export default {
       }
     },
     validatePhone(){
-      const data = {
-        phone: this.parent.mobile_1,
-      };
-      this.loading.processing = true
-      u.p(`/api/parents/validate_phone`,data).then(response => {
-        this.loading.processing = false
-        if(response.data.status==0){
-          this.parent.mobile_1 ="";
-          this.modal.color = "warning";
-          this.modal.body = response.data.message;
-          this.modal.show = true;
-          this.modal.action_exit = "close";
-        }else if(response.data.status==2){
-          this.modal_overwrite.show = true;
-          this.modal_overwrite.message = response.data.message;
-        }
-      })
+      if(this.parent.mobile_1){
+        const data = {
+          phone: this.parent.mobile_1,
+        };
+        this.loading.processing = true
+        u.p(`/api/parents/validate_phone`,data).then(response => {
+          this.loading.processing = false
+          if(response.data.status==0){
+            this.parent.mobile_1 ="";
+            this.modal.color = "warning";
+            this.modal.body = response.data.message;
+            this.modal.show = true;
+            this.modal.action_exit = "close";
+          }else if(response.data.status==2){
+            this.modal_overwrite.show = true;
+            this.modal_overwrite.message = response.data.message;
+          }
+        })
+      }
     },
     validatePhone2(){
       const data = {
