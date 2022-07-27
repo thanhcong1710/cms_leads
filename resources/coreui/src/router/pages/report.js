@@ -4,6 +4,7 @@ const Report01 = () => import('../../views/reports/report_01')
 const Report02 = () => import('../../views/reports/report_02')
 const Report03 = () => import('../../views/reports/report_03')
 const Report04 = () => import('../../views/reports/report_04')
+const Report05 = () => import('../../views/reports/report_05')
 
 export default {
   router: {
@@ -39,6 +40,11 @@ export default {
         path: '/reports/04',
         name: 'Báo cáo chi tiết cuộc gọi',
         component: Report04
+      },
+      {
+        path: '/reports/05',
+        name: 'Báo cáo ghi đè',
+        component: Report05
       },
     ]
   }
