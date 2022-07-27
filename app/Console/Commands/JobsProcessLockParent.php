@@ -43,6 +43,7 @@ class JobsProcessLockParent extends Command
     {
         $import = new ParentsController();
         $import->processParentLock();
+        u::query("INSERT INTO log_jobs (`action`, created_at) VALUES ('jobsProcessLockParent','".date('Y-m-d H:i:s')."')");
         return "ok";
     }
     

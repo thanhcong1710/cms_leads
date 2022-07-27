@@ -48,6 +48,7 @@ class JobsProcessReport extends Command
             $tool = new ToolsController();
             $tool->processReportSaleHub($report_week->id);
         }
+        u::query("INSERT INTO log_jobs (`action`, created_at) VALUES ('jobsProcessReport','".date('Y-m-d H:i:s')."')");
         return "ok";
     }
     

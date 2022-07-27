@@ -457,40 +457,45 @@ export default {
       }
     },
     validatePhone(){
-      const data = {
-        phone: this.parent.mobile_1,
-        parent_id: this.parent.id,
-      };
-      this.loading.processing = true
-      u.p(`/api/parents/validate_phone`,data).then(response => {
-        this.loading.processing = false
-        if(response.data.status==0){
-          this.parent.mobile_1 ="";
-          this.modal.color = "warning";
-          this.modal.body = response.data.message;
-          this.modal.show = true;
-          this.modal.action_exit = "close";
-        }
-      })
+      if(this.parent.mobile_1){
+        const data = {
+          phone: this.parent.mobile_1,
+          parent_id: this.parent.id,
+        };
+        this.loading.processing = true
+        u.p(`/api/parents/validate_phone`,data).then(response => {
+          this.loading.processing = false
+          if(response.data.status==0){
+            this.parent.mobile_1 ="";
+            this.modal.color = "warning";
+            this.modal.body = response.data.message;
+            this.modal.show = true;
+            this.modal.action_exit = "close";
+          }
+        })
+      }
     },
     validatePhone2(){
-      const data = {
-        phone: this.parent.mobile_2,
-      };
-      this.loading.processing = true
-      u.p(`/api/parents/validate_phone`,data).then(response => {
-        this.loading.processing = false
-        if(response.data.status==0){
-          this.parent.mobile_2 ="";
-          this.modal.color = "warning";
-          this.modal.body = response.data.message;
-          this.modal.show = true;
-          this.modal.action_exit = "close";
-        }else if(response.data.status==2){
-          this.modal_overwrite.show = true;
-          this.modal_overwrite.message = response.data.message;
-        }
-      })
+      if(this.parent.mobile_2){
+        const data = {
+          phone: this.parent.mobile_2,
+          parent_id: this.parent.id,
+        };
+        this.loading.processing = true
+        u.p(`/api/parents/validate_phone`,data).then(response => {
+          this.loading.processing = false
+          if(response.data.status==0){
+            this.parent.mobile_2 ="";
+            this.modal.color = "warning";
+            this.modal.body = response.data.message;
+            this.modal.show = true;
+            this.modal.action_exit = "close";
+          }else if(response.data.status==2){
+            this.modal_overwrite.show = true;
+            this.modal_overwrite.message = response.data.message;
+          }
+        })
+      }
     },
     validatePhoneC2C(){
       this.c2c_info=""

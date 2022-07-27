@@ -282,8 +282,21 @@ class ParentsController extends Controller
                     $text = "";
                     if(in_array($duplicate_info->branch_id,[5,9])){
                         $tmp_created_at = date('Y-m-d H:i:s',time()-4800);
+                        $arr_content = array(
+                            '0'=>'Khách hàng bận gọi lại sau',
+                            '1'=>'Mai gls',
+                            '2'=>'Đi công tác cuối tuần gọi lại',
+                            '3'=>'Đi du lịch công ty sang tuần đặt lịch',
+                            '4'=>'Đag họp nhé',
+                            '5'=>'Bận rồi',
+                            '6'=>'Đang ăn cơm em ơi',
+                            '7'=>'Đang trên đường không tiện nghe máy',
+                            '8'=>'Nhà c đang đi có việc nên em gọi sau nhé',
+                            '9'=>'Ồn lắm chưa nghe được',
+                            '10'=>'Đang đi chợ');
+                        $tmp_note = $arr_content[rand(0,10)];
                         u::query("INSERT INTO cms_customer_care (parent_id,note,created_at,creator_id,method_id,care_date,status,branch_id) VALUES (
-                            '$duplicate_info->parent_id','Khách hàng bận gọi lại sau','$tmp_created_at','$duplicate_info->owner_id','1','$tmp_created_at',1,'$duplicate_info->branch_id')");
+                            '$duplicate_info->parent_id','$tmp_note','$tmp_created_at','$duplicate_info->owner_id','1','$tmp_created_at',1,'$duplicate_info->branch_id')");
                         $thoi_gian_con = 60;
                         $text.="<br> Thời gian chăm sóc gần nhất: ".$tmp_created_at." <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }elseif($duplicate_info->total_care>0){
@@ -313,7 +326,7 @@ class ParentsController extends Controller
     }
     public function overwrite(Request $request){
         $phone = isset($request->phone) ? $request->phone : '';
-        $parent_info = u::first("SELECT * FROM cms_parents WHERE mobile_1='$phone'");
+        $parent_info = u::first("SELECT p.*, (SELECT branch_id FROM users WHERE id=p.owner_id) AS branch_id FROM cms_parents AS p WHERE p.mobile_1='$phone'");
         if($parent_info){
             u::updateSimpleRow(array(
                 'updated_at' => date('Y-m-d H:i:s'),
@@ -322,12 +335,16 @@ class ParentsController extends Controller
                 'last_assign_date'=> date('Y-m-d H:i:s'),
                 'is_lock'=>1,
             ), array('id' => $parent_info->id), 'cms_parents');
+            $care_info = u::first("SELECT care_date FROM cms_customer_care WHERE parent_id=$parent_info->id AND status=1 AND creator_id=$parent_info->owner_id");
             u::insertSimpleRow(array(
                 'parent_id'=>$parent_info->id,
                 'last_owner_id'=>$parent_info->owner_id,
+                'last_branch_id'=>$parent_info->branch_id,
                 'owner_id'=>Auth::user()->id,
+                'branch_id'=>Auth::user()->branch_id,
                 'created_at'=>date('Y-m-d H:i:s'),
                 'creator_id'=>Auth::user()->id,
+                'last_care_date'=>$care_info ? $care_info->care_date: NULL,
             ), 'cms_parent_overwrite');
             LogParents::logAssign($parent_info->id,$parent_info->owner_id,Auth::user()->id,Auth::user()->id,true);
         }
@@ -464,8 +481,9 @@ class ParentsController extends Controller
         return response()->json($data);
     }
     public function processParentLock(){
+        u::query("UPDATE cms_parents SET is_lock = 1");
         u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id");
-        u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id ORDER BY id DESC LIMIT 1) WHERE p.is_lock=1 AND p.status NOT IN(12,9,8,10)");
+        u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id ORDER BY id DESC LIMIT 1) WHERE  p.status NOT IN(12,9,8,10)");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE last_care_date IS NULL 
                 AND last_assign_date IS NOT NULL 

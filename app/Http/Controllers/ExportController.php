@@ -556,4 +556,84 @@ class ExportController extends Controller
             throw $exception;
         }
     }
+    public function report05(Request $request , $key,$value) {
+        set_time_limit(300);
+        ini_set('memory_limit', '-1');
+        $cond = "1";
+        $arr_key =explode(',',$key);
+        $arr_value =explode(',',$value);
+        foreach($arr_key AS $k=>$key){
+            if($key=='keyword'){
+                $keyword = $arr_value[$k];
+                $cond .= " AND (p.mobile_1 LIKE '%$keyword%' OR p.mobile_2 LIKE '%$keyword%' )";;
+            }
+            if($key=='branch_id'){
+                $cond .= " AND (o.last_branch_id IN (".str_replace("-",",", $arr_value[$k]).") OR o.branch_id IN (".str_replace("-",",", $arr_value[$k])."))";
+            }
+        }
+        
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
+            $cond .= " AND (o.last_owner_id IN (".$request->user_info->users_manager.") OR o.owner_id IN (".$request->user_info->users_manager."))";
+        }
+        $list = u::query("SELECT p.mobile_1,CONCAT(u.name,' - ',u.hrm_id) AS last_owner_name,b.name AS last_branch_name,
+                    CONCAT(u1.name,' - ',u1.hrm_id) AS owner_name,b1.name AS branch_name,o.last_care_date,o.created_at
+                FROM cms_parent_overwrite AS o
+                    LEFT JOIN cms_parents AS p ON p.id=o.parent_id
+                    LEFT JOIN users AS u ON u.id=o.last_owner_id 
+                    LEFT JOIN cms_branches AS b ON b.id=last_branch_id
+                    LEFT JOIN users AS u1 ON u1.id=o.owner_id 
+                    LEFT JOIN cms_branches AS b1 ON b1.id= o.branch_id
+                WHERE $cond ORDER BY o.id DESC ");
+            
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'STT');
+        $sheet->setCellValue('B1', 'SĐT');
+        $sheet->setCellValue('C1', 'Ngày phụ trách');
+        $sheet->setCellValue('D1', 'Trung tâm');
+        $sheet->setCellValue('E1', 'Thời gian chăm sóc gần nhất');
+        $sheet->setCellValue('F1', 'Người ghi đè');
+        $sheet->setCellValue('G1', 'Trung tâm');
+        $sheet->setCellValue('H1', 'Thời gian ghi đè');
+        ProcessExcel::styleCells($spreadsheet, "A1", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "B1", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "C1", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "D1", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "E1", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "F1", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "G1", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+        ProcessExcel::styleCells($spreadsheet, "H1", NULL, 'FFFFFF', 12, 1, 3, "center", "center", true, 0, 'Cambria');
+
+        $sheet->getColumnDimension("A")->setWidth(10);
+        $sheet->getColumnDimension("B")->setWidth(30);
+        $sheet->getColumnDimension("C")->setWidth(30);
+        $sheet->getColumnDimension("D")->setWidth(30);
+        $sheet->getColumnDimension("E")->setWidth(30);
+        $sheet->getColumnDimension("F")->setWidth(30);
+        $sheet->getColumnDimension("G")->setWidth(30);
+        $sheet->getColumnDimension("H")->setWidth(30);
+        for ($i = 0; $i < count($list) ; $i++) {
+            $x = $i + 2;
+            $sheet->setCellValue('A' . $x, $i+1);
+            $sheet->setCellValue('B' . $x, $list[$i]->mobile_1);
+            $sheet->setCellValue('C' . $x, $list[$i]->last_owner_name) ;
+            $sheet->setCellValue('D' . $x, $list[$i]->last_branch_name );
+            $sheet->setCellValue('E' . $x, $list[$i]->last_care_date);
+            $sheet->setCellValue('F' . $x, $list[$i]->owner_name);
+            $sheet->setCellValue('G' . $x, $list[$i]->branch_name);
+            $sheet->setCellValue('H' . $x, $list[$i]->created_at);
+            
+            $sheet->getRowDimension($x)->setRowHeight(23);
+
+        }
+        $writer = new Xlsx($spreadsheet);
+        try {
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="Báo cáo ghi đè.xlsx"');
+            header('Cache-Control: max-age=0');
+            $writer->save("php://output");
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
 }

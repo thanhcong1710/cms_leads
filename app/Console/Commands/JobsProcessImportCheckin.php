@@ -42,6 +42,7 @@ class JobsProcessImportCheckin extends Command
     {
         $import = new ImportsController();
         $import->processImportCheckin();
+        u::query("INSERT INTO log_jobs (`action`, created_at) VALUES ('jobsProcessImportCheckin','".date('Y-m-d H:i:s')."')");
         return "ok";
     }
     
