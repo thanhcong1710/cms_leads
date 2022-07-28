@@ -280,7 +280,7 @@ class ParentsController extends Controller
                 }else{
                     $result->status = 0;
                     $text = "";
-                    if(in_array($duplicate_info->branch_id,[5,9])){
+                    if(in_array($duplicate_info->branch_id,[5,9]) &&1==2){
                         $tmp_created_at = date('Y-m-d H:i:s',time()-4800);
                         $arr_content = array(
                             '0'=>'Khách hàng bận gọi lại sau',
@@ -484,13 +484,13 @@ class ParentsController extends Controller
             WHERE last_care_date IS NULL 
                 AND last_assign_date IS NOT NULL 
                 AND is_lock=1 AND status NOT IN(12,8)
-                AND tmp_branch_id NOT IN (5,9)
+                -- AND tmp_branch_id NOT IN (5,9)
                 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE
                 last_care_date IS NOT NULL 
                 AND last_assign_date IS NOT NULL 
-                AND tmp_branch_id NOT IN (5,9)
+                -- AND tmp_branch_id NOT IN (5,9)
                 AND is_lock=1 AND status NOT IN(12,8)
                 AND DATEDIFF( CURRENT_DATE, last_care_date )> 60");
         return "ok";
