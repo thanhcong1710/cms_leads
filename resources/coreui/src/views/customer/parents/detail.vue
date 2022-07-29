@@ -128,9 +128,9 @@
                   </ul>
                   <div class="tab-content py-3" id="myTabContent">
                     <div class="tab-pane fade" :class="{ 'active show': isActive('customer_care') }" id="customer_care">
-                      <div class="padding-bottom-10">
+                      <!-- <div class="padding-bottom-10">
                         <button :disabled="disabled_action" class="btn btn-success" @click="showModalCare"><i class="fa fa-plus"></i> Thêm mới</button>
-                      </div>
+                      </div> -->
                       <div>
                       <table class="table table-striped table-hover">
                         <thead>
