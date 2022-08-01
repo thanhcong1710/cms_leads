@@ -31,6 +31,7 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::get('/tools/report_salehub/{report_week_id}', 'ToolsController@processReportSaleHub');
     Route::get('/import/process_import_checkin', 'ImportsController@processImportCheckin');
     Route::get('/parent/process_parent_lock', 'ParentsController@processParentLock');
+    Route::get('/parent/delete_file_attached', 'ParentCareController@deleteFileAttached');
 
     Route::group(['middleware' => 'admin'], function ($router) {
         Route::resource('users', 'UsersController')->except( ['create', 'store'] );

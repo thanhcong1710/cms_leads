@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Http\Controllers\ParentsController;
+use App\Http\Controllers\ParentCareController;
 use App\Models\Sms;
 use Illuminate\Console\Command;
 use App\Providers\UtilityServiceProvider as u;
@@ -43,6 +44,10 @@ class JobsProcessLockParent extends Command
     {
         $import = new ParentsController();
         $import->processParentLock();
+        
+        //delete file attach cms_customer_care
+        $care = new ParentCareController();
+        $care->deleteFileAttached();
         u::query("INSERT INTO log_jobs (`action`, created_at) VALUES ('jobsProcessLockParent','".date('Y-m-d H:i:s')."')");
         return "ok";
     }

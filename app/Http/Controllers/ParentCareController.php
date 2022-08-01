@@ -11,7 +11,32 @@ class ParentCareController extends Controller
 {
     public function add(Request $request)
     {
-        $data = u::insertSimpleRow(array(
+        $dataRequest = $request->all();
+        $attachedFile = $dataRequest['attached_file'];
+        if (!$attachedFile) {
+            $data = (object)[
+                'status' => 0 ,
+                'message' => "File upload không hợp lệ",
+            ];
+            return response()->json($data);
+        }
+
+        // SAVE FILES TO SERVER
+        $explod = explode(',', $attachedFile);
+        $decod = base64_decode($explod[1]);
+        if ( in_array(strtolower($explod[0]),['data:image/png;base64','data:image/jpg;base64'])) {
+            $extend = 'jpg';
+        } else {
+            $data = (object)[
+                'status' => 0 ,
+                'message' => "File upload không hợp lệ. chỉ hỗ trợ định dạng JPG, PNG",
+            ];
+            return response()->json($data);
+        }
+        $fileAttached = 'customer_care_'.md5($request->attached_file.date('YmdHis')).'.'.$extend;
+        $p = __DIR__.'/../../../public/static/upload/'.$fileAttached;
+        file_put_contents($p, $decod);
+        $id = u::insertSimpleRow(array(
             'parent_id'=>$request->parent_id,
             'note'=>$request->note,
             'method_id' => $request->method_id,
@@ -19,7 +44,13 @@ class ParentCareController extends Controller
             'created_at' => date('Y-m-d H:i:s'),
             'creator_id' => Auth::user()->id,
             'branch_id' => Auth::user()->branch_id,
+            'attached_file'=>'static/upload/'.$fileAttached,
         ), 'cms_customer_care');
+        $data = (object)[
+            'status' => 1 ,
+            'message' => "Thành công",
+            'data'=>$id
+        ];
         return response()->json($data);
     }
     public function getAllDataByParent(Request $request, $parent_id){
@@ -44,6 +75,17 @@ class ParentCareController extends Controller
     }
     public function updateNoteCare(Request $request){
         u::updateSimpleRow(array('note'=>$request->note,'status'=>1),array('id'=>$request->care_id),'cms_customer_care');
+        return "ok";
+    }
+    public function deleteFileAttached(){
+        $list = u::query("SELECT id,attached_file FROM cms_customer_care WHERE attached_file IS NOT NULL AND created_at<'".date('Y-m-d 23:59:59',time()-24*3600*60)."'");
+        foreach($list AS $row){
+            $p = __DIR__.'/../../../public/'.$row->attached_file;
+            if (file_exists($p)) {
+                unlink($p);
+            }
+            u::query("UPDATE cms_customer_care SET attached_file=NULL WHERE id=".$row->id);
+        }
         return "ok";
     }
 }

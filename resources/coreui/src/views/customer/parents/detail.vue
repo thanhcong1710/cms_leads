@@ -128,9 +128,9 @@
                   </ul>
                   <div class="tab-content py-3" id="myTabContent">
                     <div class="tab-pane fade" :class="{ 'active show': isActive('customer_care') }" id="customer_care">
-                      <!-- <div class="padding-bottom-10">
+                      <div class="padding-bottom-10">
                         <button :disabled="disabled_action" class="btn btn-success" @click="showModalCare"><i class="fa fa-plus"></i> Thêm mới</button>
-                      </div> -->
+                      </div>
                       <div>
                       <table class="table table-striped table-hover">
                         <thead>
@@ -157,6 +157,9 @@
                                 </audio>
                               </p>
                               <p v-html="item.note"></p>
+                              <p v-if="item.attached_file">
+                                <a :href="item.attached_file" target="blank">File đính kèm</a>
+                              </p>
                             </td>
                           </tr>
                         </tbody>
@@ -243,6 +246,15 @@
                     :key="index"
                   >{{method.name}}</option>
                 </select>
+              </div>
+              <div class="form-group col-sm-6">
+                <label for="nf-email">File đính kèm</label>
+                <input
+                      type="file"
+                      class="form-control"
+                      id="fileUploadExcel"
+                      @change="fileChanged"
+                    >
               </div>
               <div class="form-group col-sm-12">
                 <label for="nf-email">Ghi chú</label>
@@ -543,6 +555,8 @@ export default {
         care_date:"",
         note:"",
         parent_id:"",
+        attached_file:"",
+        file_name:"",
       },
       students:[],
       student:{
@@ -683,11 +697,18 @@ export default {
         mess += " - Nội dung chăm sóc không được để trống<br/>";
         resp = false;
       }
+      if (this.care.file_name == "") {
+        mess += " - File đính kèm không được để trống<br/>";
+        resp = false;
+      }
       if(resp){
         this.loading.processing = true;
         this.exit("care");
         u.p(`/api/care/add`,this.care)
         .then((response) => {
+          if(response.data.status ==0){
+            alert(response.data.message)
+          }
           this.loading.processing = false;
           this.loadCares(this.parent.id);
         })
@@ -1010,6 +1031,15 @@ export default {
       this.modal_checkin.checkin_at = item.checkin_at
       this.modal_checkin.error_message=""
     },
+    fileChanged(e) {
+      const fileReader = new FileReader();
+      const fileName = e.target.value.split("\\").pop();
+      this.care.file_name = fileName
+      fileReader.readAsDataURL(e.target.files[0]);
+      fileReader.onload = e => {
+        this.care.attached_file = e.target.result;
+      };
+    },
   },
   filters: {
     genTextGender(item){
@@ -1031,7 +1061,7 @@ export default {
         resp = 'Đã đến checkin'
       }
       return resp
-    }
+    },
   },
   sockets: {
     connect: function () {
