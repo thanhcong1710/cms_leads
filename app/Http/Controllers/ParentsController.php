@@ -280,7 +280,7 @@ class ParentsController extends Controller
                 }else{
                     $result->status = 0;
                     $text = "";
-                    if(in_array($duplicate_info->branch_id,[5,9])){
+                    if(in_array($duplicate_info->branch_id,[5,9]) &&1==2){
                         $tmp_created_at = date('Y-m-d H:i:s',time()-4800);
                         $arr_content = array(
                             '0'=>'Khách hàng bận gọi lại sau',
@@ -306,7 +306,7 @@ class ParentsController extends Controller
                         $thoi_gian_con = 15 - ceil((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
                         $text.="<br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }
-                    if(in_array($duplicate_info->status,[12,8,9,10])){
+                    if(in_array($duplicate_info->status,[12,8])){
                         $text="<br> Khách hàng thuộc các trường hợp không được phép ghi đè - ".u::getStatus($duplicate_info->status);
                     }
                     $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name .".$text;
@@ -487,15 +487,15 @@ class ParentsController extends Controller
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE last_care_date IS NULL 
                 AND last_assign_date IS NOT NULL 
-                AND is_lock=1 AND status NOT IN(12,9,8,10)
-                AND tmp_branch_id NOT IN (5,9)
+                AND is_lock=1 AND status NOT IN(12,8)
+                -- AND tmp_branch_id NOT IN (5,9)
                 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE
                 last_care_date IS NOT NULL 
                 AND last_assign_date IS NOT NULL 
-                AND tmp_branch_id NOT IN (5,9)
-                AND is_lock=1 AND status NOT IN(12,9,8,10)
+                -- AND tmp_branch_id NOT IN (5,9)
+                AND is_lock=1 AND status NOT IN(12,8)
                 AND DATEDIFF( CURRENT_DATE, last_care_date )> 60");
         return "ok";
     }
