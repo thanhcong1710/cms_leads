@@ -24,7 +24,7 @@ class ParentCareController extends Controller
         // SAVE FILES TO SERVER
         $explod = explode(',', $attachedFile);
         $decod = base64_decode($explod[1]);
-        if ( in_array(strtolower($explod[0]),['data:image/png;base64','data:image/jpg;base64'])) {
+        if ( in_array(strtolower($explod[0]),['data:image/png;base64','data:image/jpg;base64','data:image/jpeg;base64'])) {
             $extend = 'jpg';
         } else {
             $data = (object)[

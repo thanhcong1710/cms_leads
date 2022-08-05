@@ -669,6 +669,10 @@ export default {
       // document.getElementById('published_date').value=""
       this.modal_care.show = true
       this.modal_care.error_message=""
+      this.care.method_id=""
+      this.care.note=""
+      this.care.attached_file=""
+      this.care.file_name=""
     },
     loadCares(parent_id){
       this.loading.processing = true;
