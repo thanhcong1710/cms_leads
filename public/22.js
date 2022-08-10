@@ -30,6 +30,7 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   components: {},
@@ -39,13 +40,15 @@ __webpack_require__.r(__webpack_exports__);
       showBC01: false,
       showBC02: false,
       showBC03: false,
-      showBC04: false
+      showBC04: false,
+      showBC05: false
     };
   },
   created: function created() {
     this.showBC01 = true;
     this.showBC03 = true;
     this.showBC04 = true;
+    this.showBC05 = true;
     var arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
 
     if (arr_role.indexOf("admin") > -1) {
@@ -174,6 +177,19 @@ var render = function() {
                 _vm.showBC04
                   ? _c("router-link", { attrs: { to: "/reports/04" } }, [
                       _vm._v("04. Báo cáo chi tiết cuộc gọi")
+                    ])
+                  : _vm._e()
+              ],
+              1
+            ),
+            _vm._v(" "),
+            _c(
+              "p",
+              { staticClass: "h6" },
+              [
+                _vm.showBC05
+                  ? _c("router-link", { attrs: { to: "/reports/05" } }, [
+                      _vm._v("05. Báo cáo ghi đè")
                     ])
                   : _vm._e()
               ],

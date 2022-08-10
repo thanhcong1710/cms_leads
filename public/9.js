@@ -500,6 +500,18 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -599,7 +611,9 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         method_id: "",
         care_date: "",
         note: "",
-        parent_id: ""
+        parent_id: "",
+        attached_file: "",
+        file_name: ""
       },
       students: [],
       student: {
@@ -749,10 +763,19 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         resp = false;
       }
 
+      if (this.care.file_name == "") {
+        mess += " - File đính kèm không được để trống<br/>";
+        resp = false;
+      }
+
       if (resp) {
         this.loading.processing = true;
         this.exit("care");
         _utilities_utility__WEBPACK_IMPORTED_MODULE_1__["default"].p("/api/care/add", this.care).then(function (response) {
+          if (response.data.status == 0) {
+            alert(response.data.message);
+          }
+
           _this4.loading.processing = false;
 
           _this4.loadCares(_this4.parent.id);
@@ -1080,6 +1103,18 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.modal_checkin.branch_id = item.checkin_branch_id;
       this.modal_checkin.checkin_at = item.checkin_at;
       this.modal_checkin.error_message = "";
+    },
+    fileChanged: function fileChanged(e) {
+      var _this17 = this;
+
+      var fileReader = new FileReader();
+      var fileName = e.target.value.split("\\").pop();
+      this.care.file_name = fileName;
+      fileReader.readAsDataURL(e.target.files[0]);
+
+      fileReader.onload = function (e) {
+        _this17.care.attached_file = e.target.result;
+      };
     }
   },
   filters: {
@@ -2117,7 +2152,22 @@ var render = function() {
                                             domProps: {
                                               innerHTML: _vm._s(item.note)
                                             }
-                                          })
+                                          }),
+                                          _vm._v(" "),
+                                          item.attached_file
+                                            ? _c("p", [
+                                                _c(
+                                                  "a",
+                                                  {
+                                                    attrs: {
+                                                      href: item.attached_file,
+                                                      target: "blank"
+                                                    }
+                                                  },
+                                                  [_vm._v("File đính kèm")]
+                                                )
+                                              ])
+                                            : _vm._e()
                                         ])
                                       ])
                                     }),
@@ -2513,6 +2563,18 @@ var render = function() {
                       ],
                       2
                     )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group col-sm-6" }, [
+                    _c("label", { attrs: { for: "nf-email" } }, [
+                      _vm._v("File đính kèm")
+                    ]),
+                    _vm._v(" "),
+                    _c("input", {
+                      staticClass: "form-control",
+                      attrs: { type: "file", id: "fileUploadExcel" },
+                      on: { change: _vm.fileChanged }
+                    })
                   ]),
                   _vm._v(" "),
                   _c("div", { staticClass: "form-group col-sm-12" }, [
