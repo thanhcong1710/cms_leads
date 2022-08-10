@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 class ParentsController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource
      *
      * @return \Illuminate\Http\Response
      */
