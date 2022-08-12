@@ -266,7 +266,7 @@
             select-label="Chọn một người phụ trách"
             v-model="owners"
             :options="users_manager"
-            label="name"
+            label="label_name"
             :close-on-select="false"
             :hide-selected="true"
             :multiple="true"

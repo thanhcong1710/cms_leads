@@ -172,7 +172,7 @@ class UsersController extends Controller
         }
     }
     public function getUserAssgin(Request $request){
-        $data = u::query("SELECT *,CONCAT(name,' - ',hrm_id) AS label_name FROM users WHERE status=1 AND id IN (".$request->user_info->users_manager.")");
+        $data = u::query("SELECT *,CONCAT(name,' - ',hrm_id, ' - ', branch_name) AS label_name FROM users WHERE status=1 AND id IN (".$request->user_info->users_manager.")");
         return response()->json($data);
     }
     public function list(Request $request)
