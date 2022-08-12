@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 class ParentsController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a listing of the resource
      *
      * @return \Illuminate\Http\Response
      */
@@ -38,7 +38,7 @@ class ParentsController extends Controller
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
         if($request->user()->hasRole('Marketing')){
-            $cond .= " AND (p.creator_id IN (".$request->user()->id.") OR p.owner_id = ".$request->user()->id.")";
+            $cond .= " AND (p.creator_id IN (".$request->user()->id.") OR p.owner_id = ".$request->user()->id." OR p.source_id=26)";
         }
         if (!empty($status)) {
             $cond .= " AND p.status IN (".implode(",",$status).")";
@@ -483,7 +483,7 @@ class ParentsController extends Controller
     public function processParentLock(){
         u::query("UPDATE cms_parents SET is_lock = 1");
         u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id");
-        u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id ORDER BY id DESC LIMIT 1) WHERE  p.status NOT IN(12,9,8,10)");
+        u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1) WHERE  p.status NOT IN(12,9,8,10)");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE last_care_date IS NULL 
                 AND last_assign_date IS NOT NULL 
