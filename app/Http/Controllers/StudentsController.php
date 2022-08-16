@@ -84,7 +84,8 @@ class StudentsController extends Controller
                 p.mobile_2 AS gud_mobile_2,
                 p.gender AS gud_gender,
                 p.birthday AS gud_birthday,
-                p.source_id AS source, 
+                p.source_id AS source,
+                p.source_detail_id AS source_detail, 
                 p.job_id AS  gud_job,
                 (SELECT hrm_id FROM users WHERE id=p.owner_id) AS owner_hrm,
                 (SELECT crm_id FROM cms_students WHERE parent_id=p.id AND id !=s.id AND crm_id IS NOT NULL LIMIT 1) AS sibling_id 
@@ -103,6 +104,7 @@ class StudentsController extends Controller
             'gud_birthday'=>$student_info->gud_birthday,
             'gud_job'=>$student_info->gud_job,
             'source'=>$student_info->source,
+            'source_detail'=>$student_info->source_detail,
             'address'=>$student_info->address,
             'province_id'=>$student_info->province_id,
             'district_id'=>$student_info->district_id,
@@ -164,7 +166,8 @@ class StudentsController extends Controller
                 p.mobile_2 AS gud_mobile_2,
                 p.gender AS gud_gender,
                 p.birthday AS gud_birthday,
-                p.source_id AS source, 
+                p.source_id AS source,
+                p.source_detail_id AS source_detail, 
                 p.job_id AS  gud_job
             FROM cms_parents AS p WHERE p.id=$parent_id");
             $method = "POST";
@@ -177,6 +180,7 @@ class StudentsController extends Controller
                 'gud_birthday'=>$student_info->gud_birthday,
                 'gud_job'=>$student_info->gud_job,
                 'source'=>$student_info->source,
+                'source_detail'=>$student_info->source_detail,
                 'address'=>$student_info->address,
                 'province_id'=>$student_info->province_id,
                 'district_id'=>$student_info->district_id,
