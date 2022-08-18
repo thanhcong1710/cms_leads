@@ -210,6 +210,9 @@
         <CButton :color="'btn btn-' + modal.color" @click="exit" type="button"
           >Đóng</CButton
         >
+         <CButton :color="'btn btn-success'" v-if="change_source" @click="changeSourceMKT" type="button"
+          >Thay đổi nguồn MKT</CButton
+        >
       </template>
     </CModal>
     <CModal
@@ -323,9 +326,15 @@ export default {
       },
       users_manager:[],
       c2c_info:"",
+      change_source: false,
+      change_source_parent_id:"",
     };
   },
   created() {
+    const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
+    if(arr_role.indexOf("Marketing")> -1){
+      this.change_source = true
+    }
     u.g(`/api/user/get-users-manager`)
       .then(response => {
       this.users_manager = response.data
@@ -482,6 +491,7 @@ export default {
         u.p(`/api/parents/validate_phone`,data).then(response => {
           this.loading.processing = false
           if(response.data.status==0){
+            this.change_source_parent_id = response.data.dup_parent_id
             this.parent.mobile_1 ="";
             this.modal.color = "warning";
             this.modal.body = response.data.message;
@@ -502,6 +512,7 @@ export default {
       u.p(`/api/parents/validate_phone`,data).then(response => {
         this.loading.processing = false
         if(response.data.status==0){
+          this.change_source_parent_id = response.data.dup_parent_id
           this.parent.mobile_2 ="";
           this.modal.color = "warning";
           this.modal.body = response.data.message;
@@ -516,6 +527,23 @@ export default {
     exit_overwrite(){
       this.modal_overwrite.show = false;
       this.parent.mobile_1 ="";
+    },
+    changeSourceMKT(){
+      const data = {
+        parent_id: this.change_source_parent_id,
+      };
+      this.loading.processing = true
+      this.modal.show = false;
+      u.p(`/api/parents/change_source_mkt`,data).then(response => {
+        this.loading.processing = false
+        if(response.status==200){
+          this.parent.mobile_1 ="";
+          this.modal.color = "success";
+          this.modal.body = "Thay đổi nguồn MKT thành công!";
+          this.modal.show = true;
+          this.modal.action_exit = "exit";
+        }
+      })
     },
     overwrite(){
       const data = {

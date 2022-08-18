@@ -92,6 +92,7 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::post('/parents/validate_phone', 'ParentsController@validatePhone');
         Route::post('/parents/validate_c2c_phone', 'ParentsController@validateC2CPhone');
         Route::post('/parents/overwrite', 'ParentsController@overwrite');
+        Route::post('/parents/change_source_mkt', 'ParentsController@changeSourceMKT');
         Route::get('/parents/show/{parent_id}', 'ParentsController@show');
         Route::get('/parents/get_logs/{parent_id}', 'ParentsController@getLogs');
         Route::get('/parents/make_to_call/{parent_id}', 'ParentsController@makeToCall');
