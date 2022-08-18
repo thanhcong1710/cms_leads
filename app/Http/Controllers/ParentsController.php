@@ -244,10 +244,11 @@ class ParentsController extends Controller
         $phone = isset($request->phone) ? $request->phone : '';
         $result =(object)array(
             'status'=>1,
-            'message'=>''
+            'message'=>'',
+            'dup_parent_id'=>'',
         );
         if($parent_id){
-            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name, 
+            $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name,p.id AS parent_id,
                     (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND status=1 ORDER BY care_date DESC LIMIT 1) AS care_date,
                     (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1 ) AS total_care, p.last_assign_date
                 FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  
@@ -255,6 +256,7 @@ class ParentsController extends Controller
             if($duplicate_info){
                 $result->status = 0;
                 $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name";
+                $result->dup_parent_id = $duplicate_info->parent_id;
             }
             // $parent_info = u::first("SELECT mobile_1,mobile_2 FROM cms_parents WHERE id=$parent_id");
             // if($parent_info->mobile_1!=$phone && $parent_info->mobile_2!=$phone){
@@ -277,8 +279,10 @@ class ParentsController extends Controller
                 if($duplicate_info->is_lock==0){
                     $result->status = 2;
                     $result->message = "Khách hàng có SĐT: $phone đã tồn tại trên hệ thống, bạn có muốn chăm sóc?";
+                    $result->dup_parent_id = $duplicate_info->parent_id;
                 }else{
                     $result->status = 0;
+                    $result->dup_parent_id = $duplicate_info->parent_id;
                     $text = "";
                     if(in_array($duplicate_info->branch_id,[5,9]) &&1==2){
                         $tmp_created_at = date('Y-m-d H:i:s',time()-4800);
@@ -300,10 +304,10 @@ class ParentsController extends Controller
                         $thoi_gian_con = 60;
                         $text.="<br> Thời gian chăm sóc gần nhất: ".$tmp_created_at." <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }elseif($duplicate_info->total_care>0){
-                        $thoi_gian_con = 60 - ceil((time() - strtotime($duplicate_info->care_date))/(3600*24));
+                        $thoi_gian_con = 61 - ceil((time() - strtotime($duplicate_info->care_date))/(3600*24));
                         $text.="<br> Thời gian chăm sóc gần nhất: $duplicate_info->care_date <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }else{
-                        $thoi_gian_con = 15 - ceil((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
+                        $thoi_gian_con = 16 - ceil((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
                         $text.="<br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }
                     if(in_array($duplicate_info->status,[12,8])){
@@ -497,6 +501,19 @@ class ParentsController extends Controller
                 -- AND tmp_branch_id NOT IN (5,9)
                 AND is_lock=1 AND status NOT IN(12,8)
                 AND DATEDIFF( CURRENT_DATE, last_care_date )> 60");
+        return "ok";
+    }
+    public function changeSourceMKT(Request $request){
+        $parent_info = u::first("SELECT * FROM cms_parents WHERE id='$request->parent_id'");
+        if($parent_info){
+            $data_update = array(
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updator_id' => Auth::user()->id,
+                'source_id'=>26
+            );
+            u::updateSimpleRow($data_update, array('id' => $parent_info->id), 'cms_parents');
+            LogParents::logUpdateInfo($parent_info,$data_update,Auth::user()->id);
+        }
         return "ok";
     }
 }
