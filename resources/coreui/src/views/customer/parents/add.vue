@@ -331,10 +331,6 @@ export default {
     };
   },
   created() {
-    const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
-    if(arr_role.indexOf("Marketing")> -1){
-      this.change_source = true
-    }
     u.g(`/api/user/get-users-manager`)
       .then(response => {
       this.users_manager = response.data
@@ -420,6 +416,7 @@ export default {
         this.$router.push({ path: "/parents" });
       } else {
         this.modal.show = false;
+        this.change_source = false;
       }
     },
     getDistrict(data = null){
@@ -492,6 +489,10 @@ export default {
           this.loading.processing = false
           if(response.data.status==0){
             this.change_source_parent_id = response.data.dup_parent_id
+            const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
+            if(arr_role.indexOf("Marketing")> -1){
+              this.change_source = true
+            }
             this.parent.mobile_1 ="";
             this.modal.color = "warning";
             this.modal.body = response.data.message;
@@ -513,6 +514,10 @@ export default {
         this.loading.processing = false
         if(response.data.status==0){
           this.change_source_parent_id = response.data.dup_parent_id
+          const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
+          if(arr_role.indexOf("Marketing")> -1){
+            this.change_source = true
+          }
           this.parent.mobile_2 ="";
           this.modal.color = "warning";
           this.modal.body = response.data.message;
