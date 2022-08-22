@@ -168,7 +168,6 @@ class ReportsController extends Controller
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
         }
-        var_dump($cond1);die();
         $total = u::first("SELECT count(u.id) AS total FROM users AS u 
             WHERE u.status=1 AND $cond ");
         $list = u::query("SELECT CONCAT(u.sip_id,' - ',u.name,' - ',u.hrm_id) AS sip_name,
