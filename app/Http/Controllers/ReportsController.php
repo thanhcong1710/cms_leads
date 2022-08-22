@@ -147,14 +147,19 @@ class ReportsController extends Controller
             $request->type_date = 0;
             $cond1 .= " AND start_time <= '".date('Y-m-d H:i:s',strtotime($request->to_date))."'";
         }
+        if(date("l")=='Monday'){
+            $tmp_last_monday = date('Y-m-d 00:00:00');
+        }else{
+            $tmp_last_monday = date('Y-m-d 00:00:00',strtotime("last Monday"));
+        }
         if($request->type_date == 1){
             $cond1 .= " AND start_time >= '".date('Y-m-d 00:00:00')."'";
         }elseif($request->type_date == 2){
             $cond1 .= " AND start_time < '".date('Y-m-d 00:00:00')."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime ( '-1 day' , time() ) )."'";
         }elseif($request->type_date == 3){
-            $cond1 .= " AND start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday"))."'";
+            $cond1 .= " AND start_time >= '".$tmp_last_monday."'";
         }elseif($request->type_date == 4){
-            $cond1 .= " AND start_time < '".date('Y-m-d 00:00:00',strtotime("last Monday"))."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday")-24*7*3600)."'";
+            $cond1 .= " AND start_time < '".$tmp_last_monday."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime($tmp_last_monday)-24*7*3600)."'";
         }elseif($request->type_date == 5){
             $cond1 .= " AND start_time >= '".date('Y-m-01 00:00:00')."'";
         }elseif($request->type_date == 6){
@@ -163,6 +168,7 @@ class ReportsController extends Controller
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
         }
+        var_dump($cond1);die();
         $total = u::first("SELECT count(u.id) AS total FROM users AS u 
             WHERE u.status=1 AND $cond ");
         $list = u::query("SELECT CONCAT(u.sip_id,' - ',u.name,' - ',u.hrm_id) AS sip_name,
