@@ -174,19 +174,21 @@ class ReportsController extends Controller
                 (SELECT name FROM cms_branches WHERE id=u.branch_id) AS branch_name,
                 (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND status=1 AND $cond1) AS total_inbound,
                 (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND status=1 AND $cond1) AS total_outbound,
-                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND status=1 AND $cond1) AS total_duration_inbound,
-                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND status=1 AND $cond1) AS total_duration_outbound,
-                0 As duration_inbound,
-                0 AS duration_outbound
+                -- (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND status=1 AND $cond1) AS total_duration_inbound,
+                -- (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND status=1 AND $cond1) AS total_duration_outbound,
+                -- 0 As duration_inbound,
+                -- 0 AS duration_outbound
+                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND status=1  AND  disposition = 'ANSWERED' AND $cond1) AS total_call_success,
+                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND status=1 AND disposition != 'ANSWERED' AND $cond1) AS total_call_fail
             FROM users AS u 
             WHERE u.status=1 AND $cond AND sip_id IS NOT NULL
             ORDER BY u.id DESC $limitation");
-        foreach($list AS $k=>$row){
-            $list[$k]->duration_inbound = gmdate("H:i:s", ($row->total_inbound ? $row->total_duration_inbound / $row->total_inbound :0));
-            $list[$k]->duration_outbound = gmdate("H:i:s", ($row->total_outbound ? $row->total_duration_outbound/ $row->total_outbound :0));
-            $list[$k]->total_duration_inbound = gmdate("H:i:s", $row->total_duration_inbound);
-            $list[$k]->total_duration_outbound = gmdate("H:i:s", $row->total_duration_outbound);
-        }
+        // foreach($list AS $k=>$row){
+        //     $list[$k]->duration_inbound = gmdate("H:i:s", ($row->total_inbound ? $row->total_duration_inbound / $row->total_inbound :0));
+        //     $list[$k]->duration_outbound = gmdate("H:i:s", ($row->total_outbound ? $row->total_duration_outbound/ $row->total_outbound :0));
+        //     $list[$k]->total_duration_inbound = gmdate("H:i:s", $row->total_duration_inbound);
+        //     $list[$k]->total_duration_outbound = gmdate("H:i:s", $row->total_duration_outbound);
+        // }
             
         $data = u::makingPagination($list, $total->total, $page, $limit);
         return response()->json($data);
