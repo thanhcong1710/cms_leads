@@ -111,10 +111,12 @@
                   <th>Tên máy nhánh</th>
                   <th>Tổng gọi vào</th>
                   <th>Tổng gọi ra</th>
-                  <th>Thời gian gọi vào TB</th>
+                  <th>Tổng số cuộc gọi thành công</th>
+                  <th>Tổng số cuộc gọi thất bại</th>
+                  <!-- <th>Thời gian gọi vào TB</th>
                   <th>Thời gian gọi ra TB</th>
                   <th>Tổng thời gian gọi vào</th>
-                  <th>Tổng thời gian gọi ra</th>
+                  <th>Tổng thời gian gọi ra</th> -->
                 </tr>
               </thead>
               <tbody>
@@ -126,10 +128,12 @@
                   <td>{{ item.sip_name }}</td>
                   <td>{{ item.total_inbound }}</td>
                   <td>{{ item.total_outbound }}</td>
-                  <td>{{ item.duration_inbound}}</td>
+                  <td>{{ item.total_call_success }}</td>
+                  <td>{{ item.total_call_fail }}</td>
+                  <!-- <td>{{ item.duration_inbound}}</td>
                   <td>{{ item.duration_outbound }}</td>
                   <td>{{ item.total_duration_inbound}}</td>
-                  <td>{{ item.total_duration_outbound}}</td>
+                  <td>{{ item.total_duration_outbound}}</td> -->
                 </tr>
               </tbody>
             </table>

@@ -35,7 +35,11 @@ class ParentsController extends Controller
         $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
         $cond = " 1 ";
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
-            $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
+            if($request->user()->id== 21){
+                $cond .= " AND (p.owner_id IN (".$request->user_info->users_manager.") OR p.source_id=27 OR p.source_id=35)";
+            }else{
+                $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
+            }
         }
         if($request->user()->hasRole('Marketing')){
             $cond .= " AND (p.creator_id IN (".$request->user()->id.") OR p.owner_id = ".$request->user()->id." OR p.source_id=26)";

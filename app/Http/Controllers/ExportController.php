@@ -369,30 +369,19 @@ class ExportController extends Controller
                 (SELECT name FROM cms_branches WHERE id=u.branch_id) AS branch_name,
                 (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND v.status=1 AND `type`='inbound' AND $cond1) AS total_inbound,
                 (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND v.status=1 AND `type`='outbound' AND $cond1) AS total_outbound,
-                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND v.status=1 AND `type`='inbound' AND $cond1) AS total_duration_inbound,
-                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND v.status=1 AND `type`='outbound' AND $cond1) AS total_duration_outbound,
-                0 As duration_inbound,
-                0 AS duration_outbound
+                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND status=1  AND  disposition = 'ANSWERED' AND $cond1) AS total_call_success,
+                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND status=1 AND disposition != 'ANSWERED' AND $cond1) AS total_call_fail
             FROM users AS u 
             WHERE u.status=1 AND $cond AND sip_id IS NOT NULL
             ORDER BY u.id DESC ");
-        foreach($list AS $k=>$row){
-            $list[$k]->duration_inbound = gmdate("H:i:s", ($row->total_inbound ? $row->total_duration_inbound / $row->total_inbound :0));
-            $list[$k]->duration_outbound = gmdate("H:i:s", ($row->total_outbound ? $row->total_duration_outbound/ $row->total_outbound :0));
-            $list[$k]->total_duration_inbound = gmdate("H:i:s", $row->total_duration_inbound);
-            $list[$k]->total_duration_outbound = gmdate("H:i:s", $row->total_duration_outbound);
-        }
-            
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('A1', 'Trung tâm');
         $sheet->setCellValue('B1', 'Tên máy nhánh');
         $sheet->setCellValue('C1', 'Tổng gọi vào');
         $sheet->setCellValue('D1', 'Tổng gọi ra');
-        $sheet->setCellValue('E1', 'Thời gian gọi vào TB');
-        $sheet->setCellValue('F1', 'Thời gian gọi ra TB');
-        $sheet->setCellValue('G1', 'Tổng thời gian gọi vào');
-        $sheet->setCellValue('H1', 'Tổng thời gian gọi ra');
+        $sheet->setCellValue('E1', 'Tổng cuộc gọi thành công');
+        $sheet->setCellValue('F1', 'Tổng cuộc gọi thất bại');
 
         $sheet->getColumnDimension("A")->setWidth(30);
         $sheet->getColumnDimension("B")->setWidth(30);
@@ -400,18 +389,14 @@ class ExportController extends Controller
         $sheet->getColumnDimension("D")->setWidth(20);
         $sheet->getColumnDimension("E")->setWidth(20);
         $sheet->getColumnDimension("F")->setWidth(20);
-        $sheet->getColumnDimension("G")->setWidth(20);
-        $sheet->getColumnDimension("H")->setWidth(20);
         for ($i = 0; $i < count($list) ; $i++) {
             $x = $i + 2;
             $sheet->setCellValue('A' . $x, $list[$i]->branch_name);
             $sheet->setCellValue('B' . $x, $list[$i]->sip_name);
             $sheet->setCellValue('C' . $x, $list[$i]->total_inbound) ;
             $sheet->setCellValue('D' . $x, $list[$i]->total_outbound );
-            $sheet->setCellValue('E' . $x, $list[$i]->duration_inbound);
-            $sheet->setCellValue('F' . $x, $list[$i]->duration_outbound);
-            $sheet->setCellValue('G' . $x, $list[$i]->total_duration_inbound);
-            $sheet->setCellValue('H' . $x, $list[$i]->total_duration_outbound);
+            $sheet->setCellValue('E' . $x, $list[$i]->total_call_success);
+            $sheet->setCellValue('F' . $x, $list[$i]->total_call_fail);
             
             $sheet->getRowDimension($x)->setRowHeight(23);
 
