@@ -178,8 +178,8 @@ class ReportsController extends Controller
                 -- (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND status=1 AND $cond1) AS total_duration_outbound,
                 -- 0 As duration_inbound,
                 -- 0 AS duration_outbound
-                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND status=1  AND  disposition = 'ANSWERED' AND $cond1) AS total_call_success,
-                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND status=1 AND disposition != 'ANSWERED' AND $cond1) AS total_call_fail
+                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1  AND  disposition = 'ANSWERED' AND $cond1) AS total_call_success,
+                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1 AND disposition != 'ANSWERED' AND $cond1) AS total_call_fail
             FROM users AS u 
             WHERE u.status=1 AND $cond AND sip_id IS NOT NULL
             ORDER BY u.id DESC $limitation");
