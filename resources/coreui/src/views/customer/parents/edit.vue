@@ -136,6 +136,7 @@
                             :searchable="true"
                             language="tv-VN"
                             :onChange="saveSource"
+                            :disabled="disabled_source"
                         ></vue-select>
                     </div>
                     <div class="form-group col-sm-6">
@@ -291,9 +292,14 @@ export default {
       tmp_district_id:"",
       users_manager:[],
       c2c_info:"",
+      disabled_source: true
     };
   },
   created() {
+    const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
+    if(arr_role.indexOf("admin")> -1){
+      this.disabled_action = true
+    }
     u.g(`/api/user/get-users-manager`)
       .then(response => {
       this.users_manager = response.data
