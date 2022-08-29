@@ -504,7 +504,8 @@ class ParentsController extends Controller
                 AND last_assign_date IS NOT NULL 
                 -- AND tmp_branch_id NOT IN (5,9)
                 AND is_lock=1 AND status NOT IN(12,8)
-                AND DATEDIFF( CURRENT_DATE, last_care_date )> 60");
+                AND DATEDIFF( CURRENT_DATE, last_care_date )> 60
+                AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
         return "ok";
     }
     public function changeSourceMKT(Request $request){
