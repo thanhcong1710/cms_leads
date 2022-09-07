@@ -80,11 +80,13 @@ class ImportsController extends Controller
         $this->processCheckDuplicateData($import_id);
         u::query("UPDATE cms_import_parents AS p LEFT JOIN users AS u ON u.hrm_id=p.owner_hrm SET p.owner_id=u.id WHERE p.import_id =$import_id");
         $data = u::query("SELECT * FROM cms_import_parents WHERE import_id =$import_id");
+        $total_open_lock = u::first("SELECT count(id) AS total FROM cms_import_parents WHERE import_id =$import_id AND status=4 AND is_lock=0");
         $total_error = u::first("SELECT count(id) AS total FROM cms_import_parents WHERE import_id =$import_id AND status IN (2,3,4)");
         $total_validate = u::first("SELECT count(id) AS total FROM cms_import_parents WHERE import_id =$import_id AND status IN (1)");
         
         $data_mes->data = $data;
-        $data_mes->total_error = $total_error->total;
+        $data_mes->total_error = $total_error->total - $total_open_lock->total;
+        $data_mes->total_open_lock = $total_open_lock->total;
         $data_mes->total_validate = $total_validate->total;
         $data_mes->message = 'Import file thành công!';
         $data_mes->import_id = $import_id;
@@ -218,7 +220,7 @@ class ImportsController extends Controller
             u::query($sql_update);
         }
         // check duplicate cms_parents
-        $list = u::query("SELECT p.id, u.name, u.hrm_id,u.branch_name 
+        $list = u::query("SELECT p.id, u.name, u.hrm_id,u.branch_name, p.is_lock 
                     FROM
                         cms_import_parents AS p
                         LEFT JOIN cms_parents AS ps ON ps.mobile_1 = p.gud_mobile1
@@ -227,7 +229,7 @@ class ImportsController extends Controller
                         p.import_id = $import_id 
                         AND ps.id IS NOT NULL 
                 UNION
-                    SELECT p.id, u.name, u.hrm_id,u.branch_name
+                    SELECT p.id, u.name, u.hrm_id,u.branch_name, p.is_lock
                     FROM
                         cms_import_parents AS p
                         LEFT JOIN cms_parents AS ps ON ( ps.mobile_2 = p.gud_mobile1 AND ps.mobile_2 IS NOT NULL AND ps.mobile_2 != '' )
@@ -236,7 +238,7 @@ class ImportsController extends Controller
                         p.import_id = $import_id 
                         AND ps.id IS NOT NULL 
                 UNION
-                    SELECT p.id, u.name, u.hrm_id,u.branch_name 
+                    SELECT p.id, u.name, u.hrm_id,u.branch_name, p.is_lock 
                     FROM
                         cms_import_parents AS p
                         LEFT JOIN cms_parents AS ps ON ( ps.mobile_1 = p.gud_mobile2 AND p.gud_mobile2 IS NOT NULL AND p.gud_mobile2 != '' )
@@ -245,7 +247,7 @@ class ImportsController extends Controller
                         p.import_id = $import_id 
                         AND ps.id IS NOT NULL 
                 UNION
-                    SELECT p.id, u.name, u.hrm_id,u.branch_name 
+                    SELECT p.id, u.name, u.hrm_id,u.branch_name, p.is_lock
                     FROM
                         cms_import_parents AS p
                         LEFT JOIN cms_parents AS ps ON ( ps.mobile_2 = p.gud_mobile2 AND ps.mobile_2 IS NOT NULL AND ps.mobile_2 != '' )
@@ -254,12 +256,12 @@ class ImportsController extends Controller
                         p.import_id = $import_id 
                         AND ps.id IS NOT NULL");
         if(!empty($list)){
-            $sql_update = "INSERT INTO cms_import_parents (id,`status`,error_message) VALUES ";
+            $sql_update = "INSERT INTO cms_import_parents (id,`status`,error_message,is_lock,parent_id) VALUES ";
             foreach($list AS $row){
-                $sql_update.="($row->id,4,'SĐT đang thuộc quyền quản lý của nhân viên $row->name - $row->hrm_id $row->branch_name'),";
+                $sql_update.="($row->id,4,'SĐT đang thuộc quyền quản lý của nhân viên $row->name - $row->hrm_id $row->branch_name',$row->is_lock,$row->parent_id),";
             }
             $sql_update = substr($sql_update, 0, -1);
-            $sql_update.=" ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `status` = VALUES(`status`), `error_message` = VALUES(`error_message`)";
+            $sql_update.=" ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `status` = VALUES(`status`), `error_message` = VALUES(`error_message`), `is_lock` = VALUES(`is_lock`), `parent_id` = VALUES(`parent_id`)";
             u::query($sql_update);
         }
     }
@@ -270,7 +272,11 @@ class ImportsController extends Controller
         $import_id = $request->import_id;
         $list_data = u::query("SELECT * FROM cms_import_parents WHERE import_id=$import_id AND status=1");
         $this->addItemDataParent($list_data,$arr_owner,$source_id,$request->user()->id, $source_detail_id);
+        $list_data_overwirte = u::query("SELECT * FROM cms_import_parents WHERE import_id=$import_id AND status=4 AND is_lock=0");
+        $this->OverwirteItemDataParent($list_data_overwirte,$arr_owner,$source_id,$request->user()->id, $source_detail_id);
+
         u::query("UPDATE cms_import_parents SET status=6 WHERE import_id=$import_id AND status=1");
+        u::query("UPDATE cms_import_parents SET status=6 WHERE import_id=$import_id AND status=4 AND is_lock=0");
         u::query("UPDATE cms_imports SET status=1 WHERE id=$import_id ");
         u::query("UPDATE cms_students AS s LEFT JOIN cms_parents AS p ON s.gud_mobile_1 =p.mobile_1 SET s.parent_id=p.id WHERE s.parent_id IS NULL ");
         u::query("UPDATE cms_students AS s LEFT JOIN cms_branches AS b ON s.checkin_branch_accounting_id =b.accounting_id SET s.checkin_branch_id=b.id WHERE s.checkin_branch_id IS NULL  AND s.checkin_branch_accounting_id IS NOT NULL");
@@ -311,7 +317,7 @@ class ImportsController extends Controller
                     $query_student = substr($query_student, 0, -1);
                     u::query($query_student);
                 }
-                $this->addItemDataImport(array_slice($list, 10000),$arr_owner,$source_id,$creator_id);
+                $this->addItemDataParent(array_slice($list, 10000),$arr_owner,$source_id,$creator_id,$source_detail_id);
             } else {
                 foreach($list as $i=>$item) {
                     $item = (object)$item;
@@ -355,5 +361,56 @@ class ImportsController extends Controller
             }
         }
         return "ok";
+    }
+
+    public function OverwirteItemDataParent($list,$arr_owner,$source_id,$creator_id,$source_detail_id) {
+        if ($list) {
+            $created_at = date('Y-m-d H:i:s');
+            $sql_update_owner = "INSERT INTO cms_parents (id,updated_at,updator_id,owner_id,last_assign_date,is_lock) VALUES ";
+            $sql_cms_parent_overwrite = "INSERT INTO cms_parent_overwrite (`parent_id`,last_owner_id,owner_id,`created_at`,creator_id) VALUES ";
+            $sql_cms_parent_logs = "INSERT INTO cms_parent_logs (`parent_id`,`content`,creator_id,created_at,`status`) VALUES ";
+            $check_student =0;
+            if (count($list) > 10000) {
+                for($i = 0; $i < 10000; $i++) {
+                    $item = (object)$list[$i];
+                    $owner_id = $item->owner_id? $item->owner_id : $arr_owner[$i%count($arr_owner)];
+                    $sql_update_owner.=" ($item->parent_id,'$created_at',$creator_id,$owner_id,'$created_at',1), ";
+                    $sql_cms_parent_overwrite.=" ($item->parent_id,$item->owner_id,$owner_id,'$created_at',$creator_id), ";
+                    
+                    $content = "Ghi đè người phụ trách khi import: từ $item->owner_id thành $owner_id`";
+                    $sql_cms_parent_logs.=" ($item->parent_id,'$content',$creator_id,'$created_at',1), ";
+                    $check_student = 1;
+                }
+                
+                if($check_student){
+                    $sql_update_owner = substr($sql_update_owner, 0, -1);
+                    u::query($sql_update_owner);
+                    $sql_cms_parent_overwrite = substr($sql_cms_parent_overwrite, 0, -1);
+                    u::query($sql_cms_parent_overwrite);
+                    $sql_cms_parent_logs = substr($sql_cms_parent_logs, 0, -1);
+                    u::query($sql_cms_parent_logs);
+                }
+                $this->OverwirteItemDataParent(array_slice($list, 10000),$arr_owner,$source_id,$creator_id,$source_detail_id);
+            } else {
+                foreach($list as $i=>$item) {
+                    $item = (object)$list[$i];
+                    $owner_id = $item->owner_id? $item->owner_id : $arr_owner[$i%count($arr_owner)];
+                    $sql_update_owner.=" ($item->parent_id,'$created_at',$creator_id,$owner_id,'$created_at',1), ";
+                    $sql_cms_parent_overwrite.=" ($item->parent_id,$item->owner_id,$owner_id,'$created_at',$creator_id), ";
+                    
+                    $content = "Ghi đè người phụ trách khi import: từ $item->owner_id thành $owner_id`";
+                    $sql_cms_parent_logs.=" ($item->parent_id,'$content',$creator_id,'$created_at',1), ";
+                    $check_student = 1;
+                }
+                if($check_student){
+                    $sql_update_owner = substr($sql_update_owner, 0, -1);
+                    u::query($sql_update_owner);
+                    $sql_cms_parent_overwrite = substr($sql_cms_parent_overwrite, 0, -1);
+                    u::query($sql_cms_parent_overwrite);
+                    $sql_cms_parent_logs = substr($sql_cms_parent_logs, 0, -1);
+                    u::query($sql_cms_parent_logs);
+                }
+            }
+        }
     }
 }

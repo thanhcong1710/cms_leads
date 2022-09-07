@@ -113,6 +113,10 @@
                       <td>Số khách hàng không hợp lệ</td>
                       <td>{{ total_error }}</td>
                     </tr>
+                    <tr>
+                      <td>Số khách hàng có thể ghi đè/td>
+                      <td>{{ total_open_lock }}</td>
+                    </tr>
                   </tbody>
                 </table>
               </div>
@@ -232,6 +236,7 @@ export default {
       error_checked:false,
       total_error:0,
       total_validate:0,
+      total_open_lock:0,
       list_owner:[],
       list_source:[],
       list_source_detail:[],
@@ -292,6 +297,7 @@ export default {
               this.curr_step=2
               this.total_error = response.data.total_error
               this.total_validate = response.data.total_validate
+              this.total_open_lock = response.data.total_open_lock
               this.data_assign.import_id = response.data.import_id
             }
           })
