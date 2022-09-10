@@ -220,7 +220,7 @@ class ImportsController extends Controller
             u::query($sql_update);
         }
         // check duplicate cms_parents
-        $list = u::query("SELECT p.id, u.name, u.hrm_id,u.branch_name, p.is_lock 
+        $list = u::query("SELECT p.id, u.name, u.hrm_id,u.branch_name, ps.is_lock, ps.id AS parent_id
                     FROM
                         cms_import_parents AS p
                         LEFT JOIN cms_parents AS ps ON ps.mobile_1 = p.gud_mobile1
@@ -229,7 +229,7 @@ class ImportsController extends Controller
                         p.import_id = $import_id 
                         AND ps.id IS NOT NULL 
                 UNION
-                    SELECT p.id, u.name, u.hrm_id,u.branch_name, p.is_lock
+                    SELECT p.id, u.name, u.hrm_id,u.branch_name, ps.is_lock, ps.id AS parent_id
                     FROM
                         cms_import_parents AS p
                         LEFT JOIN cms_parents AS ps ON ( ps.mobile_2 = p.gud_mobile1 AND ps.mobile_2 IS NOT NULL AND ps.mobile_2 != '' )
@@ -238,7 +238,7 @@ class ImportsController extends Controller
                         p.import_id = $import_id 
                         AND ps.id IS NOT NULL 
                 UNION
-                    SELECT p.id, u.name, u.hrm_id,u.branch_name, p.is_lock 
+                    SELECT p.id, u.name, u.hrm_id,u.branch_name, ps.is_lock, ps.id AS parent_id
                     FROM
                         cms_import_parents AS p
                         LEFT JOIN cms_parents AS ps ON ( ps.mobile_1 = p.gud_mobile2 AND p.gud_mobile2 IS NOT NULL AND p.gud_mobile2 != '' )
@@ -247,7 +247,7 @@ class ImportsController extends Controller
                         p.import_id = $import_id 
                         AND ps.id IS NOT NULL 
                 UNION
-                    SELECT p.id, u.name, u.hrm_id,u.branch_name, p.is_lock
+                    SELECT p.id, u.name, u.hrm_id,u.branch_name, ps.is_lock, ps.id AS parent_id
                     FROM
                         cms_import_parents AS p
                         LEFT JOIN cms_parents AS ps ON ( ps.mobile_2 = p.gud_mobile2 AND ps.mobile_2 IS NOT NULL AND ps.mobile_2 != '' )
@@ -272,7 +272,7 @@ class ImportsController extends Controller
         $import_id = $request->import_id;
         $list_data = u::query("SELECT * FROM cms_import_parents WHERE import_id=$import_id AND status=1");
         $this->addItemDataParent($list_data,$arr_owner,$source_id,$request->user()->id, $source_detail_id);
-        $list_data_overwirte = u::query("SELECT * FROM cms_import_parents WHERE import_id=$import_id AND status=4 AND is_lock=0");
+        $list_data_overwirte = u::query("SELECT i.*, p.owner_id AS curr_owner_id FROM cms_import_parents AS i LEFT JOIN cms_parents AS p ON p.id=i.parent_id WHERE i.import_id=$import_id AND i.status=4 AND i.is_lock=0");
         $this->OverwirteItemDataParent($list_data_overwirte,$arr_owner,$source_id,$request->user()->id, $source_detail_id);
 
         u::query("UPDATE cms_import_parents SET status=6 WHERE import_id=$import_id AND status=1");
@@ -374,16 +374,17 @@ class ImportsController extends Controller
                 for($i = 0; $i < 10000; $i++) {
                     $item = (object)$list[$i];
                     $owner_id = $item->owner_id? $item->owner_id : $arr_owner[$i%count($arr_owner)];
-                    $sql_update_owner.=" ($item->parent_id,'$created_at',$creator_id,$owner_id,'$created_at',1), ";
-                    $sql_cms_parent_overwrite.=" ($item->parent_id,$item->owner_id,$owner_id,'$created_at',$creator_id), ";
+                    $sql_update_owner.=" ($item->parent_id,'$created_at',$creator_id,$owner_id,'$created_at',1),";
+                    $sql_cms_parent_overwrite.=" ($item->parent_id,'$item->curr_owner_id',$owner_id,'$created_at',$creator_id),";
                     
-                    $content = "Ghi đè người phụ trách khi import: từ $item->owner_id thành $owner_id`";
-                    $sql_cms_parent_logs.=" ($item->parent_id,'$content',$creator_id,'$created_at',1), ";
+                    $content = "Ghi đè người phụ trách khi import: từ $item->curr_owner_id thành $owner_id`";
+                    $sql_cms_parent_logs.=" ($item->parent_id,'$content',$creator_id,'$created_at',1),";
                     $check_student = 1;
                 }
                 
                 if($check_student){
                     $sql_update_owner = substr($sql_update_owner, 0, -1);
+                    $sql_update_owner.= " ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `updated_at` = VALUES(`updated_at`), `updator_id` = VALUES(`updator_id`), `owner_id` = VALUES(`owner_id`), `last_assign_date` = VALUES(`last_assign_date`), `is_lock` = VALUES(`is_lock`)";
                     u::query($sql_update_owner);
                     $sql_cms_parent_overwrite = substr($sql_cms_parent_overwrite, 0, -1);
                     u::query($sql_cms_parent_overwrite);
@@ -395,15 +396,16 @@ class ImportsController extends Controller
                 foreach($list as $i=>$item) {
                     $item = (object)$list[$i];
                     $owner_id = $item->owner_id? $item->owner_id : $arr_owner[$i%count($arr_owner)];
-                    $sql_update_owner.=" ($item->parent_id,'$created_at',$creator_id,$owner_id,'$created_at',1), ";
-                    $sql_cms_parent_overwrite.=" ($item->parent_id,$item->owner_id,$owner_id,'$created_at',$creator_id), ";
+                    $sql_update_owner.=" ($item->parent_id,'$created_at',$creator_id,$owner_id,'$created_at',1),";
+                    $sql_cms_parent_overwrite.=" ($item->parent_id,'$item->curr_owner_id',$owner_id,'$created_at',$creator_id),";
                     
-                    $content = "Ghi đè người phụ trách khi import: từ $item->owner_id thành $owner_id`";
-                    $sql_cms_parent_logs.=" ($item->parent_id,'$content',$creator_id,'$created_at',1), ";
+                    $content = "Ghi đè người phụ trách khi import: từ $item->curr_owner_id thành $owner_id`";
+                    $sql_cms_parent_logs.=" ($item->parent_id,'$content',$creator_id,'$created_at',1),";
                     $check_student = 1;
                 }
                 if($check_student){
                     $sql_update_owner = substr($sql_update_owner, 0, -1);
+                    $sql_update_owner.= " ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `updated_at` = VALUES(`updated_at`), `updator_id` = VALUES(`updator_id`), `owner_id` = VALUES(`owner_id`), `last_assign_date` = VALUES(`last_assign_date`), `is_lock` = VALUES(`is_lock`)";
                     u::query($sql_update_owner);
                     $sql_cms_parent_overwrite = substr($sql_cms_parent_overwrite, 0, -1);
                     u::query($sql_cms_parent_overwrite);
