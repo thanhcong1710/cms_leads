@@ -85,7 +85,6 @@
                       <td> <i v-if="item.status ==1" class="fas fa-check" style="color:rgb(18 152 23);font-size: 20px;"></i>
                         <i v-else class="fas fa-times" style="color:rgb(177 8 8); font-size: 20px"></i></td>
                       <td>{{ item.error_message }}</td>
-                      <td></td>
                     </tr>
                   </tbody>
                 </table>
@@ -114,7 +113,7 @@
                       <td>{{ total_error }}</td>
                     </tr>
                     <tr>
-                      <td>Số khách hàng có thể ghi đè/td>
+                      <td>Số khách hàng có thể ghi đè</td>
                       <td>{{ total_open_lock }}</td>
                     </tr>
                   </tbody>
