@@ -82,10 +82,9 @@
                       </td>
                       <td>{{item.name}}</td>
                       <td>{{ item.gud_mobile1 }}</td>
-                      <td> <i v-if="item.status ==1" class="fas fa-check" style="color:rgb(18 152 23);font-size: 20px;"></i>
+                      <td> <i v-if="item.status ==1 || (item.status==4 && item.is_lock==0)" class="fas fa-check" style="color:rgb(18 152 23);font-size: 20px;"></i>
                         <i v-else class="fas fa-times" style="color:rgb(177 8 8); font-size: 20px"></i></td>
                       <td>{{ item.error_message }}</td>
-                      <td></td>
                     </tr>
                   </tbody>
                 </table>
@@ -112,6 +111,10 @@
                     <tr>
                       <td>Số khách hàng không hợp lệ</td>
                       <td>{{ total_error }}</td>
+                    </tr>
+                    <tr>
+                      <td>Số khách hàng có thể ghi đè</td>
+                      <td>{{ total_open_lock }}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -232,6 +235,7 @@ export default {
       error_checked:false,
       total_error:0,
       total_validate:0,
+      total_open_lock:0,
       list_owner:[],
       list_source:[],
       list_source_detail:[],
@@ -292,6 +296,7 @@ export default {
               this.curr_step=2
               this.total_error = response.data.total_error
               this.total_validate = response.data.total_validate
+              this.total_open_lock = response.data.total_open_lock
               this.data_assign.import_id = response.data.import_id
             }
           })
