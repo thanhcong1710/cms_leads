@@ -307,7 +307,7 @@ class ParentsController extends Controller
                             '$duplicate_info->parent_id','$tmp_note','$tmp_created_at','$duplicate_info->owner_id','1','$tmp_created_at',1,'$duplicate_info->branch_id')");
                         $thoi_gian_con = 60;
                         $text.="<br> Thời gian chăm sóc gần nhất: ".$tmp_created_at." <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
-                    }elseif($duplicate_info->total_care>0){
+                    }elseif($duplicate_info->total_care>0 && (61 - ceil((time() - strtotime($duplicate_info->care_date))/(3600*24)))>0){
                         $thoi_gian_con = 61 - ceil((time() - strtotime($duplicate_info->care_date))/(3600*24));
                         $text.="<br> Thời gian chăm sóc gần nhất: $duplicate_info->care_date <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }else{
