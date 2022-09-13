@@ -258,7 +258,11 @@ class ImportsController extends Controller
         if(!empty($list)){
             $sql_update = "INSERT INTO cms_import_parents (id,`status`,error_message,is_lock,parent_id) VALUES ";
             foreach($list AS $row){
-                $sql_update.="($row->id,4,'SĐT đang thuộc quyền quản lý của nhân viên $row->name - $row->hrm_id $row->branch_name',$row->is_lock,$row->parent_id),";
+                if($row->is_lock==0){
+                    $sql_update.="($row->id,4,'SĐT đang thuộc quyền quản lý của nhân viên $row->name - $row->hrm_id $row->branch_name (có thể ghi đè)',$row->is_lock,$row->parent_id),";
+                }else{
+                    $sql_update.="($row->id,4,'SĐT đang thuộc quyền quản lý của nhân viên $row->name - $row->hrm_id $row->branch_name',$row->is_lock,$row->parent_id),";
+                }
             }
             $sql_update = substr($sql_update, 0, -1);
             $sql_update.=" ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `status` = VALUES(`status`), `error_message` = VALUES(`error_message`), `is_lock` = VALUES(`is_lock`), `parent_id` = VALUES(`parent_id`)";

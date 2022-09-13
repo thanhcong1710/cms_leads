@@ -82,7 +82,7 @@
                       </td>
                       <td>{{item.name}}</td>
                       <td>{{ item.gud_mobile1 }}</td>
-                      <td> <i v-if="item.status ==1" class="fas fa-check" style="color:rgb(18 152 23);font-size: 20px;"></i>
+                      <td> <i v-if="item.status ==1 || (item.status==4 && item.is_lock==0)" class="fas fa-check" style="color:rgb(18 152 23);font-size: 20px;"></i>
                         <i v-else class="fas fa-times" style="color:rgb(177 8 8); font-size: 20px"></i></td>
                       <td>{{ item.error_message }}</td>
                     </tr>
