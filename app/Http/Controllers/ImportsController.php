@@ -370,7 +370,7 @@ class ImportsController extends Controller
     public function OverwirteItemDataParent($list,$arr_owner,$source_id,$creator_id,$source_detail_id) {
         if ($list) {
             $created_at = date('Y-m-d H:i:s');
-            $sql_update_owner = "INSERT INTO cms_parents (id,updated_at,updator_id,owner_id,last_assign_date,is_lock) VALUES ";
+            $sql_update_owner = "INSERT INTO cms_parents (id,updated_at,updator_id,owner_id,last_assign_date,is_lock,source_id,source_detail_id) VALUES ";
             $sql_cms_parent_overwrite = "INSERT INTO cms_parent_overwrite (`parent_id`,last_owner_id,owner_id,`created_at`,creator_id) VALUES ";
             $sql_cms_parent_logs = "INSERT INTO cms_parent_logs (`parent_id`,`content`,creator_id,created_at,`status`) VALUES ";
             $check_student =0;
@@ -378,7 +378,7 @@ class ImportsController extends Controller
                 for($i = 0; $i < 10000; $i++) {
                     $item = (object)$list[$i];
                     $owner_id = $item->owner_id? $item->owner_id : $arr_owner[$i%count($arr_owner)];
-                    $sql_update_owner.=" ($item->parent_id,'$created_at',$creator_id,$owner_id,'$created_at',1),";
+                    $sql_update_owner.=" ($item->parent_id,'$created_at',$creator_id,$owner_id,'$created_at',1,'$source_id','$source_detail_id'),";
                     $sql_cms_parent_overwrite.=" ($item->parent_id,'$item->curr_owner_id',$owner_id,'$created_at',$creator_id),";
                     
                     $content = "Ghi đè người phụ trách khi import: từ $item->curr_owner_id thành $owner_id`";
@@ -400,7 +400,7 @@ class ImportsController extends Controller
                 foreach($list as $i=>$item) {
                     $item = (object)$list[$i];
                     $owner_id = $item->owner_id? $item->owner_id : $arr_owner[$i%count($arr_owner)];
-                    $sql_update_owner.=" ($item->parent_id,'$created_at',$creator_id,$owner_id,'$created_at',1),";
+                    $sql_update_owner.=" ($item->parent_id,'$created_at',$creator_id,$owner_id,'$created_at',1,'$source_id','$source_detail_id'),";
                     $sql_cms_parent_overwrite.=" ($item->parent_id,'$item->curr_owner_id',$owner_id,'$created_at',$creator_id),";
                     
                     $content = "Ghi đè người phụ trách khi import: từ $item->curr_owner_id thành $owner_id`";
