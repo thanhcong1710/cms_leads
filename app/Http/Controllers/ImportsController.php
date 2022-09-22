@@ -388,7 +388,7 @@ class ImportsController extends Controller
                 
                 if($check_student){
                     $sql_update_owner = substr($sql_update_owner, 0, -1);
-                    $sql_update_owner.= " ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `updated_at` = VALUES(`updated_at`), `updator_id` = VALUES(`updator_id`), `owner_id` = VALUES(`owner_id`), `last_assign_date` = VALUES(`last_assign_date`), `is_lock` = VALUES(`is_lock`)";
+                    $sql_update_owner.= " ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `updated_at` = VALUES(`updated_at`), `updator_id` = VALUES(`updator_id`), `owner_id` = VALUES(`owner_id`), `last_assign_date` = VALUES(`last_assign_date`), `is_lock` = VALUES(`is_lock`), `source_id` = VALUES(`source_id`), `source_detail_id` = VALUES(`source_detail_id`)";
                     u::query($sql_update_owner);
                     $sql_cms_parent_overwrite = substr($sql_cms_parent_overwrite, 0, -1);
                     u::query($sql_cms_parent_overwrite);
@@ -409,7 +409,7 @@ class ImportsController extends Controller
                 }
                 if($check_student){
                     $sql_update_owner = substr($sql_update_owner, 0, -1);
-                    $sql_update_owner.= " ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `updated_at` = VALUES(`updated_at`), `updator_id` = VALUES(`updator_id`), `owner_id` = VALUES(`owner_id`), `last_assign_date` = VALUES(`last_assign_date`), `is_lock` = VALUES(`is_lock`)";
+                    $sql_update_owner.= " ON DUPLICATE KEY UPDATE `id` = VALUES(`id`), `updated_at` = VALUES(`updated_at`), `updator_id` = VALUES(`updator_id`), `owner_id` = VALUES(`owner_id`), `last_assign_date` = VALUES(`last_assign_date`), `is_lock` = VALUES(`is_lock`), `source_id` = VALUES(`source_id`), `source_detail_id` = VALUES(`source_detail_id`)";
                     u::query($sql_update_owner);
                     $sql_cms_parent_overwrite = substr($sql_cms_parent_overwrite, 0, -1);
                     u::query($sql_cms_parent_overwrite);
