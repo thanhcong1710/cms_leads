@@ -136,12 +136,12 @@ class ImportsController extends Controller
         }
     }
     public function convertData($data){
-        if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$data[7])) {
+        if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$data[8])) {
             $student_birthday_1 = $data[8];
         } else {
             $student_birthday_1 = NULL;
         }
-        if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$data[9])) {
+        if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$data[10])) {
             $student_birthday_2 = $data[10];
         } else {
             $student_birthday_2 = NULL;
