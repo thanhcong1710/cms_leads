@@ -54,16 +54,17 @@ class StudentsController extends Controller
     public function checkin(Request $request){
         $student_info = u::first("SELECT * FROM cms_students WHERE id = $request->student_id");
         if($student_info->crm_id){
-            self::updateCheckinCRM($request->student_id,$request->checkin_at,$request->branch_id);
+            self::updateCheckinCRM($request->student_id,$request->checkin_at,$request->branch_id,$request->type_product);
             $data_update = array(
                 'checkin_at'=>$request->checkin_at,
                 'checkin_branch_id'=>$request->branch_id,
                 'updated_at' => date('Y-m-d H:i:s'),
-                'updator_id' => Auth::user()->id
+                'updator_id' => Auth::user()->id,
+                'type_product'=>$request->type_product,
             );
             u::updateSimpleRow($data_update,array('id'=>$request->student_id), 'cms_students');
         }else{
-            $crm_id= self::createCheckinCRM($request->student_id,$request->checkin_at,$request->branch_id);
+            $crm_id= self::createCheckinCRM($request->student_id,$request->checkin_at,$request->branch_id,$request->type_product);
             if($crm_id){
                 $data_update = array(
                     'checkin_at'=>$request->checkin_at,
@@ -71,14 +72,15 @@ class StudentsController extends Controller
                     'status' => 1,
                     'updated_at' => date('Y-m-d H:i:s'),
                     'updator_id' => Auth::user()->id,
-                    'crm_id'=>$crm_id
+                    'crm_id'=>$crm_id,
+                    'type_product'=>$request->type_product,
                 );
                 u::updateSimpleRow($data_update,array('id'=>$request->student_id), 'cms_students');
             }
         }
         return response()->json("ok");
     }
-    public static function createCheckinCRM($student_id,$checkin_at,$checkin_branch_id){
+    public static function createCheckinCRM($student_id,$checkin_at,$checkin_branch_id,$type_product){
         $student_info = u::first("SELECT s.*,p.name AS gud_name,p.email AS gud_email,p.address,p.province_id,p.district_id,
                 p.mobile_1 AS gud_mobile_1,
                 p.mobile_2 AS gud_mobile_2,
@@ -110,6 +112,7 @@ class StudentsController extends Controller
             'district_id'=>$student_info->district_id,
             'branch_id'=>$checkin_branch_id,
             'checkin_at'=>$checkin_at,
+            'type_product'=>$type_product,
             'ec_hrm'=>$student_info->owner_hrm,
             'creator_hrm' => isset(Auth::user()->hrm_id) ? Auth::user()->hrm_id : $student_info->owner_hrm,
             'sibling_id' => $student_info->sibling_id ? $student_info->sibling_id : 0,
@@ -138,7 +141,7 @@ class StudentsController extends Controller
             'student_gender' => $student_info->gender,
             'student_note' => $student_info->note,
             'student_date_of_birth'=>$student_info->birthday,
-            'updator_hrm' => Auth::user()->hrm_id,
+            'updator_hrm' => Auth::user()->hrm_id
         );
         if(env('APP_ENV', 'staging')=='production'){
             $url = sprintf('%s/api/leads-update-student-info', 'https://crm.cmsedu.vn/');
@@ -204,14 +207,15 @@ class StudentsController extends Controller
             return NULL;
         }
     }
-    public static function updateCheckinCRM($student_id,$checkin_at,$checkin_branch_id){
+    public static function updateCheckinCRM($student_id,$checkin_at,$checkin_branch_id,$type_product){
         $student_info = u::first("SELECT s.* FROM cms_students AS s LEFT JOIN cms_parents AS p ON p.id=s.parent_id WHERE s.id=$student_id");
         $method = "POST";
         $data = array(
             'branch_id'=>$checkin_branch_id,
             'checkin_at'=>$checkin_at,
             'crm_student_id'=> $student_info->crm_id,
-            'updator_hrm' => Auth::user()->hrm_id
+            'updator_hrm' => Auth::user()->hrm_id,
+            'type_product'=>$type_product
         );
         if(env('APP_ENV', 'staging')=='production'){
             $url = sprintf('%s/api/leads-update-checkin', 'https://crm.cmsedu.vn/');
