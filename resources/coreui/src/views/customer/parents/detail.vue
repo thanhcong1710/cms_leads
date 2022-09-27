@@ -434,6 +434,14 @@
                 >
                 </datepicker>
             </div>
+            <div class="form-group col-sm-6">
+              <label for="nf-email">Sản phẩm</label>
+              <select class="form-control" v-model="modal_checkin.type_product">
+                <option value="">Chọn sản phẩm</option>
+                <option value="1">CMS</option>
+                <option value="2">Accelium</option>
+              </select>
+            </div>
           </div>
           <p style="color:red" v-html="modal_checkin.error_message"></p>
         </div>
@@ -526,6 +534,7 @@ export default {
         student_id:"",
         error_message:"",
         disabled:false,
+        type_product:"",
       },
       parent: {
         id:"",
@@ -997,6 +1006,7 @@ export default {
       this.modal_checkin.branch_id = this.parent.branch_id
       this.modal_checkin.checkin_at = ""
       this.modal_checkin.error_message=""
+      this.modal_checkin.type_product=""
     },
     checkin(){
       let mess = "";
@@ -1009,11 +1019,16 @@ export default {
         mess += " - Thời gian checkin không được để trống<br/>";
         resp = false;
       }
+      if (this.modal_checkin.type_product == "") {
+        mess += " - Sản phẩm không được để trống<br/>";
+        resp = false;
+      }
       if(resp){
         const data = {
           student_id: this.modal_checkin.student_id,
           branch_id: this.modal_checkin.branch_id,
           checkin_at: moment(this.modal_checkin.checkin_at).format('YYYY-MM-DD HH:mm'),
+          type_product: this.modal_checkin.type_product
         };
         this.loading.processing = true;
         this.exit("checkin");
@@ -1033,6 +1048,7 @@ export default {
       this.modal_checkin.student_id = item.id
       this.modal_checkin.branch_id = item.checkin_branch_id
       this.modal_checkin.checkin_at = item.checkin_at
+      this.modal_checkin.type_product = item.type_product
       this.modal_checkin.error_message=""
     },
     fileChanged(e) {
