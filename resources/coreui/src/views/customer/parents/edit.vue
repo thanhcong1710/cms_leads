@@ -136,6 +136,7 @@
                             :searchable="true"
                             language="tv-VN"
                             :onChange="saveSource"
+                            :disabled="edit_source"
                         ></vue-select>
                     </div>
                     <div class="form-group col-sm-6">
@@ -291,6 +292,7 @@ export default {
       tmp_district_id:"",
       users_manager:[],
       c2c_info:"",
+      edit_source: true,
     };
   },
   created() {
@@ -324,6 +326,16 @@ export default {
       this.parent.source_detail = this.html.source_detail.list.filter(item => item.id == this.parent.source_detail_id)[0]
       this.parent.province = this.html.province.list.filter(item => item.id == this.parent.province_id)[0]
       this.tmp_district_id = this.parent.district_id
+      if(this.parent.source_id==26 || this.parent.source_id==32){
+        const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
+        if(arr_role.indexOf("admin")> -1){
+           this.edit_source=false
+        }else{
+          this.edit_source=true
+        }
+      }else{
+        this.edit_source=false
+      }
     })
   },
   methods: {
@@ -521,3 +533,8 @@ export default {
   },
 };
 </script>
+<style>
+.dropdown.single.searchable.disabled input.form-control{
+  display: none;
+}
+</style>
