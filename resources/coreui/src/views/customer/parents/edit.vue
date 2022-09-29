@@ -533,3 +533,8 @@ export default {
   },
 };
 </script>
+<style>
+.dropdown.single.searchable.disabled input.form-control{
+  display: none;
+}
+</style>
