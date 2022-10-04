@@ -36,7 +36,7 @@ class ParentsController extends Controller
         $cond = " 1 ";
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
             if($request->user()->id== 21){
-                $cond .= " AND ((p.owner_id IN (".$request->user()->users_manager.") AND p.owner_id NOT IN (".$request->user()->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35)";
+                $cond .= " AND ((p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35)";
             }else{
                 $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
             }
