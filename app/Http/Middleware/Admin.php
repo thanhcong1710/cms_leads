@@ -25,7 +25,7 @@ class Admin
             foreach($list_users AS $row){
                 $users_manager.=$users_manager ? ",".$row->id : $row->id;
             }
-        }elseif($user->hasRole('Marketing') || $user->id == 21){
+        }elseif($user->hasRole('Marketing')){
             $list_users = u::query("SELECT u.id,u.manager_id FROM users AS u WHERE u.status=1 AND
             ((SELECT count(role_id) FROM model_has_roles WHERE model_id=u.id AND role_id=7)>0 OR u.id=$user->id)");
             $users_manager="";
@@ -36,9 +36,21 @@ class Admin
             $users_manager = implode(",",$this->data_tree($list_users,$user->id));
             $users_manager = $user->id.($users_manager?",".$users_manager:"");
         }
+        $tmp_users_manager="";
+        if($user->id == 21){
+            $list_users = u::query("SELECT u.id,u.manager_id FROM users AS u WHERE u.status=1 AND
+            ((SELECT count(role_id) FROM model_has_roles WHERE model_id=u.id AND role_id=7)>0 OR u.id=$user->id)");
+            foreach($list_users AS $row){
+                $tmp_users_manager.=$tmp_users_manager ? ",".$row->id : $row->id;
+            }
+            foreach($list_users AS $row){
+                $users_manager.=$users_manager ? ",".$row->id : $row->id;
+            }
+        }
         $request->user_info = (object)array(
             'users_manager' => $users_manager,
-            'hrm_id' => $user->hrm_id
+            'hrm_id' => $user->hrm_id,
+            'tmp_users_manager' => $tmp_users_manager
         );
         return $next($request);
     }
