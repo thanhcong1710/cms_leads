@@ -36,7 +36,7 @@ class ParentsController extends Controller
         $cond = " 1 ";
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
             if($request->user()->id== 21){
-                $cond .= " AND (p.owner_id IN (".$request->user()->id.") OR p.source_id=27 OR p.source_id=35)";
+                $cond .= " AND ((p.owner_id IN (".$request->user()->users_manager.") AND p.owner_id NOT IN (".$request->user()->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35)";
             }else{
                 $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
             }
@@ -209,7 +209,7 @@ class ParentsController extends Controller
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
         if($request->user()->id== 21){
-            $cond .= " AND (p.owner_id IN (".$request->user()->id.") OR p.source_id=27 OR p.source_id=35)";
+            $cond .= " AND ( (p.owner_id IN (".$request->user()->users_manager.") AND p.owner_id NOT IN (".$request->user()->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35)";
         }
         $data = u::first("SELECT p.*,(SELECT name FROM users WHERE id=p.creator_id) AS creator_name,
                 (SELECT name FROM cms_districts WHERE id=p.district_id) AS district_name,
