@@ -171,7 +171,7 @@
                       {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
                     </td>
                     <td class="sticky-col st3-col"><router-link :to="`/parents/${item.id}/detail`"><a>{{ item.name }}</a></router-link></td>
-                    <td class="sticky-col st4-col">{{ item.mobile_1 }}</td>
+                    <td class="sticky-col st4-col"><router-link :to="`/parents/${item.id}/detail`"><a>{{ item.mobile_1 }}</a></router-link></td>
                     <td>{{ item.hs2_name }}</td>
                     <td>{{ item.hs1_name }}</td>
                     <td>{{ item.source_name }}</td>
