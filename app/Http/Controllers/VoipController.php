@@ -76,6 +76,7 @@ class VoipController extends Controller
                     'branch_id'=>$user_info->branch_id,
                     'status'=>0,
                 ),'cms_customer_care');
+                ParentsController::processParentLockById($parent_info->id);
                 $this->socketIo($user_info->id,'call_end',array('user_id'=>$user_info->id,'care_id'=>$care_id,'parent_id'=>$parent_info->id));
             }
         }elseif($obj->state == 'Ring' && $obj->type=="inbound"){
