@@ -36,7 +36,7 @@ class ParentsController extends Controller
         $cond = " 1 ";
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
             if($request->user()->id== 21){
-                $cond .= " AND ((p.owner_id IN (".$request->user()->users_manager.") AND p.owner_id NOT IN (".$request->user()->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35)";
+                $cond .= " AND ((p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35)";
             }else{
                 $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
             }
@@ -209,7 +209,7 @@ class ParentsController extends Controller
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
         if($request->user()->id== 21){
-            $cond .= " AND ( (p.owner_id IN (".$request->user()->users_manager.") AND p.owner_id NOT IN (".$request->user()->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35)";
+            $cond .= " AND ( (p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35)";
         }
         $data = u::first("SELECT p.*,(SELECT name FROM users WHERE id=p.creator_id) AS creator_name,
                 (SELECT name FROM cms_districts WHERE id=p.district_id) AS district_name,
@@ -511,6 +511,28 @@ class ParentsController extends Controller
                 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
         return "ok";
     }
+
+    public static function processParentLockById($parent_id){
+        u::query("UPDATE cms_parents SET is_lock = 1 AND id=$parent_id");
+        u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id AND p.id=$parent_id");
+        u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1) WHERE  p.id=$parent_id AND p.status NOT IN(12,9,8,10)");
+        u::query("UPDATE cms_parents SET is_lock = 0 
+            WHERE last_care_date IS NULL  AND id=$parent_id
+                AND last_assign_date IS NOT NULL 
+                AND is_lock=1 AND status NOT IN(12,8)
+                -- AND tmp_branch_id NOT IN (5,9)
+                AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
+        u::query("UPDATE cms_parents SET is_lock = 0 
+            WHERE
+                last_care_date IS NOT NULL  AND id=$parent_id
+                AND last_assign_date IS NOT NULL 
+                -- AND tmp_branch_id NOT IN (5,9)
+                AND is_lock=1 AND status NOT IN(12,8)
+                AND DATEDIFF( CURRENT_DATE, last_care_date )> 60
+                AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
+        return true;
+    }
+    
     public function changeSourceMKT(Request $request){
         $parent_info = u::first("SELECT * FROM cms_parents WHERE id='$request->parent_id'");
         if($parent_info){
