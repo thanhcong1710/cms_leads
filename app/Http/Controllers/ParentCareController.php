@@ -51,6 +51,7 @@ class ParentCareController extends Controller
             'message' => "Thành công",
             'data'=>$id
         ];
+        ParentsController::processParentLockById($request->parent_id);
         return response()->json($data);
     }
     public function getAllDataByParent(Request $request, $parent_id){
