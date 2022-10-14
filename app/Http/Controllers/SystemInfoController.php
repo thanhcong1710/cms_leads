@@ -29,7 +29,7 @@ class SystemInfoController extends Controller
         return response()->json($data);
     }
     public function getAllSourceDetail(Request $request){
-        $cond= $request->user()->branch_id && !$request->user()->hasRole('admin') ? " AND (branch_id =".$request->user()->branch_id." OR branch_id IS NULL)" :"";
+        $cond= $request->user()->branch_id && !$request->user()->hasRole('admin') ? " AND (branch_id =".$request->user()->branch_id." OR branch_id IS NULL OR branch_id=0)" :"";
         $data = u::query("SELECT * FROM cms_source_detail WHERE status=1 $cond");
         return response()->json($data);
     }
