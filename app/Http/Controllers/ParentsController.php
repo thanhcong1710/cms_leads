@@ -205,12 +205,12 @@ class ParentsController extends Controller
     public function show(Request $request,$parent_id)
     {
         $cond="";
-        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
-            $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
-        }
         if($request->user()->id== 21){
             $cond .= " AND ( (p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35)";
+        }elseif(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
+            $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
+        
         $data = u::first("SELECT p.*,(SELECT name FROM users WHERE id=p.creator_id) AS creator_name,
                 (SELECT name FROM cms_districts WHERE id=p.district_id) AS district_name,
                 (SELECT name FROM cms_provinces WHERE id=p.province_id) AS province_name,
