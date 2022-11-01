@@ -312,6 +312,12 @@ class ExportController extends Controller
         $cond1 = "1";
         $arr_key =explode(',',$key);
         $arr_value =explode(',',$value);
+        $disabled_type_date = 0;
+        foreach($arr_key AS $k=>$key){
+            if($key=='from_date'||$key=='to_date'){
+                $disabled_type_date = 1;
+            }
+        }
         foreach($arr_key AS $k=>$key){
             if($key=='keyword'){
                 $keyword = $arr_value[$k];
@@ -333,13 +339,10 @@ class ExportController extends Controller
                     $cond1.=" AND ( $cond2 ) ";
                 }
             }
-            $disabled_type_date = 0;
             if($key=='from_date'){
-                $disabled_type_date = 1;
                 $cond1 .= " AND start_time >= '".date('Y-m-d H:i:s',strtotime($arr_value[$k]))."'";
             }
             if($key=='to_date'){
-                $disabled_type_date = 1;
                 $cond1 .= " AND start_time <= '".date('Y-m-d H:i:s',strtotime($arr_value[$k]))."'";
             }
             if($key=='type_date' && !$disabled_type_date){
@@ -417,6 +420,12 @@ class ExportController extends Controller
         $cond = "1";
         $arr_key =explode(',',$key);
         $arr_value =explode(',',$value);
+        $disabled_type_date = 0;
+        foreach($arr_key AS $k=>$key){
+            if($key=='from_date'||$key=='to_date'){
+                $disabled_type_date = 1;
+            }
+        }
         foreach($arr_key AS $k=>$key){
             if($key=='keyword'){
                 $keyword = $arr_value[$k];
@@ -438,13 +447,10 @@ class ExportController extends Controller
                     $cond.=" AND ( $cond2 ) ";
                 }
             }
-            $disabled_type_date = 0;
             if($key=='from_date'){
-                $disabled_type_date = 1;
                 $cond .= " AND start_time >= '".date('Y-m-d H:i:s',strtotime($arr_value[$k]))."'";
             }
             if($key=='to_date'){
-                $disabled_type_date = 1;
                 $cond .= " AND start_time <= '".date('Y-m-d H:i:s',strtotime($arr_value[$k]))."'";
             }
             if($key=='type_call'){
