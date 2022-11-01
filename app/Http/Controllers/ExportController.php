@@ -367,8 +367,8 @@ class ExportController extends Controller
         }
         $list = u::query("SELECT CONCAT(u.sip_id,' - ',u.name,' - ',u.hrm_id) AS sip_name,
                 (SELECT name FROM cms_branches WHERE id=u.branch_id) AS branch_name,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND v.status=1 AND `type`='inbound' AND $cond1) AS total_inbound,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND v.status=1 AND `type`='outbound' AND $cond1) AS total_outbound,
+                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1 AND `type`='inbound' AND $cond1) AS total_inbound,
+                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1 AND `type`='outbound' AND $cond1) AS total_outbound,
                 (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND status=1  AND  disposition = 'ANSWERED' AND $cond1) AS total_call_success,
                 (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND status=1 AND disposition != 'ANSWERED' AND $cond1) AS total_call_fail
             FROM users AS u 
