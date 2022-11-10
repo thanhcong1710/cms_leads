@@ -205,12 +205,12 @@ class ParentsController extends Controller
     public function show(Request $request,$parent_id)
     {
         $cond="";
-        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
-            $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
-        }
         if($request->user()->id== 21){
             $cond .= " AND ( (p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35)";
+        }elseif(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
+            $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
+        
         $data = u::first("SELECT p.*,(SELECT name FROM users WHERE id=p.creator_id) AS creator_name,
                 (SELECT name FROM cms_districts WHERE id=p.district_id) AS district_name,
                 (SELECT name FROM cms_provinces WHERE id=p.province_id) AS province_name,
@@ -513,8 +513,8 @@ class ParentsController extends Controller
     }
 
     public static function processParentLockById($parent_id){
-        u::query("UPDATE cms_parents SET is_lock = 1 AND id=$parent_id");
-        u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id AND p.id=$parent_id");
+        u::query("UPDATE cms_parents SET is_lock = 1 WHERE id=$parent_id");
+        u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id WHERE p.id=$parent_id");
         u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1) WHERE  p.id=$parent_id AND p.status NOT IN(12,9,8,10)");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE last_care_date IS NULL  AND id=$parent_id

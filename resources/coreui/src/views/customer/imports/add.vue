@@ -344,6 +344,10 @@ export default {
         mess += " - Nguồn dữ liệu không được để trống<br/>";
         resp = false;
       }
+      if(this.data_assign.source == 32 && this.data_assign.source_detail_id ==''){
+        mess += " - Nguồn chi tiết không được để trống<br/>";
+        resp = false;
+      }
       if (!this.data_assign.owners_id.length) {
         mess += " - Người phụ trách không được để trống<br/>";
         resp = false;

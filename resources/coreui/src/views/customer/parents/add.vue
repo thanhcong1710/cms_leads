@@ -389,6 +389,10 @@ export default {
         mess += " - Nguồn không được để trống<br/>";
         resp = false;
       }
+      if(this.parent.source_id == 32 && this.parent.source_detail_id ==''){
+        mess += " - Nguồn chi tiết không được để trống<br/>";
+        resp = false;
+      }
       if (!resp) {
         this.modal.color = "warning";
         this.modal.body = mess;

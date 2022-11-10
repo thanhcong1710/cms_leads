@@ -312,6 +312,12 @@ class ExportController extends Controller
         $cond1 = "1";
         $arr_key =explode(',',$key);
         $arr_value =explode(',',$value);
+        $disabled_type_date = 0;
+        foreach($arr_key AS $k=>$key){
+            if($key=='from_date'||$key=='to_date'){
+                $disabled_type_date = 1;
+            }
+        }
         foreach($arr_key AS $k=>$key){
             if($key=='keyword'){
                 $keyword = $arr_value[$k];
@@ -333,14 +339,11 @@ class ExportController extends Controller
                     $cond1.=" AND ( $cond2 ) ";
                 }
             }
-            $disabled_type_date = 0;
             if($key=='from_date'){
-                $disabled_type_date = 1;
-                $cond1 .= " AND start_time >= '".date('Y-m-d H:i:s',$arr_value[$k])."'";
+                $cond1 .= " AND start_time >= '".date('Y-m-d H:i:s',strtotime($arr_value[$k]))."'";
             }
             if($key=='to_date'){
-                $disabled_type_date = 1;
-                $cond1 .= " AND start_time <= '".date('Y-m-d H:i:s',$arr_value[$k])."'";
+                $cond1 .= " AND start_time <= '".date('Y-m-d H:i:s',strtotime($arr_value[$k]))."'";
             }
             if($key=='type_date' && !$disabled_type_date){
                 if($arr_value[$k] == 1){
@@ -367,8 +370,8 @@ class ExportController extends Controller
         }
         $list = u::query("SELECT CONCAT(u.sip_id,' - ',u.name,' - ',u.hrm_id) AS sip_name,
                 (SELECT name FROM cms_branches WHERE id=u.branch_id) AS branch_name,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND v.status=1 AND `type`='inbound' AND $cond1) AS total_inbound,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND v.status=1 AND `type`='outbound' AND $cond1) AS total_outbound,
+                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1 AND `type`='inbound' AND $cond1) AS total_inbound,
+                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1 AND `type`='outbound' AND $cond1) AS total_outbound,
                 (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND status=1  AND  disposition = 'ANSWERED' AND $cond1) AS total_call_success,
                 (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND status=1 AND disposition != 'ANSWERED' AND $cond1) AS total_call_fail
             FROM users AS u 
@@ -417,6 +420,12 @@ class ExportController extends Controller
         $cond = "1";
         $arr_key =explode(',',$key);
         $arr_value =explode(',',$value);
+        $disabled_type_date = 0;
+        foreach($arr_key AS $k=>$key){
+            if($key=='from_date'||$key=='to_date'){
+                $disabled_type_date = 1;
+            }
+        }
         foreach($arr_key AS $k=>$key){
             if($key=='keyword'){
                 $keyword = $arr_value[$k];
@@ -438,14 +447,11 @@ class ExportController extends Controller
                     $cond.=" AND ( $cond2 ) ";
                 }
             }
-            $disabled_type_date = 0;
             if($key=='from_date'){
-                $disabled_type_date = 1;
-                $cond .= " AND start_time >= '".date('Y-m-d H:i:s',$arr_value[$k])."'";
+                $cond .= " AND start_time >= '".date('Y-m-d H:i:s',strtotime($arr_value[$k]))."'";
             }
             if($key=='to_date'){
-                $disabled_type_date = 1;
-                $cond .= " AND start_time <= '".date('Y-m-d H:i:s',$arr_value[$k])."'";
+                $cond .= " AND start_time <= '".date('Y-m-d H:i:s',strtotime($arr_value[$k]))."'";
             }
             if($key=='type_call'){
                 $cond.=$arr_value[$k] ==2 ? " AND v.type='inbound' " : "v.type='outbound'";
