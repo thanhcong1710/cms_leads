@@ -39,7 +39,7 @@ class Admin
         $tmp_users_manager="";
         if($user->id == 21){
             $list_users = u::query("SELECT u.id,u.manager_id FROM users AS u WHERE u.status=1 AND
-            ((SELECT count(role_id) FROM model_has_roles WHERE model_id=u.id AND role_id=7)>0 OR u.id=$user->id)");
+                (SELECT count(role_id) FROM model_has_roles WHERE model_id=u.id AND role_id=7)>0 ");
             foreach($list_users AS $row){
                 $tmp_users_manager.=$tmp_users_manager ? ",".$row->id : $row->id;
             }
