@@ -70,11 +70,10 @@ class ParentsController extends Controller
         $cond_1 = " AND p.care_date IS NULL AND p.status != 8 ";
         //type_search=2
         $cond_2 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') = '".date('Y-m-d')."'";
-        $cond_3 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') < '".date('Y-m-d')."' 
+        $cond_3 = " AND next_care_date < '".date('Y-m-d')."' 
             AND p.care_date < p.next_care_date AND p.status NOT IN (8,9,10,12)";
         $order_by = " ORDER BY p.id DESC ";
         $tmp_cond="";
-        $type_seach=3;
         if($type_seach==1){
             $tmp_cond = $cond_1;
         }elseif($type_seach==2){
@@ -87,7 +86,7 @@ class ParentsController extends Controller
 
         $total = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $tmp_cond");
         
-        $list = u::query("SELECT p.*, (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
+        $list = u::query("SELECT p.name,p.id,p.mobile_1,p.status,p.next_care_date, (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
                 (SELECT name FROM cms_source_detail WHERE id=p.source_detail_id) AS source_detail_name,
                 (SELECT note FROM cms_customer_care WHERE parent_id=p.id AND status=1 ORDER BY care_date DESC LIMIT 1) AS last_care,
                 p.care_date AS last_time_care,
