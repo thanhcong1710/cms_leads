@@ -34,7 +34,7 @@ class ReportsController extends Controller
             $cond .= " AND p.created_at <= '$request->end_date 23:59:59'";
         }
         if($request->user()->id==21){
-            $cond .= " AND ((p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35)";
+            $cond .= " AND ((p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35 OR p.source_id=26)";
         }elseif(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
