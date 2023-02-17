@@ -212,7 +212,6 @@ class ParentsController extends Controller
         }elseif(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
-        dd($cond);
         $data = u::first("SELECT p.*,(SELECT name FROM users WHERE id=p.creator_id) AS creator_name,
                 (SELECT name FROM cms_districts WHERE id=p.district_id) AS district_name,
                 (SELECT name FROM cms_provinces WHERE id=p.province_id) AS province_name,
