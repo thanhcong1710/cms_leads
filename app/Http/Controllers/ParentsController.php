@@ -38,11 +38,11 @@ class ParentsController extends Controller
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
         if($request->user()->hasRole('Marketing')){
-            if($request->user()->id== 21){
-                $cond .= " AND ((p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35  OR p.source_id=26)";
-            }else{
+            // if($request->user()->id== 21){
+            //     $cond .= " AND ((p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35  OR p.source_id=26)";
+            // }else{
                 $cond .= " AND (p.creator_id IN (".$request->user()->id.") OR p.owner_id = ".$request->user()->id." OR p.source_id=26)";
-            }
+            // }
         }
         if (!empty($status)) {
             $cond .= " AND p.status IN (".implode(",",$status).")";
@@ -207,9 +207,10 @@ class ParentsController extends Controller
     public function show(Request $request,$parent_id)
     {
         $cond="";
-        if($request->user()->id== 21){
-            $cond .= " AND ( (p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35 OR p.source_id=26)";
-        }elseif(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
+        // if($request->user()->id== 21){
+        //     $cond .= " AND ( (p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35 OR p.source_id=26)";
+        // }else
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
         $data = u::first("SELECT p.*,(SELECT name FROM users WHERE id=p.creator_id) AS creator_name,
