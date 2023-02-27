@@ -439,9 +439,9 @@ export default {
   },
   created() {
     const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
-    if(arr_role.indexOf("Supervisor")> -1){
-      this.disabled_action = true
-    }
+    // if(arr_role.indexOf("Supervisor")> -1){
+    //   this.disabled_action = true
+    // }
     u.g(`/api/user/get-users-manager`)
       .then(response => {
       this.users_manager = response.data
