@@ -109,7 +109,7 @@
                       </select>
                       <br>
                       <textarea class="form-control" v-model="phone.note" placeholder="Thêm ghi chú cuộc gọi"></textarea>
-                      <div style="margin-top:5px;text-align:right" v-if="phone.show_input_note || 1==1">
+                      <div style="margin-top:5px;text-align:right" v-if="phone.show_input_note">
                         <button class="btn btn-success" @click="updateNotePhone"> <i class="fa fa-save"></i> Lưu</button>
                         <!-- <button class="btn btn-secondary" @click="phone.show=false"> <i class="fa fa-times"></i> Đóng</button> -->
                       </div>
