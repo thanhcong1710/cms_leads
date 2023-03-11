@@ -59,6 +59,8 @@ class JobsDownloadVoip extends Command
 
                 shell_exec('ffmpeg -i ' . $dir.$file_name . ' ' . $dir.$file_name_mp3 . ''); 
                 u::updateSimpleRow(array('meta_data'=>$response,'process_data'=>1,'link_record'=>$dir_file.$file_name_mp3),array('callid'=>$row->callid),'voip24h_data');
+            }else{
+                u::updateSimpleRow(array('process_data'=>1),array('callid'=>$row->callid),'voip24h_data');
             }
         }
         u::query("INSERT INTO log_jobs (`action`, created_at) VALUES ('jobsDownloadVoip','".date('Y-m-d H:i:s')."')");
