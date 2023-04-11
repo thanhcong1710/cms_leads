@@ -389,6 +389,7 @@ class ParentsController extends Controller
                 'phone'=>$phone ,
                 'data_state'=> isset($res['CodeResult']) && $res['CodeResult']==100 ? 'Thành công' : 'Thất bại'
             ),'cms_customer_care');
+            $this->processParentLockById($parent_info->id);
         }
         return "ok";
     }
