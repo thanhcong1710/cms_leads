@@ -78,9 +78,10 @@ class ParentCareController extends Controller
     public function updateNoteCare(Request $request){
         u::updateSimpleRow(array('note'=>$request->note,'status'=>1),array('id'=>$request->care_id),'cms_customer_care');
         $data_info=u::first("SELECT parent_id FROM cms_customer_care WHERE id=".$request->care_id);
+        Log::info("updateNoteCare $request->care_id",['parent_id'=>$data_info->parent_id]);
         if($data_info){
             ParentsController::processParentLockById($data_info->parent_id);
-            Log::info("updateNoteCare $request->care_id",['parent_id'=>$data_info->parent_id]);
+            Log::info("updateNoteCare processParentLockById $request->care_id",['parent_id'=>$data_info->parent_id]);
         }
         return "ok";
     }
