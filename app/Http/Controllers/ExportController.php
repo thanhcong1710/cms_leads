@@ -364,7 +364,6 @@ class ExportController extends Controller
                 $cond .= " AND u.branch_id IN (".str_replace("-",",", $arr_value[$k]).")";
             }
         }
-        
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
         }
@@ -372,8 +371,8 @@ class ExportController extends Controller
                 (SELECT name FROM cms_branches WHERE id=u.branch_id) AS branch_name,
                 (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1 AND `type`='inbound' AND $cond1) AS total_inbound,
                 (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1 AND `type`='outbound' AND $cond1) AS total_outbound,
-                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND status=1  AND  disposition = 'ANSWERED' AND $cond1) AS total_call_success,
-                (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND status=1 AND disposition != 'ANSWERED' AND $cond1) AS total_call_fail
+                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1  AND  disposition = 'ANSWERED' AND $cond1) AS total_call_success,
+                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1 AND disposition != 'ANSWERED' AND $cond1) AS total_call_fail
             FROM users AS u 
             WHERE u.status=1 AND $cond AND sip_id IS NOT NULL
             ORDER BY u.id DESC ");

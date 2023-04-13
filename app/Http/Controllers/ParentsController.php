@@ -35,14 +35,14 @@ class ParentsController extends Controller
         $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
         $cond = " 1 ";
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
-            if($request->user()->id== 21){
-                $cond .= " AND ((p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35)";
-            }else{
-                $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
-            }
+            $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
         if($request->user()->hasRole('Marketing')){
-            $cond .= " AND (p.creator_id IN (".$request->user()->id.") OR p.owner_id = ".$request->user()->id." OR p.source_id=26)";
+            // if($request->user()->id== 21){
+            //     $cond .= " AND ((p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35  OR p.source_id=26)";
+            // }else{
+                $cond .= " AND (p.creator_id IN (".$request->user()->id.") OR p.owner_id = ".$request->user()->id." OR p.source_id=26)";
+            // }
         }
         if (!empty($status)) {
             $cond .= " AND p.status IN (".implode(",",$status).")";
@@ -67,11 +67,11 @@ class ParentsController extends Controller
             $cond .= " AND p.next_care_date > '$start_date 00:00:00'";
         }
         //type_search=1
-        $cond_1 = " AND (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1)=0 AND p.status != 8 ";
+        $cond_1 = " AND p.care_date IS NULL AND p.status != 8 ";
         //type_search=2
         $cond_2 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') = '".date('Y-m-d')."'";
-        $cond_3 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') < '".date('Y-m-d')."' 
-            AND ( SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND care_date >= next_care_date AND status=1 )=0 AND p.status NOT IN (8,9,10,12)";
+        $cond_3 = " AND next_care_date < '".date('Y-m-d')."' 
+            AND (p.care_date < p.next_care_date OR p.care_date IS NULL) AND p.status NOT IN (8,9,10,12)";
         $order_by = " ORDER BY p.id DESC ";
         $tmp_cond="";
         if($type_seach==1){
@@ -83,11 +83,13 @@ class ParentsController extends Controller
             $tmp_cond = $cond_3;
             $order_by = " ORDER BY next_care_date ASC ";
         }
+
         $total = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $tmp_cond");
-        $list = u::query("SELECT p.*, (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
+        
+        $list = u::query("SELECT p.name,p.id,p.mobile_1,p.status,p.next_care_date, (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
                 (SELECT name FROM cms_source_detail WHERE id=p.source_detail_id) AS source_detail_name,
                 (SELECT note FROM cms_customer_care WHERE parent_id=p.id AND status=1 ORDER BY care_date DESC LIMIT 1) AS last_care,
-                (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND status=1 ORDER BY care_date DESC LIMIT 1) AS last_time_care,
+                p.care_date AS last_time_care,
                 (SELECT name FROM users WHERE id=p.owner_id) AS owner_name ,
                 (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 0,1) AS hs1_name,
                 (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 1,1) AS hs2_name
@@ -205,12 +207,12 @@ class ParentsController extends Controller
     public function show(Request $request,$parent_id)
     {
         $cond="";
-        if($request->user()->id== 21){
-            $cond .= " AND ( (p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35)";
-        }elseif(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
+        // if($request->user()->id== 21){
+        //     $cond .= " AND ( (p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35 OR p.source_id=26)";
+        // }else
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor') && !$request->user()->hasRole('Marketing')){
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
-        
         $data = u::first("SELECT p.*,(SELECT name FROM users WHERE id=p.creator_id) AS creator_name,
                 (SELECT name FROM cms_districts WHERE id=p.district_id) AS district_name,
                 (SELECT name FROM cms_provinces WHERE id=p.province_id) AS province_name,
@@ -391,6 +393,7 @@ class ParentsController extends Controller
                 'phone'=>$phone ,
                 'data_state'=> isset($res['CodeResult']) && $res['CodeResult']==100 ? 'Thành công' : 'Thất bại'
             ),'cms_customer_care');
+            $this->processParentLockById($parent_info->id);
         }
         return "ok";
     }
@@ -494,6 +497,7 @@ class ParentsController extends Controller
     public function processParentLock(){
         u::query("UPDATE cms_parents SET is_lock = 1");
         u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id");
+        u::query("UPDATE cms_parents AS p SET p.care_date=(SELECT  IF(care_date IS NULL, p.care_date,care_date) FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1)");
         u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1) WHERE  p.status NOT IN(12,9,8,10)");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE last_care_date IS NULL 
@@ -513,23 +517,26 @@ class ParentsController extends Controller
     }
 
     public static function processParentLockById($parent_id){
-        u::query("UPDATE cms_parents SET is_lock = 1 WHERE id=$parent_id");
-        u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id WHERE p.id=$parent_id");
-        u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1) WHERE  p.id=$parent_id AND p.status NOT IN(12,9,8,10)");
-        u::query("UPDATE cms_parents SET is_lock = 0 
-            WHERE last_care_date IS NULL  AND id=$parent_id
-                AND last_assign_date IS NOT NULL 
-                AND is_lock=1 AND status NOT IN(12,8)
-                -- AND tmp_branch_id NOT IN (5,9)
-                AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
-        u::query("UPDATE cms_parents SET is_lock = 0 
-            WHERE
-                last_care_date IS NOT NULL  AND id=$parent_id
-                AND last_assign_date IS NOT NULL 
-                -- AND tmp_branch_id NOT IN (5,9)
-                AND is_lock=1 AND status NOT IN(12,8)
-                AND DATEDIFF( CURRENT_DATE, last_care_date )> 60
-                AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
+        u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET 
+                p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1) ,
+                p.care_date=(SELECT IF(care_date IS NULL, p.care_date,care_date) FROM cms_customer_care WHERE parent_id=p.id AND `status`=1 ORDER BY id DESC LIMIT 1)
+            WHERE p.id=$parent_id ");
+        u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id,p.is_lock = 1
+            WHERE p.id=$parent_id AND p.status NOT IN(12,9,8,10)");
+        // u::query("UPDATE cms_parents SET is_lock = 0 
+        //     WHERE last_care_date IS NULL  AND id=$parent_id
+        //         AND last_assign_date IS NOT NULL 
+        //         AND is_lock=1 AND status NOT IN(12,8)
+        //         -- AND tmp_branch_id NOT IN (5,9)
+        //         AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
+        // u::query("UPDATE cms_parents SET is_lock = 0 
+        //     WHERE
+        //         last_care_date IS NOT NULL  AND id=$parent_id
+        //         AND last_assign_date IS NOT NULL 
+        //         -- AND tmp_branch_id NOT IN (5,9)
+        //         AND is_lock=1 AND status NOT IN(12,8)
+        //         AND DATEDIFF( CURRENT_DATE, last_care_date )> 60
+        //         AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
         return true;
     }
     

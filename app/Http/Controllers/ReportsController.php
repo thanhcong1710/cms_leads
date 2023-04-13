@@ -33,9 +33,10 @@ class ReportsController extends Controller
         if($request->end_date){
             $cond .= " AND p.created_at <= '$request->end_date 23:59:59'";
         }
-        if($request->user()->id==21){
-            $cond .= " AND ((p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35)";
-        }elseif(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
+        // if($request->user()->id==21){
+        //     $cond .= " AND ((p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35 OR p.source_id=26)";
+        // }else
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
         $total = u::first("SELECT count(p.id) AS total FROM cms_parents AS p 
@@ -168,9 +169,10 @@ class ReportsController extends Controller
             $cond1 .= " AND start_time < '".date('Y-m-01 00:00:00')."' AND start_time >= '".date('Y-m-01 00:00:00',strtotime('-1 month'))."'";
         }
         
-        if($request->user()->id==21){
-            $cond .= " AND (u.id IN (".$request->user_info->users_manager.") AND u.id NOT IN (".$request->user_info->tmp_users_manager.")) ";
-        }elseif(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
+        // if($request->user()->id==21){
+        //     $cond .= " AND (u.id IN (".$request->user_info->users_manager.") AND u.id NOT IN (".$request->user_info->tmp_users_manager.")) ";
+        // }else
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
         }
         
@@ -266,9 +268,10 @@ class ReportsController extends Controller
         }elseif($request->type_date == 6){
             $cond .= " AND v.start_time < '".date('Y-m-01 00:00:00')."' AND v.start_time >= '".date('Y-m-01 00:00:00',strtotime('-1 month'))."'";
         }
-        if($request->user()->id==21){
-            $cond .= " AND (u.id IN (".$request->user_info->users_manager.") AND u.id NOT IN (".$request->user_info->tmp_users_manager.")) ";
-        }elseif(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
+        // if($request->user()->id==21){
+        //     $cond .= " AND (u.id IN (".$request->user_info->users_manager.") AND u.id NOT IN (".$request->user_info->tmp_users_manager.")) ";
+        // }else
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
         }
         $total = u::first("SELECT count(v.id) AS total FROM voip24h_data AS v
