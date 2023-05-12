@@ -27,7 +27,7 @@ jobs:
    #   run: npm run build
    #   working-directory: /opt/cms_leads_tmp/resources/coreui
     - name: Complete
-      run: npm run dev
+      run: npm run watch
       working-directory: /opt/cms_leads_tmp
   cms_leads_develop:
     runs-on: self-hosted
