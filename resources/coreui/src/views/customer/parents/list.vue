@@ -114,7 +114,7 @@
                   <i class="fas fa-undo-alt"></i> Reset
                 </button>
               </div>
-              <div class="form-group col-sm-12" v-if="temp.length>0">
+              <div class="form-group col-sm-12" v-if="temp.length>0 && !disabled_action">
                 <p>Bạn đã lựa chọn <b>{{temp.length}}</b> khách hàng   <button  style="margin-left:30px;" class="btn btn-outline-primary" type="button" @click="showModalAssgin">Bàn giao</button></p>
               </div>  
             </div>
