@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 
 Route::group(['middleware' => 'api'], function ($router) {
     Route::get('menu', 'MenuController@index');
+    Route::get('menu-camera-ai', 'MenuController@cameraAI');
 
     Route::post('login', 'AuthController@login');
     Route::post('logout', 'AuthController@logout');
@@ -138,6 +139,11 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('/export/report03/{key}/{value}', 'ExportController@report03');
         Route::post('/reports/04', 'ReportsController@report04');
         Route::get('/export/report04/{key}/{value}', 'ExportController@report04');
+
+        Route::post('/camera-ai/list-action', 'CameraAIController@listAction');
+        Route::post('/camera-ai/list-student', 'CameraAIController@listStudent');
+        Route::post('/camera-ai/update-student', 'CameraAIController@updateStudent');
+        Route::post('/camera-ai/push-data', 'CameraAIController@pushData');
     });
 });
-
+Route::post('/camera/ipn', 'CameraAIController@ipn');

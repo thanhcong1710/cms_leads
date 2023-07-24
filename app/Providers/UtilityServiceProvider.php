@@ -363,4 +363,9 @@ class UtilityServiceProvider extends ServiceProvider
         }
         return $resp;
     }
+    public static function firstCRM($query, $print = false)
+	{
+		$resp = self::queryCRM($query, $print);
+		return $resp && is_array($resp) && count($resp) >= 1 ? $resp[0] : $resp;
+	}
 }
