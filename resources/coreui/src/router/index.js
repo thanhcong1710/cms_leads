@@ -354,7 +354,7 @@ function configRoutes () {
       component: Page404
     },
     {
-      path: '/single-sign-on/:hrm_id/:token',
+      path: '/single-sign-on/:hrm_id/:token/:type',
       name: 'Single Sign On',
       component: SingleSignOn
     },
