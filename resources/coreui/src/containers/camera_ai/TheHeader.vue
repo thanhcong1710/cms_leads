@@ -124,7 +124,7 @@ export default {
           language: this.$i18n.locale,
           modal_checkin: {
             title: "KHÁCH HÀNG CHECKIN",
-            show: true,
+            show: false,
             color: "success",
             error_message:"",
             name:'',
