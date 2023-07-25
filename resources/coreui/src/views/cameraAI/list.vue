@@ -61,39 +61,26 @@
                 </button>
               </div> 
             </div>
-            <div class="wrapper2">
-              <table class="table table-striped table-hover" style="width:1800px">
+            <div>
+              <table class="table table-striped table-hover">
                 <thead>
                   <tr>
-                    <th class="sticky-col st2-col">STT</th>
-                    <th class="sticky-col st3-col">Tên khách hàng</th>
-                    <th class="sticky-col st4-col">Số điện thoại</th>
-                    <th>Học sinh 2</th>
-                    <th>Học sinh 1</th>
-                    <th>Nguồn</th>
-                    <th>Nguồn chi tiết</th>
-                    <th>Người phụ trách</th>
-                    <th>Lịch chăm sóc tiếp theo</th>
-                    <th>Lịch sử chăm sóc</th>
-                    <th>Thời gian chăm sóc gần nhất</th>
+                    <th>STT</th>
+                    <th>Trung tâm</th>
+                    <th>Học sinh</th>
+                    <th>Thời gian checkin</th>
+                    <th>Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr v-for="(item, index) in parents" :key="index">
-                    <td  class="sticky-col st2-col">
+                    <td>
                       {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
                     </td>
-                    <td class="sticky-col st3-col"><router-link :to="`/parents/${item.id}/detail`"><a>{{ item.name }}</a></router-link></td>
-                    <td class="sticky-col st4-col"><router-link :to="`/parents/${item.id}/detail`"><a>{{ item.mobile_1 }}</a></router-link></td>
-                    <td>{{ item.hs2_name }}</td>
-                    <td>{{ item.hs1_name }}</td>
-                    <td>{{ item.source_name }}</td>
-                    <td>{{ item.source_detail_name }}</td>
-                    <td>{{ item.owner_name }}</td>
-                    <td>{{ item.next_care_date}}</td>
-                    <td>{{ item.last_care }}</td>
-                    <td>{{ item.last_time_care }}</td>
-                    
+                    <td>{{ item.branch_name }}</td>
+                    <td>{{ item.student_name }}</td>
+                    <td>{{ item.date }}</td>
+                    <td><button class="btn btn-sm btn-info" @click="showModalImg(item.detected_image_url)"><i class="fa fa-eye"></i> </button></td>
                   </tr>
                 </tbody>
               </table>
@@ -134,9 +121,8 @@
       :title="modal.title"
       :show.sync="modal.show"
       :color="modal.color"
-      :closeOnBackdrop="modal.closeOnBackdrop"
     >
-      {{ modal.body }}
+      <img :src="modal.img_url" width="100%">
       <template #header>
         <h5 class="modal-title">{{ modal.title }}</h5>
       </template>
@@ -218,10 +204,11 @@ export default {
         pages: [],
       },
       modal: {
-        title: "THÔNG BÁO",
+        title: "CHI TIẾT",
         show: false,
         color: "success",
         body: "Cập nhật khách hàng thành công",
+        img_url:"",
         closeOnBackdrop: false,
       },
     };
@@ -252,6 +239,8 @@ export default {
         keyword: this.searchData.keyword,
         branch_id:ids_branch_id,
         pagination:this.pagination,
+        end_date:endDate,
+        start_date:startDate
       };
       const link = "/api/camera-ai/list-action";
 
@@ -282,12 +271,20 @@ export default {
       this.pagination.cpage = parseInt(page);
       this.search();
     },
+    showModalImg(img_url){
+      this.modal.img_url = img_url
+      this.modal.show = true
+    },
     exit() {
       this.modal.show = false;
     },
   },
-  filters: {
-    
+  sockets: {
+    camera_ai: function (data) { 
+      if( localStorage.getItem("branch_id") == 0 || data.branch_id == localStorage.getItem("branch_id")){
+        this.search();
+      }
+    },
   },
 };
 </script>

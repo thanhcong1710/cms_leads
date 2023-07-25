@@ -8,21 +8,50 @@ use App\Providers\UtilityServiceProvider as u;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\SocketIO;
 
 class CameraAIController extends Controller
 {
+    public function __construct()
+    {
+        $this->baseUri = "103.226.250.52";
+    }
     public function ipn(Request $request){
-        u::insertSimpleRow(array(
-            'aliasID'=>$request->aliasID,
-            'deviceID'=>$request->deviceID,
-            'personID' => $request->personID,
-            'placeID' => $request->placeID,
-            'date' => $request->date,
-            'detected_image_url' => $request->detected_image_url,
-            'personType' => $request->personType,
-            'meta_data' => json_encode($request->input()),
-            'created_at' => date('Y-m-d H:i:s')
-        ), 'camera_ai_checkin');
+        if($request->data_type == 'log'){
+            u::insertSimpleRow(array(
+                'aliasID'=>$request->aliasID,
+                'deviceID'=>$request->deviceID,
+                'personID' => $request->personID,
+                'placeID' => $request->placeID,
+                'date' => $request->date,
+                'detected_image_url' => $request->detected_image_url,
+                'personType' => $request->personType,
+                'meta_data' => json_encode($request->input()),
+                'created_at' => date('Y-m-d H:i:s')
+            ), 'camera_ai_checkin');
+            $branch_info = u::firstCRM("SELECT id FROM branches WHERE placeID=".$request->placeID);
+            if($request->aliasID){
+                $student_info = u::firstCRM("SELECT s.branch_id, s.name, s.crm_id, s.accounting_id, c.avatar_url
+                    FROM students AS s LEFT JOIN camera_ai_student AS c ON c.student_id=s.id WHERE s.id=".$request->aliasID);
+                $data =array(
+                    'branch_id' => $branch_info->id,
+                    'name' => $student_info->name,
+                    'crm_id'=> $student_info->crm_id,
+                    'accounting_id'=> $student_info->accounting_id,
+                    'avatar_url'=> $student_info->avatar_url
+                );
+            }else{
+                $data =array(
+                    'branch_id' => $branch_info->id,
+                    'name' => 'Khách vãng lai',
+                    'crm_id'=> '',
+                    'accounting_id'=> '',
+                    'avatar_url'=> ''
+                );
+            }
+
+            $this->socketIo($branch_info->id,'camera_ai', $data);
+        }
         return response()->json("ok");
     }
     /**
@@ -45,7 +74,7 @@ class CameraAIController extends Controller
         $cond = " 1 ";
         
         if ($keyword !== '') {
-            $cond .= " AND (p.name LIKE '%$keyword%' OR p.mobile_1 LIKE '%$keyword%' OR p.mobile_2 LIKE '%$keyword%') ";
+            $cond .= " AND (s.name LIKE '%$keyword%' OR s.gud_mobile1 LIKE '%$keyword%' OR s.gud_mobile2 LIKE '%$keyword%' OR s.crm_id LIKE '%$keyword%') ";
         }
         if ($end_date !== '') {
             $cond .= " AND c.date < '$end_date 23:59:59' ";
@@ -54,15 +83,23 @@ class CameraAIController extends Controller
             $cond .= " AND c.date > '$start_date 00:00:00'";
         }
         if (!empty($branch_id)) {
-            $cond .= " AND s.branch_id IN (".implode(",",$branch_id).")";
+            $cond .= " AND b.id IN (".implode(",",$branch_id).")";
         }
         
         $order_by = " ORDER BY c.id DESC ";
         
-        $total = u::firstCRM("SELECT count(id) AS total FROM camera_ai_checkin AS c WHERE $cond");
+        $total = u::firstCRM("SELECT count(c.id) AS total 
+            FROM camera_ai_checkin AS c 
+                LEFT JOIN students AS s ON s.id= c.aliasID
+                LEFT JOIN branches AS b ON b.placeID=c.placeID
+            WHERE $cond");
         
-        $list = u::queryCRM("SELECT c.*
-            FROM camera_ai_checkin AS c WHERE $cond $order_by $limitation");
+        $list = u::queryCRM("SELECT IF(s.id IS NULL, 'Vãng Lai', CONCAT(s.name,' - ',s.crm_id)) AS student_name,
+                b.name AS branch_name, c.date, c.detected_image_url
+            FROM camera_ai_checkin AS c 
+                LEFT JOIN students AS s ON s.id= c.aliasID
+                LEFT JOIN branches AS b ON b.placeID=c.placeID
+            WHERE $cond $order_by $limitation");
         $data = u::makingPagination($list, $total->total, $page, $limit);
         
         return response()->json($data);
@@ -141,5 +178,26 @@ class CameraAIController extends Controller
         $data=$cameraAI->registerByUrl($request->student_id);
         
         return response()->json($data);
+    }
+    public function socketIo($user_id,$event,$data){
+
+        $arr=[
+            'user_id'=>$user_id,
+            'event'=>$event,
+            'data'=>$data
+        ];
+        
+        $socketio = new SocketIO();
+        if ($socketio->send($this->baseUri, 3000 , 'pushData', json_encode($arr))){
+            u::insertSimpleRow( array(
+                'user_id'=>$user_id,
+                'event'=>$event,
+                'created_at'=>date('Y-m-d H:i:s'),
+                'data'=>json_encode($data)
+            ),'log_socket');
+            echo 'we sent the message and disconnected: '.json_encode($data);
+        } else {
+            echo 'Sorry, we have a mistake :\'(';
+        }
     }
 }

@@ -86,25 +86,22 @@
       <CBreadcrumbRouter class="border-0 mb-0"/>
     </CSubheader>
     <CModal
-      :title="modal_inbound.title"
-      :show.sync="modal_inbound.show"
-      :color="modal_inbound.color"
-      :closeOnBackdrop="modal_inbound.closeOnBackdrop"
+      :title="modal_checkin.title"
+      :show.sync="modal_checkin.show"
+      :color="modal_checkin.color"
     >
       <div>
-        <div class="form-in-list" style="text-align:center">
-          <h3>{{modal_inbound.phone}}</h3>
-          <h2>{{modal_inbound.name}}</h2>
-        </div>
+          <div style="float: left; width: 90px;"><img :src="modal_checkin.img_url" class="c-avatar-img"></div>
+          <div style="float: left; padding: 10px;">
+              <h5 style="margin-bottom: 0px;">{{modal_checkin.name}}</h5>
+              <p style="margin-top: 3px;">Mã CRM: {{modal_checkin.crm_id}}</p>
+          </div>
       </div>
       <template #header>
-        <h5 class="modal-title"> <i class="fa fa-phone" style="margin-right:10px"></i> {{ modal_inbound.title }}</h5>
+        <h5 class="modal-title"><i class="fa fa-check" style="margin-right:10px"></i> {{ modal_checkin.title }}</h5>
       </template>
       <template #footer>
-        <CButton :color="'btn btn-info'"  type="button" @click="viewDetail"
-          >Xem thông tin</CButton
-        >
-        <CButton :color="'btn btn-secondary'"  type="button"  @click="modal_inbound.show=false"
+        <CButton :color="'btn btn-secondary'"  type="button"  @click="modal_checkin.show=false"
           >Đóng</CButton
         >
       </template>
@@ -125,15 +122,14 @@ export default {
   data() {
       return {
           language: this.$i18n.locale,
-          modal_inbound: {
-            title: "CUỘC GỌI ĐẾN TỪ KHÁCH HÀNG",
-            show: false,
+          modal_checkin: {
+            title: "KHÁCH HÀNG CHECKIN",
+            show: true,
             color: "success",
-            closeOnBackdrop: false,
             error_message:"",
-            parent_id:'',
             name:'',
-            phone:'',
+            crm_id:'',
+            img_url:'',
           },
       };
   },
@@ -146,37 +142,17 @@ export default {
         this.$i18n.locale = this.language;
         fetch(`api/language/${this.language}?token=` + localStorage.getItem("api_token"));
     },
-    changeModalInbound(data){
-      if(this.modal_inbound.show == true){
-        this.modal_inbound.title = "CUỘC GỌI NHỠ TỪ KHÁCH HÀNG"
-        this.modal_inbound.color = "danger"
-      }
+    showModalCheckin(data){
+      this.modal_checkin.show = true;
+      this.modal_checkin.img_url = data.img_url ? data.img_url : 'img/avatars/avatar.png'
+      this.modal_checkin.name = data.name
+      this.modal_checkin.crm_id = data.crm_id
     },
-    showModalInbound(data){
-      u.g(`/api/parents/get_info_by_phone/${data.phone}`)
-        .then((response) => {
-          this.modal_inbound.show = true;
-          this.modal_inbound.name = response.data.name
-          this.modal_inbound.phone = response.data.mobile_1
-          this.modal_inbound.parent_id = response.data.id
-        })
-        .catch((e) => {
-        });
-    },
-    viewDetail(){
-      this.modal_inbound.show = false;
-       this.$router.push({ path: `/parents/${this.modal_inbound.parent_id}/detail` });
-    }
   },
   sockets: {
-    inbound: function (data) { 
-      if(data.user_id == localStorage.getItem("user_id")){
-        this.showModalInbound(data)
-      }
-    },
-    call_end: function (data) { 
-      if(data.user_id == localStorage.getItem("user_id")){
-        this.changeModalInbound(data)
+    camera_ai: function (data) { 
+      if( localStorage.getItem("branch_id") == 0 || data.branch_id == localStorage.getItem("branch_id")){
+        this.showModalCheckin(data)
       }
     },
   },

@@ -20,6 +20,7 @@ import u from "../../utilities/utility";
         })
           .then((response) => {
               localStorage.setItem("user_id", response.data.user_id);
+              localStorage.setItem("branch_id", response.data.branch_id);
               localStorage.setItem("api_token", response.data.access_token);
               localStorage.setItem('roles', JSON.stringify(response.data.roles));
               localStorage.setItem('rules_setting', response.data.rules_setting);

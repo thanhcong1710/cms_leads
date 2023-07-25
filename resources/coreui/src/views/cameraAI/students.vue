@@ -5,7 +5,7 @@
         <div class="card">
           <loader :active="loading.processing" :text="loading.text" />
           <div class="card-header">
-            <strong>Danh sách sự kiện</strong>
+            <strong>Danh sách học sinh</strong>
           </div>
           <div class="card-body">
             <div class="row">
@@ -74,7 +74,7 @@
                     <td>
                       {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
                     </td>
-                    <td><img  :src="item.avatar_url ? item.avatar_url :'img/avatars/avatar.png'" class="c-avatar-img " style="width:40px"></td>
+                    <td><img @click="showModalImg(item.avatar_url)" :src="item.avatar_url ? item.avatar_url :'img/avatars/avatar.png'" class="c-avatar-img " style="width:40px; cursor: pointer;"></td>
                     <td>{{ item.branch_name }}</td>
                     <td>{{ item.name }}</td>
                     <td>{{ item.crm_id }}</td>
@@ -123,7 +123,6 @@
       :title="modal.title"
       :show.sync="modal.show"
       :color="modal.color"
-      :closeOnBackdrop="modal.closeOnBackdrop"
     >
       <input
           type="file"
@@ -139,6 +138,21 @@
           >Lưu</CButton
         >
         <CButton :color="'btn btn-' + modal.color" @click="exit" type="button"
+          >Đóng</CButton
+        >
+      </template>
+    </CModal>
+     <CModal
+      :title="modal_img.title"
+      :show.sync="modal_img.show"
+      :color="modal_img.color"
+    >
+      <img :src="modal_img.img_url" width="100%">
+      <template #header>
+        <h5 class="modal-title">{{ modal_img.title }}</h5>
+      </template>
+      <template #footer>
+        <CButton :color="'btn btn-' + modal_img.color" @click="modal_img.show=false" type="button"
           >Đóng</CButton
         >
       </template>
@@ -220,9 +234,13 @@ export default {
         show: false,
         color: "info",
         body: "Cập nhật học sinh thành công",
-        closeOnBackdrop: false,
         attached_file:"",
         student_id:"",
+      },
+      modal_img: {
+        title: "AVATAR",
+        show: false,
+        color: "info",
       },
     };
   },
@@ -330,6 +348,12 @@ export default {
           this.search();
         })
         .catch(e => console.log(e))
+    },
+    showModalImg(img_url){
+      if(img_url){
+        this.modal_img.img_url = img_url
+        this.modal_img.show = true
+      }
     }
   },
   filters: {
