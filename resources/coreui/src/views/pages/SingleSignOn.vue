@@ -24,7 +24,11 @@ import u from "../../utilities/utility";
               localStorage.setItem("api_token", response.data.access_token);
               localStorage.setItem('roles', JSON.stringify(response.data.roles));
               localStorage.setItem('rules_setting', response.data.rules_setting);
-              this.$router.push({ path: '/dashboard' });
+              if(this.$route.params.type ==1){
+                this.$router.push({ path: '/camera-ai' });
+              }else{
+                this.$router.push({ path: '/dashboard' });
+              }
           })
           .catch((e) => {
             u.processAuthen(e);
