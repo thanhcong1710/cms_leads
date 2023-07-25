@@ -3,12 +3,13 @@ import Router from 'vue-router'
 import Customer from './pages/customer'
 import Report from './pages/report'
 import Setting from './pages/setting'
+import CameraAi from './pages/camera_ai'
 
 // Containers
 const TheContainer = () => import('@/containers/TheContainer')
 
 // Views - New Layout
-const TheContainerNew = () => import('@/containers/TheContainerNew')
+const TheContainerCameraAI = () => import('@/containers/camera_ai/TheContainer')
 
 // Views
 const Dashboard = () => import('@/views/Dashboard')
@@ -361,6 +362,15 @@ function configRoutes () {
       path: '/switch-system',
       name: 'Swith System',
       component: SwitchSystem
+    },
+    {
+      path: '/',
+      redirect: '/camera-ai',
+      name: 'Home',
+      component: TheContainerCameraAI,
+      children: [
+        CameraAi.router,
+      ]
     },
   ]
 }

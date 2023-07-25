@@ -101,6 +101,7 @@ class AuthController extends Controller
             'expires_in' => auth()->factory()->getTTL() * 60,
             'roles' => $user->roles,
             'user_id'=>$user->id,
+            'branch_id'=>$user->branch_id,
             'rules_setting'=>$user->rules_setting
         ]);
     }

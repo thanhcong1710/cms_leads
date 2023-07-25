@@ -48,6 +48,10 @@ class GetSidebarMenu implements MenuInterface{
         $this->getMenuFromDB($menuName, 'Salehub');
     }
 
+    private function getHRMenu($menuName){
+        $this->getMenuFromDB($menuName, 'HR');
+    }
+
     public function get($roles, $menuName = 'sidebar menu'){
         $roles = explode(',', $roles);
         if(empty($roles)){
@@ -58,6 +62,8 @@ class GetSidebarMenu implements MenuInterface{
             $this->getSupervisorMenu($menuName);
         }elseif(in_array('Salehub', $roles)){
             $this->getSalehubMenu($menuName);
+        }elseif(in_array('HR', $roles)){
+            $this->getHRMenu($menuName);
         }elseif(in_array('user', $roles)){
             $this->getUserMenu($menuName);
         }else{
