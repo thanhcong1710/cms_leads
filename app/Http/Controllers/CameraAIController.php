@@ -24,7 +24,7 @@ class CameraAIController extends Controller
             $branch_info = u::firstCRM("SELECT id FROM branches WHERE placeID=".$request->placeID);
             if($request->aliasID){
                 $student_info = u::firstCRM("SELECT s.branch_id, s.name, s.crm_id, s.accounting_id, c.avatar_url
-                    FROM students AS s LEFT JOIN camera_ai_student AS c ON c.student_id=s.id WHERE s.id=".$request->aliasID);
+                    FROM students AS s LEFT JOIN camera_ai_student AS c ON c.student_id=s.id WHERE s.id='".$request->aliasID."'");
                 $data =array(
                     'branch_id' => $branch_info->id,
                     'name' => $student_info->name,
