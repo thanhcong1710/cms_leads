@@ -18,17 +18,9 @@ class CameraAIController extends Controller
     }
     public function ipn(Request $request){
         if($request->data_type == 'log'){
-            u::insertSimpleRow(array(
-                'aliasID'=>$request->aliasID,
-                'deviceID'=>$request->deviceID,
-                'personID' => $request->personID,
-                'placeID' => $request->placeID,
-                'date' => $request->date,
-                'detected_image_url' => $request->detected_image_url,
-                'personType' => $request->personType,
-                'meta_data' => json_encode($request->input()),
-                'created_at' => date('Y-m-d H:i:s')
-            ), 'camera_ai_checkin');
+            u::queryCRM("INSERT INTO camera_ai_checkin (aliasID,deviceID,personID,placeID,`date`,detected_image_url,personType,meta_data,created_at) 
+                VALUES ('$request->aliasID','$request->deviceID','$request->personID','$request->placeID','$request->date','$request->detected_image_url','$request->personType','".json_encode($request->input())."','".date('Y-m-d H:i:s')."')");
+            
             $branch_info = u::firstCRM("SELECT id FROM branches WHERE placeID=".$request->placeID);
             if($request->aliasID){
                 $student_info = u::firstCRM("SELECT s.branch_id, s.name, s.crm_id, s.accounting_id, c.avatar_url
