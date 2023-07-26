@@ -318,6 +318,7 @@ export default {
     },
     updateAvatar(){
       if (this.modal.attached_file) {
+        this.modal.show = false;
         this.loading.processing = true
         let dataUpload = {
           files: this.modal.attached_file,
