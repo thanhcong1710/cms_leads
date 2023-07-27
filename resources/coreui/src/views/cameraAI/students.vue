@@ -9,7 +9,7 @@
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="form-group col-sm-3">
+              <div class="form-group col-sm-3" v-if="list_branches.length > 1">
                 <label for="name">Trung tâm</label>
                 <multiselect
                   placeholder="Chọn trung tâm"
@@ -245,7 +245,7 @@ export default {
     };
   },
   created() {
-    u.g(`/api/branches`)
+    u.g(`/api/branches?permission=1`)
       .then(response => {
       this.list_branches = response.data
     })

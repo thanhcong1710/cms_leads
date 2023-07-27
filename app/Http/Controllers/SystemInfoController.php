@@ -41,8 +41,13 @@ class SystemInfoController extends Controller
         $data = u::query("SELECT * FROM cms_template_note WHERE status=1");
         return response()->json($data);
     }
-    public function getAllBranches(){
-        $data = u::query("SELECT * FROM cms_branches WHERE status=1");
+    public function getAllBranches(Request $request){
+        $permission = $request->permission;
+        $cond = "";
+        if($permission ==1 && $request->user()->branch_id!=0){
+            $cond = " AND id=".$request->user()->branch_id;
+        }
+        $data = u::query("SELECT * FROM cms_branches WHERE status=1 $cond");
         return response()->json($data);
     }
     public function getAllReportWeekReport(Request $request){

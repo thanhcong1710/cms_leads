@@ -76,6 +76,8 @@ class CameraAIController extends Controller
         }
         if (!empty($branch_id)) {
             $cond .= " AND b.id IN (".implode(",",$branch_id).")";
+        }elseif($request->user()->branch_id !=0){
+            $cond .= " AND b.id = ".$request->user()->branch_id;
         }
         
         $order_by = " ORDER BY c.id DESC ";
@@ -111,8 +113,11 @@ class CameraAIController extends Controller
         if ($keyword !== '') {
             $cond .= " AND (s.name LIKE '%$keyword%' OR s.gud_mobile1 LIKE '%$keyword%' OR s.gud_mobile2 LIKE '%$keyword%' OR s.crm_id LIKE '%$keyword%') ";
         }
+        
         if (!empty($branch_id)) {
             $cond .= " AND s.branch_id IN (".implode(",",$branch_id).")";
+        }elseif($request->user()->branch_id !=0){
+            $cond .= " AND s.branch_id = ".$request->user()->branch_id;
         }
         if ($request->status == 1) {
             $cond .= " AND cs.face_id IS NOT NULL ";
