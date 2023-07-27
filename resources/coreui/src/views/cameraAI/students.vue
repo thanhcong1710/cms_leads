@@ -54,6 +54,7 @@
                 >
                   <i class="fas fa-undo-alt"></i> Reset
                 </button>
+                <button class="btn btn-warning" @click="pushAllCameraAI()"><i class="fas fa-upload"></i> Đồng bộ dữ liệu CameraAI</button>
               </div> 
             </div>
             <div class="wrapper2">
@@ -341,6 +342,18 @@ export default {
         student_id: data.student_id
       }
       u.p(`api/camera-ai/push-data`, params)
+        .then(response => {
+          this.loading.processing = false
+          if(response.data.error){
+            alert(response.data.message);
+          }
+          this.search();
+        })
+        .catch(e => console.log(e))
+    },
+    pushAllCameraAI(){
+      this.loading.processing = true
+      u.g(`api/camera-ai/push-all-data`)
         .then(response => {
           this.loading.processing = false
           if(response.data.error){

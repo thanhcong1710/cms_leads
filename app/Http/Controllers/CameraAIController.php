@@ -176,6 +176,14 @@ class CameraAIController extends Controller
         
         return response()->json($data);
     }
+    public function pushAllData(Request $request){
+        $list_stuent = u::queryCRM("SELECT student_id FROM camera_ai_student WHERE face_id IS NULL");
+        $cameraAI = new CameraAI();
+        foreach($list_stuent AS $student){
+            $cameraAI->registerByUrl($student->student_id);
+        } 
+        return response()->json("ok");
+    }
     public function socketIo($user_id,$event,$data){
 
         $arr=[
