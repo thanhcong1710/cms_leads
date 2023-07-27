@@ -9,6 +9,23 @@
           </div>
           <div class="card-body">
             <div class="row">
+              <div class="form-group col-sm-3" >
+                <label for="name">Trung tâm</label>
+                <multiselect
+                  placeholder="Chọn trung tâm"
+                  select-label="Chọn trung tâm"
+                  v-model="searchData.branch_id"
+                  :options="list_branches"
+                  label="name"
+                  :close-on-select="false"
+                  :hide-selected="true"
+                  :multiple="true"
+                  :searchable="true"
+                  track-by="id"
+                >
+                  <span slot="noResult">Không tìm thấy dữ liệu</span>
+                </multiselect>
+              </div>
               <div class="form-group col-sm-3">
                 <label for="name">Từ khóa</label>
                 <input
@@ -137,20 +154,24 @@ import axios from "axios";
 import paging from "../../components/Pagination";
 import u from "../../utilities/utility";
 import loader from "../../components/Loading";
+import Multiselect from "vue-multiselect";
 
 export default {
   components: {
     loader: loader,
     paging: paging,
+    Multiselect
   },
   name: "List-Parent",
   data() {
     return {
+      list_branches:[],
       loading: {
         text: "Đang tải dữ liệu...",
         processing: false,
       },
       searchData: {
+        branch_id:"",
         keyword: "",
         status: "",
         role_id: "",
@@ -184,6 +205,11 @@ export default {
     };
   },
   created() {
+    u.g(`/api/branches`)
+      .then(response => {
+      this.list_branches = response.data
+      this.list_branches.push({id:0,name:'Tất cả các trung tâm'})
+    })
     u.g('/api/roles').then((response) => {
           this.roles = response.data;
     }).catch((e) => {
@@ -201,7 +227,15 @@ export default {
       location.reload();
     },
     search(a) {
+      const ids_branch_id = []
+      this.searchData.branch_id = u.is.obj(this.searchData.branch_id) ? [this.searchData.branch_id] : this.searchData.branch_id
+      if (this.searchData.branch_id.length) {
+        this.searchData.branch_id.map(item => {
+          ids_branch_id.push(item.id)
+        })
+      }
       const data = {
+        branch_id: ids_branch_id,
         keyword: this.searchData.keyword,
         status: this.searchData.status,
         role_id: this.searchData.role_id,
