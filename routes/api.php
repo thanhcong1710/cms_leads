@@ -146,6 +146,7 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::post('/camera-ai/list-student', 'CameraAIController@listStudent');
         Route::post('/camera-ai/update-student', 'CameraAIController@updateStudent');
         Route::post('/camera-ai/push-data', 'CameraAIController@pushData');
+        Route::get('/camera-ai/push-all-data', 'CameraAIController@pushAllData');
     });
 });
 Route::post('/camera/ipn', 'CameraAIController@ipn');

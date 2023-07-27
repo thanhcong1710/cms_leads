@@ -24,7 +24,7 @@ class CameraAIController extends Controller
             $branch_info = u::firstCRM("SELECT id FROM branches WHERE placeID=".$request->placeID);
             if($request->aliasID){
                 $student_info = u::firstCRM("SELECT s.branch_id, s.name, s.crm_id, s.accounting_id, c.avatar_url
-                    FROM students AS s LEFT JOIN camera_ai_student AS c ON c.student_id=s.id WHERE s.id=".$request->aliasID);
+                    FROM students AS s LEFT JOIN camera_ai_student AS c ON c.student_id=s.id WHERE s.id='".$request->aliasID."'");
                 $data =array(
                     'branch_id' => $branch_info->id,
                     'name' => $student_info->name,
@@ -76,6 +76,8 @@ class CameraAIController extends Controller
         }
         if (!empty($branch_id)) {
             $cond .= " AND b.id IN (".implode(",",$branch_id).")";
+        }elseif($request->user()->branch_id !=0){
+            $cond .= " AND b.id = ".$request->user()->branch_id;
         }
         
         $order_by = " ORDER BY c.id DESC ";
@@ -111,8 +113,11 @@ class CameraAIController extends Controller
         if ($keyword !== '') {
             $cond .= " AND (s.name LIKE '%$keyword%' OR s.gud_mobile1 LIKE '%$keyword%' OR s.gud_mobile2 LIKE '%$keyword%' OR s.crm_id LIKE '%$keyword%') ";
         }
+        
         if (!empty($branch_id)) {
             $cond .= " AND s.branch_id IN (".implode(",",$branch_id).")";
+        }elseif($request->user()->branch_id !=0){
+            $cond .= " AND s.branch_id = ".$request->user()->branch_id;
         }
         if ($request->status == 1) {
             $cond .= " AND cs.face_id IS NOT NULL ";
@@ -170,6 +175,14 @@ class CameraAIController extends Controller
         $data=$cameraAI->registerByUrl($request->student_id);
         
         return response()->json($data);
+    }
+    public function pushAllData(Request $request){
+        $list_stuent = u::queryCRM("SELECT student_id FROM camera_ai_student WHERE face_id IS NULL");
+        $cameraAI = new CameraAI();
+        foreach($list_stuent AS $student){
+            $cameraAI->registerByUrl($student->student_id);
+        } 
+        return response()->json("ok");
     }
     public function socketIo($user_id,$event,$data){
 

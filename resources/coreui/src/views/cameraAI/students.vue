@@ -9,7 +9,7 @@
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="form-group col-sm-3">
+              <div class="form-group col-sm-3" v-if="list_branches.length > 1">
                 <label for="name">Trung tâm</label>
                 <multiselect
                   placeholder="Chọn trung tâm"
@@ -54,6 +54,7 @@
                 >
                   <i class="fas fa-undo-alt"></i> Reset
                 </button>
+                <button class="btn btn-warning" @click="pushAllCameraAI()"><i class="fas fa-upload"></i> Đồng bộ dữ liệu CameraAI</button>
               </div> 
             </div>
             <div class="wrapper2">
@@ -245,7 +246,7 @@ export default {
     };
   },
   created() {
-    u.g(`/api/branches`)
+    u.g(`/api/branches?permission=1`)
       .then(response => {
       this.list_branches = response.data
     })
@@ -318,6 +319,7 @@ export default {
     },
     updateAvatar(){
       if (this.modal.attached_file) {
+        this.modal.show = false;
         this.loading.processing = true
         let dataUpload = {
           files: this.modal.attached_file,
@@ -340,6 +342,18 @@ export default {
         student_id: data.student_id
       }
       u.p(`api/camera-ai/push-data`, params)
+        .then(response => {
+          this.loading.processing = false
+          if(response.data.error){
+            alert(response.data.message);
+          }
+          this.search();
+        })
+        .catch(e => console.log(e))
+    },
+    pushAllCameraAI(){
+      this.loading.processing = true
+      u.g(`api/camera-ai/push-all-data`)
         .then(response => {
           this.loading.processing = false
           if(response.data.error){
