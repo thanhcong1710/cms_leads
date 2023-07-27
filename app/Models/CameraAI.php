@@ -44,7 +44,7 @@ class CameraAI
                         u::queryCRM("UPDATE camera_ai_student SET face_id='".data_get($res['data'],'personID')."',updated_at='".date('Y-m-d H:i:s')."' WHERE student_id=$student_id");
                     }
                 } catch (RequestException $exception) {
-                    $res = is_string($exception->getMessage()) ? $exception->getMessage() : json_decode($exception->getMessage());
+                    $res = is_string($exception->getMessage()) ? $exception->getMessage() : json_encode($exception->getMessage());
                     u::logRequest($url,$method,$header,$params,$res,'log_request_outbound');
                 }
             }else{
@@ -66,7 +66,7 @@ class CameraAI
                     u::logRequest($url,$method,$header,$params,$res,'log_request_outbound');
                     $res = json_decode($res->getBody()->getContents(), true);
                 } catch (RequestException $exception) {
-                    $res = is_string($exception->getMessage()) ? $exception->getMessage() : json_decode($exception->getMessage());
+                    $res = is_string($exception->getMessage()) ? $exception->getMessage() : json_encode($exception->getMessage());
                     u::logRequest($url,$method,$header,$params,$res,'log_request_outbound');
                 }
                 
