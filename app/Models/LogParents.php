@@ -21,7 +21,7 @@ class LogParents extends Model
             'content'=>$content,
             'creator_id'=>$creator_id,
             'created_at'=>date('Y-m-d H:i:s'),
-            'status'=> in_array($creator_id,[39,40])? 0 : 1
+            'status'=> in_array($creator_id,[39,40,1])? 0 : 1
         ),'cms_parent_logs');
     }
     public static function logAssignList($list_parent_info,$owner_id,$creator_id){
@@ -56,7 +56,7 @@ class LogParents extends Model
             'content'=>$content,
             'creator_id'=>$creator_id,
             'created_at'=>date('Y-m-d H:i:s'),
-            'status'=> in_array($creator_id,[39,40])? 0 : 1
+            'status'=> in_array($creator_id,[39,40,1])? 0 : 1
         ),'cms_parent_logs');
     }
     public static function logAdd($parent_id,$content,$creator_id){
@@ -65,7 +65,7 @@ class LogParents extends Model
             'content'=>$content,
             'creator_id'=>$creator_id,
             'created_at'=>date('Y-m-d H:i:s'),
-            'status'=> in_array($creator_id,[39,40])? 0 : 1
+            'status'=> in_array($creator_id,[39,40,1])? 0 : 1
         ),'cms_parent_logs');
     }
     public static function logUpdateInfo($pre_parent_info,$data_update,$creator_id){
@@ -131,7 +131,7 @@ class LogParents extends Model
             'content'=>$content,
             'creator_id'=>$creator_id,
             'created_at'=>date('Y-m-d H:i:s'),
-            'status'=> in_array($creator_id,[39,40])? 0 : 1
+            'status'=> in_array($creator_id,[39,40,1])? 0 : 1
         ),'cms_parent_logs');
     }
     public static function logUpdateStudentInfo($pre_student_info,$data_update,$creator_id){
@@ -158,7 +158,7 @@ class LogParents extends Model
             'content'=>$content,
             'creator_id'=>$creator_id,
             'created_at'=>date('Y-m-d H:i:s'),
-            'status'=> in_array($creator_id,[39,40])? 0 : 1
+            'status'=> in_array($creator_id,[39,40,1])? 0 : 1
         ),'cms_parent_logs');
     }
 }
