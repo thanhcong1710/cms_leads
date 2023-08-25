@@ -519,20 +519,20 @@ class ParentsController extends Controller
             WHERE p.id=$parent_id ");
         u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id,p.is_lock = 1
             WHERE p.id=$parent_id AND p.status NOT IN(12,9,8,10)");
-        // u::query("UPDATE cms_parents SET is_lock = 0 
-        //     WHERE last_care_date IS NULL  AND id=$parent_id
-        //         AND last_assign_date IS NOT NULL 
-        //         AND is_lock=1 AND status NOT IN(12,8)
-        //         -- AND tmp_branch_id NOT IN (5,9)
-        //         AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
-        // u::query("UPDATE cms_parents SET is_lock = 0 
-        //     WHERE
-        //         last_care_date IS NOT NULL  AND id=$parent_id
-        //         AND last_assign_date IS NOT NULL 
-        //         -- AND tmp_branch_id NOT IN (5,9)
-        //         AND is_lock=1 AND status NOT IN(12,8)
-        //         AND DATEDIFF( CURRENT_DATE, last_care_date )> 60
-        //         AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
+        u::query("UPDATE cms_parents SET is_lock = 0 
+            WHERE last_care_date IS NULL  AND id=$parent_id
+                AND last_assign_date IS NOT NULL 
+                AND is_lock=1 AND status NOT IN(12,8)
+                -- AND tmp_branch_id NOT IN (5,9)
+                AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
+        u::query("UPDATE cms_parents SET is_lock = 0 
+            WHERE
+                last_care_date IS NOT NULL  AND id=$parent_id
+                AND last_assign_date IS NOT NULL 
+                -- AND tmp_branch_id NOT IN (5,9)
+                AND is_lock=1 AND status NOT IN(12,8)
+                AND DATEDIFF( CURRENT_DATE, last_care_date )> 60
+                AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
         return true;
     }
     
