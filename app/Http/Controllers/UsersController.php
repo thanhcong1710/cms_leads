@@ -180,6 +180,7 @@ class UsersController extends Controller
         $status = isset($request->status) ? $request->status : '';
         $keyword = isset($request->keyword) ? $request->keyword : '';
         $role_id = isset($request->role_id) ? $request->role_id : '';
+        $branch_id = isset($request->branch_id) ? $request->branch_id : [];
         
         $pagination = (object)$request->pagination;
         $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
@@ -187,6 +188,9 @@ class UsersController extends Controller
         $offset = $page == 1 ? 0 : $limit * ($page-1);
         $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
         $cond = " 1 ";
+        if (!empty($branch_id)) {
+            $cond .= " AND u.branch_id IN (".implode(",",$branch_id).")";
+        }
         if($role_id!==''){
             $cond .= " AND (SELECT count(role_id) FROM model_has_roles WHERE model_id=u.id AND role_id=$role_id)>0";
         }

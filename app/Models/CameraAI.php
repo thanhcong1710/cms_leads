@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class CameraAI
 {
-    private $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjczNzQzNTQ2NDE2OTAxNzA1NTkiLCJlbWFpbCI6InRydW5nLm5ndXllbkBjbXNlZHUudm4iLCJjbGllbnRfaWQiOiIxMTIyNDUwMDMzYWNiMzlhYWY4Y2Q4NDRjZWI2NmEwMyIsInR5cGUiOiJhdXRob3JpemF0aW9uX2NvZGUiLCJpYXQiOjE2OTAxODQ0NDksImV4cCI6MTcyMTcyMDQ0OX0.dXErf-Cdm2hzelNC011cGXua-omI8VrLPN6sgiGvfLQ';
+    private $token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjgzOTg1MDEwMTE2OTA4NjEwMzgiLCJlbWFpbCI6ImNza2gucGhvaHVlQGNtc2VkdS52biIsImNsaWVudF9pZCI6IjM0ZWE1OWVkZjAzYjkwMTRlZmE5N2I2YmFiZjRmMGZhIiwidHlwZSI6ImF1dGhvcml6YXRpb25fY29kZSIsImlhdCI6MTY5MDk1MjM5MCwiZXhwIjoxNzIyNDg4MzkwfQ.wayFEFFkWyOV2ZBvF5-KUz_L0fb01RhcsS_Y4lPhcOc';
     
     public function registerByUrl($student_id){
         $student_info = u::firstCRM("SELECT s.name,s.id AS student_id, s.crm_id, cs.avatar_url ,b.placeID, cs.face_id
