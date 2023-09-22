@@ -24,6 +24,7 @@ import u from "../../utilities/utility";
               localStorage.setItem("api_token", response.data.access_token);
               localStorage.setItem('roles', JSON.stringify(response.data.roles));
               localStorage.setItem('rules_setting', response.data.rules_setting);
+              localStorage.setItem('user_info', JSON.stringify(response.data.user_info));
               if(this.$route.params.type ==1){
                 this.$router.push({ path: '/camera-ai' });
               }else{

@@ -44,7 +44,7 @@ class UsersController extends Controller
     public function show($id)
     {
         $user = DB::table('users')
-        ->select('users.id','users.branch_id AS branch_id', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status', 'users.email_verified_at as registered','users.rules_setting')
+        ->select('users.id','users.branch_id AS branch_id', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status', 'users.email_verified_at as registered','users.rules_setting', 'users.sip_id')
         ->where('users.id', '=', $id)
         ->first();
         return response()->json( $user );
@@ -59,7 +59,7 @@ class UsersController extends Controller
     public function edit($id)
     {
         $user = DB::table('users')
-        ->select('users.id','users.branch_id','users.phone', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status','users.rules_setting')
+        ->select('users.id','users.branch_id','users.phone', 'users.name', 'users.email','users.hrm_id','users.manager_hrm_id', 'users.menuroles as roles', 'users.status','users.rules_setting', 'users.sip_id')
         ->where('users.id', '=', $id)
         ->first();
         return response()->json( $user );
@@ -89,6 +89,7 @@ class UsersController extends Controller
             $user->hrm_id      = $request->input('hrm_id');
             $user->manager_hrm_id      = $request->input('manager_hrm_id');
             $user->branch_id      = $request->input('branch_id');
+            $user->sip_id      = $request->input('sip_id');
             $user->rules_setting = $request->input('rules_setting');
             $user->status      = $request->input('status');
             if($request->password){
@@ -137,6 +138,12 @@ class UsersController extends Controller
         if($err_message){
             return response()->json( ['status' => 'error','message'=>$err_message] );
         }else{
+            if($request->input('sip_id')){
+                $sip_info = u::first("SELECT id FROM users WHERE sip_id= '".$request->input('sip_id')."'");
+                if($sip_info){
+                    return response()->json( ['status' => 'success'] );
+                }
+            }
             $user =new User();
             $user->name       = $request->input('name');
             $user->email      = $request->input('email');
@@ -147,6 +154,7 @@ class UsersController extends Controller
             $user->manager_hrm_id      = $request->input('manager_hrm_id');
             $user->email_verified_at = date('Y-m-d H:i:s');
             $user->branch_id      = $request->input('branch_id');
+            $user->sip_id      = $request->input('sip_id');
             $user->rules_setting = $request->input('rules_setting');
             $user->save();
             $roles = $request->roles;
@@ -221,5 +229,19 @@ class UsersController extends Controller
             $has_error.=$user_info ? "Mã nhân viên đã tồn tại trên hệ thống.<br>" : "";
         }
         return $has_error;
+    }
+    public function updateSipId(Request $request){
+        $user_info=u::first("SELECT * FROM users WHERE sip_id=".(int)$request->user_sip);
+        $return= (object)[
+            'status'=>1,
+            'message'=>'Cập nhật thành công'
+        ];
+        if($user_info && (int)$request->user_sip){
+            $return->status=0;
+            $return->message="Đầu số đã được sử dụng, vui lòng nhập đầu số khác";
+       }else{
+            u::query("UPDATE users SET sip_id= ".(int)$request->user_sip." WHERE id=".$request->user_id );
+       }
+       return response()->json($return);
     }
 }

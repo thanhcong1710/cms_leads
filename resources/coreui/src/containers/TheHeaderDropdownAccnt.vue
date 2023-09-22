@@ -16,8 +16,13 @@
       </CHeaderNavLink>
     </template>
     <CDropdownHeader tag="div" class="text-center" color="light">
-      <strong>Account</strong>
+      <strong>{{user_name}}</strong>
     </CDropdownHeader>
+    <div class="dropdown-item">
+      <i class="fa fa-phone" style="margin-right:3px"></i> Đầu Số
+      <input style="width: 80px; margin-left: 10px" v-model="user_sip"/>
+      <button class="btn btn-success" style="padding: 2px 5px;"  @click="updateSipID()">Lưu</button>
+    </div>
     <!-- <CDropdownItem>
       <CIcon name="cil-bell"/> Updates
       <CBadge color="info" class="ml-auto">{{ itemsCount }}</CBadge>
@@ -67,12 +72,22 @@
 
 <script>
 import axios from 'axios'
+import u from "../utilities/utility";
 export default {
   name: 'TheHeaderDropdownAccnt',
   data () {
     return { 
       itemsCount: 42,
+      user_name:'',
+      user_sip:'',
+      user_id:''
     }
+  },
+  created() {
+    var user_info =  JSON.parse(localStorage.getItem('user_info'));
+    this.user_name= user_info.name
+    this.user_sip= user_info.sip_id
+    this.user_id= localStorage.getItem('user_id')
   },
   methods:{
     logout(){
@@ -84,6 +99,20 @@ export default {
       }).catch(function (error) {
         console.log(error); 
       });
+    },
+    updateSipID(){
+      const data = {
+        user_sip: this.user_sip,
+        user_id: this.user_id
+      };
+      u.p(`/api/user/update-sip`,data).then(response => {
+        if(response.data.status==1){
+          alert("Cập nhật thành công, vui lòng đăng nhập lại để tải lại cấu hình đầu số");
+          this.logout();
+        }else{
+          alert(response.data.message);
+        }
+      })
     }
   }
 }

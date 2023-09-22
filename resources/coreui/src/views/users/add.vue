@@ -68,6 +68,16 @@
                       />
                     </div>
                     <div class="form-group col-sm-12">
+                      <label for="nf-email">Đầu số SIP</label>
+                      <input
+                      disabled
+                        class="form-control"
+                        type="text"
+                        name="title"
+                        v-model="sip_id"
+                      />
+                    </div>
+                    <div class="form-group col-sm-12">
                       <label for="nf-email">Trung Tâm </label>
                       <select class="form-control" v-model="branch_id">
                         <option value="0">Chọn trung tâm</option>

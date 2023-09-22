@@ -87,6 +87,15 @@
                         <option value="1">Được phép</option>
                       </select>
                     </div>
+                    <div class="form-group col-sm-12">
+                      <label for="nf-email">Đầu số SIP</label>
+                      <input
+                        class="form-control"
+                        type="text"
+                        name="title"
+                        v-model="sip_id"
+                      />
+                    </div>
                   </div>
                 </div>
                 <div class="col-sm-6">
@@ -170,6 +179,7 @@ export default {
         email: '',
         phone:'',
         hrm_id:'',
+        sip_id:'',
         manager_hrm_id:'',
         password: '',
         showMessage: false,
@@ -200,6 +210,7 @@ export default {
           self.hrm_id = response.data.hrm_id;
           self.manager_hrm_id = response.data.manager_hrm_id; 
           self.branch_id = response.data.branch_id; 
+          self.sip_id = response.data.sip_id; 
           self.rules_setting = response.data.rules_setting; 
           let arr_role = response.data.roles.split(",");
           self.roles.map(item => {
@@ -276,6 +287,7 @@ export default {
         status: this.status,
         hrm_id: this.hrm_id,
         manager_hrm_id : this.manager_hrm_id,
+        sip_id : this.sip_id,
         branch_id:this.branch_id,
         rules_setting:this.rules_setting
       })

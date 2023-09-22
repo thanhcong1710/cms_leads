@@ -103,7 +103,14 @@ class AuthController extends Controller
             'roles' => $user->roles,
             'user_id'=>$user->id,
             'branch_id'=>$user->branch_id,
-            'rules_setting'=>$user->rules_setting
+            'rules_setting'=>$user->rules_setting,
+            'user_info'=>[
+                'name'=>$user->name,
+                'hrm_id'=>$user->hrm_id,
+                'phone'=>$user->phone,
+                'email'=>$user->email,
+                'sip_id'=>$user->sip_id,
+            ]
         ]);
     }
     public function singleSignOn(Request $request){
