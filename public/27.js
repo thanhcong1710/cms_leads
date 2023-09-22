@@ -1,9 +1,9 @@
 (window["webpackJsonp"] = window["webpackJsonp"] || []).push([[27],{
 
-/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/media/Media.vue?vue&type=script&lang=js&":
-/*!*************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/coreui/src/views/media/Media.vue?vue&type=script&lang=js& ***!
-  \*************************************************************************************************************************************************************************/
+/***/ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/cameraAI/students.vue?vue&type=script&lang=js&":
+/*!*******************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/babel-loader/lib??ref--4-0!./node_modules/vue-loader/lib??vue-loader-options!./resources/coreui/src/views/cameraAI/students.vue?vue&type=script&lang=js& ***!
+  \*******************************************************************************************************************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -11,11 +11,13 @@
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./resources/coreui/node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var cropperjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! cropperjs */ "./resources/coreui/node_modules/cropperjs/dist/cropper.js");
-/* harmony import */ var cropperjs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(cropperjs__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var cropperjs_dist_cropper_css__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! cropperjs/dist/cropper.css */ "./resources/coreui/node_modules/cropperjs/dist/cropper.css");
-/* harmony import */ var cropperjs_dist_cropper_css__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(cropperjs_dist_cropper_css__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _coreui_icons__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @coreui/icons */ "./resources/coreui/node_modules/@coreui/icons/js/index.js");
+/* harmony import */ var _components_Pagination__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../components/Pagination */ "./resources/coreui/src/components/Pagination.vue");
+/* harmony import */ var _utilities_utility__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../utilities/utility */ "./resources/coreui/src/utilities/utility.js");
+/* harmony import */ var _components_Loading__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../../components/Loading */ "./resources/coreui/src/components/Loading.vue");
+/* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! vue2-datepicker */ "./resources/coreui/node_modules/vue2-datepicker/lib/index.js");
+/* harmony import */ var vue2_datepicker__WEBPACK_IMPORTED_MODULE_4___default = /*#__PURE__*/__webpack_require__.n(vue2_datepicker__WEBPACK_IMPORTED_MODULE_4__);
+/* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! vue-multiselect */ "./resources/coreui/node_modules/vue-multiselect/dist/vue-multiselect.min.js");
+/* harmony import */ var vue_multiselect__WEBPACK_IMPORTED_MODULE_5___default = /*#__PURE__*/__webpack_require__.n(vue_multiselect__WEBPACK_IMPORTED_MODULE_5__);
 //
 //
 //
@@ -179,442 +181,222 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
+
+
 
 
 
 
 /* harmony default export */ __webpack_exports__["default"] = ({
-  plusIcon: _coreui_icons__WEBPACK_IMPORTED_MODULE_3__["cilPlus"],
-  folderIcon: _coreui_icons__WEBPACK_IMPORTED_MODULE_3__["cilFolder"],
-  fileIcon: _coreui_icons__WEBPACK_IMPORTED_MODULE_3__["cilFile"],
-  levelUpIcon: _coreui_icons__WEBPACK_IMPORTED_MODULE_3__["cilLevelUp"],
-  name: 'Media',
+  components: {
+    DatePicker: vue2_datepicker__WEBPACK_IMPORTED_MODULE_4___default.a,
+    loader: _components_Loading__WEBPACK_IMPORTED_MODULE_3__["default"],
+    paging: _components_Pagination__WEBPACK_IMPORTED_MODULE_1__["default"],
+    Multiselect: vue_multiselect__WEBPACK_IMPORTED_MODULE_5___default.a
+  },
+  name: "List-Parent",
   data: function data() {
     return {
-      rightCard: 'fileInfo',
-      elementId: null,
-      thisFolder: null,
-      name: null,
-      medias: [],
-      mediaFolders: [],
-      parentFolder: 'disable',
-      fields: ['name', 'actions'],
-      items: [],
-      returnFolderId: null,
-      fileInfoHeader: ['name', 'data'],
-      fileInfo: [],
-      selectFolder: null,
-      moveObjectName: '',
-      deleteFolderModal: false,
-      deleteFileModal: false,
-      downloadFileName: '',
-      changePort: ':8000',
-      croppModal: false,
-      cropper: null,
-      croppUrl: ''
+      list_branches: [],
+      datepickerOptions: {
+        closed: true,
+        value: "",
+        minDate: "",
+        lang: {
+          days: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+          months: ["Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12"]
+        }
+      },
+      loading: {
+        text: "Đang tải dữ liệu...",
+        processing: false
+      },
+      searchData: {
+        branch_id: "",
+        keyword: "",
+        pagination: this.pagination,
+        dateRange: "",
+        status: ""
+      },
+      users_manager: [],
+      parents: [],
+      pagination: {
+        url: "/api/camera-ai/list-student",
+        id: "",
+        style: "line",
+        "class": "",
+        spage: 1,
+        ppage: 1,
+        npage: 0,
+        lpage: 1,
+        cpage: 1,
+        total: 0,
+        limit: 20,
+        limitSource: [10, 20, 30, 40, 50],
+        pages: []
+      },
+      modal: {
+        title: "CẬP NHẬT AVATAR",
+        show: false,
+        color: "info",
+        body: "Cập nhật học sinh thành công",
+        attached_file: "",
+        student_id: ""
+      },
+      modal_img: {
+        title: "AVATAR",
+        show: false,
+        color: "info"
+      }
     };
   },
-  computed: {
-    selectFolderArray: function selectFolderArray() {
-      var self = this;
-      return this.mediaFolders.filter(function (u) {
-        return u.id != self.elementId;
-      });
-    }
+  created: function created() {
+    var _this = this;
+
+    _utilities_utility__WEBPACK_IMPORTED_MODULE_2__["default"].g("/api/branches?permission=1").then(function (response) {
+      _this.list_branches = response.data;
+    });
+    this.search();
   },
   methods: {
-    croppImage: function croppImage() {
-      var self = this;
-      self.cropper.getCroppedCanvas().toBlob(function (blob) {
-        var formData = new FormData();
-        formData.append('file', blob);
-        formData.append('thisFolder', self.thisFolder);
-        formData.append('id', self.elementId);
-        formData.append('token', localStorage.getItem("api_token"));
-        axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/media/file/cropp', formData).then(function (response) {
-          self.croppModal = false;
-          self.getFoldersAndFiles(self.thisFolder);
-        })["catch"](function (error) {
-          console.log(error);
+    reset: function reset() {
+      location.reload();
+    },
+    search: function search(a) {
+      var _this2 = this;
+
+      var ids_branch_id = [];
+      this.searchData.branch_id = _utilities_utility__WEBPACK_IMPORTED_MODULE_2__["default"].is.obj(this.searchData.branch_id) ? [this.searchData.branch_id] : this.searchData.branch_id;
+
+      if (this.searchData.branch_id.length) {
+        this.searchData.branch_id.map(function (item) {
+          ids_branch_id.push(item.id);
         });
       }
-      /*, 'image/png' */
-      );
+
+      var data = {
+        status: this.searchData.status,
+        keyword: this.searchData.keyword,
+        branch_id: ids_branch_id,
+        pagination: this.pagination
+      };
+      var link = "/api/camera-ai/list-student";
+      this.loading.processing = true;
+      _utilities_utility__WEBPACK_IMPORTED_MODULE_2__["default"].p(link, data).then(function (response) {
+        _this2.loading.processing = false;
+        _this2.parents = response.data.list;
+        _this2.total = response.data.detail_total;
+        _this2.pagination.spage = response.data.paging.spage;
+        _this2.pagination.ppage = response.data.paging.ppage;
+        _this2.pagination.npage = response.data.paging.npage;
+        _this2.pagination.lpage = response.data.paging.lpage;
+        _this2.pagination.cpage = response.data.paging.cpage;
+        _this2.pagination.total = response.data.paging.total;
+        _this2.pagination.limit = response.data.paging.limit;
+      })["catch"](function (e) {
+        _utilities_utility__WEBPACK_IMPORTED_MODULE_2__["default"].processAuthen(e);
+      });
     },
-    openCroppFileModal: function openCroppFileModal(id) {
-      var self = this;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/media/file?id=' + id + '&thisFolder=' + self.thisFolder + '&token=' + localStorage.getItem("api_token")).then(function (response) {
-        self.elementId = response.data.id;
-        self.croppUrl = response.data.url;
-        self.croppUrl = self.croppUrl.replace('localhost', 'localhost' + self.changePort);
-        document.getElementById('cropp-img-img').setAttribute('src', self.croppUrl);
-        self.croppModal = true;
-        self.$nextTick(function () {
-          if (self.cropper !== null) {
-            self.cropper.replace(self.croppUrl);
-          } else {
-            self.cropper = new cropperjs__WEBPACK_IMPORTED_MODULE_1___default.a(document.getElementById('cropp-img-img'), {
-              minContainerWidth: 600,
-              minContainerHeight: 600
-            });
+    changePage: function changePage(link) {
+      var info = link.toString().substr(this.pagination.url.length).split("/");
+      var page = info.length > 1 ? info[1] : 1;
+      this.pagination.cpage = parseInt(page);
+      this.search();
+    },
+    showModalUpdate: function showModalUpdate(data) {
+      this.modal.show = true;
+      this.modal.attached_file = '';
+      this.modal.student_id = data.student_id;
+    },
+    exit: function exit() {
+      this.modal.show = false;
+    },
+    fileChanged: function fileChanged(e) {
+      var _this3 = this;
+
+      var fileReader = new FileReader();
+      var fileName = e.target.value.split("\\").pop();
+      this.file_name = fileName;
+      fileReader.readAsDataURL(e.target.files[0]);
+
+      fileReader.onload = function (e) {
+        _this3.modal.attached_file = e.target.result;
+      };
+    },
+    updateAvatar: function updateAvatar() {
+      var _this4 = this;
+
+      if (this.modal.attached_file) {
+        this.modal.show = false;
+        this.loading.processing = true;
+        var dataUpload = {
+          files: this.modal.attached_file,
+          student_id: this.modal.student_id
+        };
+        _utilities_utility__WEBPACK_IMPORTED_MODULE_2__["default"].p("api/camera-ai/update-student", dataUpload).then(function (response) {
+          _this4.loading.processing = false;
+
+          if (response.data.error) {
+            alert(response.data.message);
           }
-        });
-      })["catch"](function (error) {
-        console.log(error);
-      });
-    },
-    downloadFile: function downloadFile(id, name) {
-      var self = this;
-      this.downloadFileName = name;
-      axios__WEBPACK_IMPORTED_MODULE_0___default()({
-        method: 'get',
-        url: '/api/media/file/download?thisFolder=' + self.thisFolder + '&id=' + id + '&token=' + localStorage.getItem("api_token"),
-        responseType: 'arraybuffer'
-      }).then(function (response) {
-        var url = window.URL.createObjectURL(new Blob([response.data]));
-        var link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', self.downloadFileName);
-        document.body.appendChild(link);
-        link.click();
-      })["catch"](function (error) {
-        console.log(error);
-        self.$router.push({
-          path: '/login'
-        });
-      });
-    },
-    openDeleteDialog: function openDeleteDialog(id, type, name) {
-      this.moveObjectName = name;
-      this.elementId = id;
 
-      if (type == 'folder') {
-        this.deleteFolderModal = true;
-      } else {
-        this.deleteFileModal = true;
-      }
-    },
-    deleteFolder: function deleteFolder() {
-      var self = this;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/media/folder/delete?thisFolder=' + self.thisFolder + '&id=' + self.elementId + '&token=' + localStorage.getItem("api_token")).then(function (response) {
-        self.getFoldersAndFiles(self.thisFolder);
-        self.rightCard = 'fileInfo';
-        self.deleteFolderModal = false;
-      })["catch"](function (error) {
-        console.log(error);
-        self.$router.push({
-          path: '/login'
+          _this4.search();
+        })["catch"](function (e) {
+          return console.log(e);
         });
-      });
-    },
-    deleteFile: function deleteFile() {
-      var self = this;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/media/file/delete?thisFolder=' + self.thisFolder + '&id=' + self.elementId + '&token=' + localStorage.getItem("api_token")).then(function (response) {
-        self.getFoldersAndFiles(self.thisFolder);
-        self.rightCard = 'fileInfo';
-        self.deleteFileModal = false;
-      })["catch"](function (error) {
-        console.log(error);
-        self.$router.push({
-          path: '/login'
-        });
-      });
-    },
-    selectFolderRadioInput: function selectFolderRadioInput(data) {
-      this.selectFolder = data;
-    },
-    returnFolder: function returnFolder() {
-      if (this.returnFolderId != null) {
-        this.getFoldersAndFiles(this.returnFolderId);
       }
     },
-    clickOnElement: function clickOnElement(id, type) {
-      if (type == 'folder') {
-        this.returnFolderId = this.thisFolder;
-        this.getFoldersAndFiles(id);
-      } else {
-        this.getFileInfo(id);
-      }
-    },
-    renameOpenForm: function renameOpenForm(id, type) {
-      this.elementId = id;
-      var self = this;
+    pushCameraAI: function pushCameraAI(data) {
+      var _this5 = this;
 
-      if (type == 'folder') {
-        axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/media/folder?id=' + id + '&token=' + localStorage.getItem("api_token")).then(function (response) {
-          self.name = response.data.name;
-          self.rightCard = 'renameFolder';
-        })["catch"](function (error) {
-          console.log(error);
-          self.$router.push({
-            path: '/login'
-          });
-        });
-      } else {
-        axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/media/file?thisFolder=' + self.thisFolder + '&id=' + id + '&token=' + localStorage.getItem("api_token")).then(function (response) {
-          self.name = response.data.name;
-          self.rightCard = 'renameFile';
-        })["catch"](function (error) {
-          console.log(error);
-          self.$router.push({
-            path: '/login'
-          });
-        });
-      }
-    },
-    moveOpenForm: function moveOpenForm(id, type, objectName) {
-      this.elementId = id;
-      this.moveObjectName = objectName;
+      this.loading.processing = true;
+      var params = {
+        student_id: data.student_id
+      };
+      _utilities_utility__WEBPACK_IMPORTED_MODULE_2__["default"].p("api/camera-ai/push-data", params).then(function (response) {
+        _this5.loading.processing = false;
 
-      if (type == 'folder') {
-        this.rightCard = 'moveFolder';
-      } else {
-        this.rightCard = 'moveFile';
-      }
-    },
-    moveFolder: function moveFolder() {
-      if (this.selectFolder != null) {
-        var self = this;
-        axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/media/folder/move', {
-          id: this.elementId,
-          folder: this.selectFolder,
-          token: localStorage.getItem("api_token")
-        }).then(function (response) {
-          self.getFoldersAndFiles(self.thisFolder);
-          self.rightCard = 'fileInfo';
-          self.selectFolder = null;
-        })["catch"](function (error) {
-          console.log(error);
-          self.$router.push({
-            path: '/login'
-          });
-        });
-      }
-    },
-    moveFile: function moveFile() {
-      if (this.selectFolder != null) {
-        var self = this;
-        axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/media/file/move', {
-          id: this.elementId,
-          folder: this.selectFolder,
-          thisFolder: this.thisFolder,
-          token: localStorage.getItem("api_token")
-        }).then(function (response) {
-          self.getFoldersAndFiles(self.thisFolder);
-          self.rightCard = 'fileInfo';
-          self.selectFolder = null;
-        })["catch"](function (error) {
-          console.log(error);
-          self.$router.push({
-            path: '/login'
-          });
-        });
-      }
-    },
-    copyFile: function copyFile(id) {
-      var self = this;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/media/file/copy?thisFolder=' + self.thisFolder + '&id=' + id + '&token=' + localStorage.getItem("api_token")).then(function (response) {
-        self.getFoldersAndFiles(self.thisFolder);
-        self.rightCard = 'fileInfo';
-      })["catch"](function (error) {
-        console.log(error);
-        self.$router.push({
-          path: '/login'
-        });
-      });
-    },
-    renameFolder: function renameFolder() {
-      var self = this;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/media/folder/update', {
-        name: this.name,
-        id: this.elementId,
-        token: localStorage.getItem("api_token")
-      }).then(function (response) {
-        self.getFoldersAndFiles(self.thisFolder);
-        self.rightCard = 'fileInfo';
-      })["catch"](function (error) {
-        console.log(error);
-        self.$router.push({
-          path: '/login'
-        });
-      });
-    },
-    renameFile: function renameFile() {
-      var self = this;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/media/file/update', {
-        name: this.name,
-        id: this.elementId,
-        token: localStorage.getItem("api_token"),
-        thisFolder: this.thisFolder
-      }).then(function (response) {
-        self.getFoldersAndFiles(self.thisFolder);
-        self.rightCard = 'fileInfo';
-      })["catch"](function (error) {
-        console.log(error);
-        self.$router.push({
-          path: '/login'
-        });
-      });
-    },
-    getFileInfo: function getFileInfo(id) {
-      var self = this;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/media/file?thisFolder=' + self.thisFolder + '&id=' + id + '&token=' + localStorage.getItem("api_token")).then(function (response) {
-        self.fileInfo = [];
-        self.fileInfo.push({
-          name: 'Name',
-          data: response.data['name']
-        });
-        self.fileInfo.push({
-          name: 'Real name',
-          data: response.data['realName']
-        });
-        self.fileInfo.push({
-          name: 'URL',
-          data: response.data['url']
-        });
-        self.fileInfo.push({
-          name: 'Mime Type',
-          data: response.data['mimeType']
-        });
-        self.fileInfo.push({
-          name: 'Size',
-          data: response.data['size']
-        });
-        self.fileInfo.push({
-          name: 'Created At',
-          data: response.data['createdAt']
-        });
-        self.fileInfo.push({
-          name: 'Updated At',
-          data: response.data['updatedAt']
-        });
-      })["catch"](function (error) {
-        console.log(error);
-        self.$router.push({
-          path: '/login'
-        });
-      });
-    },
-    handleFileUpload: function handleFileUpload(files, event) {
-      var self = this;
-      var formData = new FormData();
-      formData.append('file', files[0]);
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.post('/api/media/file/store?thisFolder=' + self.thisFolder + '&token=' + localStorage.getItem("api_token"), formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+        if (response.data.error) {
+          alert(response.data.message);
         }
-      }).then(function () {
-        self.getFoldersAndFiles(self.thisFolder);
-      })["catch"](function (error) {
-        console.log(error);
-        self.$router.push({
-          path: '/login'
-        });
-      });
-    },
-    addFolder: function addFolder() {
-      var self = this;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/media/folder/store?thisFolder=' + self.thisFolder + '&token=' + localStorage.getItem("api_token")).then(function (response) {
-        self.getFoldersAndFiles(self.thisFolder);
-      })["catch"](function (error) {
-        console.log(error);
-        self.$router.push({
-          path: '/login'
-        });
-      });
-    },
-    buildItems: function buildItems() {
-      this.items = [];
 
-      for (var i = 0; i < this.mediaFolders.length; i++) {
-        this.items.push({
-          type: 'folder',
-          name: this.mediaFolders[i].name,
-          id: this.mediaFolders[i].id
-        });
-      }
-
-      for (var i = 0; i < this.medias.length; i++) {
-        this.items.push({
-          type: 'file',
-          name: this.medias[i].name,
-          id: this.medias[i].id,
-          url: this.medias[i].url,
-          mime: this.medias[i].mime_type
-        });
-      }
-    },
-    getFoldersAndFiles: function getFoldersAndFiles(folderId) {
-      var self = this;
-      axios__WEBPACK_IMPORTED_MODULE_0___default.a.get('/api/media?id=' + folderId + '&token=' + localStorage.getItem("api_token")).then(function (response) {
-        self.medias = response.data.medias;
-        self.mediaFolders = response.data.mediaFolders;
-        self.thisFolder = response.data.thisFolder;
-        self.parentFolder = response.data.parentFolder;
-        self.buildItems();
-        self.rightCard = 'fileInfo';
-      })["catch"](function (error) {
-        console.log(error);
-        self.$router.push({
-          path: '/login'
-        });
+        _this5.search();
+      })["catch"](function (e) {
+        return console.log(e);
       });
+    },
+    pushAllCameraAI: function pushAllCameraAI() {
+      var _this6 = this;
+
+      this.loading.processing = true;
+      _utilities_utility__WEBPACK_IMPORTED_MODULE_2__["default"].g("api/camera-ai/push-all-data").then(function (response) {
+        _this6.loading.processing = false;
+
+        if (response.data.error) {
+          alert(response.data.message);
+        }
+
+        _this6.search();
+      })["catch"](function (e) {
+        return console.log(e);
+      });
+    },
+    showModalImg: function showModalImg(img_url) {
+      if (img_url) {
+        this.modal_img.img_url = img_url;
+        this.modal_img.show = true;
+      }
     }
   },
-  mounted: function mounted() {
-    this.getFoldersAndFiles('');
-    document.getElementById('cropp-img-img').addEventListener('load', this.updateCroppImage);
-  }
+  filters: {}
 });
 
 /***/ }),
 
-/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/media/Media.vue?vue&type=template&id=268102e9&":
-/*!*****************************************************************************************************************************************************************************************************************!*\
-  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/coreui/src/views/media/Media.vue?vue&type=template&id=268102e9& ***!
-  \*****************************************************************************************************************************************************************************************************************/
+/***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/cameraAI/students.vue?vue&type=template&id=75ed15ea&":
+/*!***********************************************************************************************************************************************************************************************************************!*\
+  !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/coreui/src/views/cameraAI/students.vue?vue&type=template&id=75ed15ea& ***!
+  \***********************************************************************************************************************************************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -627,623 +409,433 @@ var render = function() {
   var _h = _vm.$createElement
   var _c = _vm._self._c || _h
   return _c(
-    "CRow",
+    "div",
+    { staticClass: "animated fadeIn" },
     [
-      _c(
-        "CCol",
-        { attrs: { col: "5", xl: "5" } },
-        [
+      _c("div", { staticClass: "row" }, [
+        _c("div", { staticClass: "col-lg-12" }, [
           _c(
-            "transition",
-            { attrs: { name: "slide" } },
+            "div",
+            { staticClass: "card" },
             [
-              _c(
-                "CCard",
-                [
-                  _c(
-                    "CCardBody",
-                    [
-                      _c("h4", [_vm._v("Media")]),
-                      _vm._v(" "),
-                      _vm.parentFolder != "disable"
-                        ? _c(
-                            "CButton",
+              _c("loader", {
+                attrs: {
+                  active: _vm.loading.processing,
+                  text: _vm.loading.text
+                }
+              }),
+              _vm._v(" "),
+              _vm._m(0),
+              _vm._v(" "),
+              _c("div", { staticClass: "card-body" }, [
+                _c("div", { staticClass: "row" }, [
+                  _vm.list_branches.length > 1
+                    ? _c(
+                        "div",
+                        { staticClass: "form-group col-sm-3" },
+                        [
+                          _c("label", { attrs: { for: "name" } }, [
+                            _vm._v("Trung tâm")
+                          ]),
+                          _vm._v(" "),
+                          _c(
+                            "multiselect",
                             {
-                              attrs: { color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  return _vm.returnFolder()
-                                }
+                              attrs: {
+                                placeholder: "Chọn trung tâm",
+                                "select-label": "Chọn trung tâm",
+                                options: _vm.list_branches,
+                                label: "name",
+                                "close-on-select": false,
+                                "hide-selected": true,
+                                multiple: true,
+                                searchable: true,
+                                "track-by": "id"
+                              },
+                              model: {
+                                value: _vm.searchData.branch_id,
+                                callback: function($$v) {
+                                  _vm.$set(_vm.searchData, "branch_id", $$v)
+                                },
+                                expression: "searchData.branch_id"
                               }
                             },
                             [
-                              _c("CIcon", {
-                                attrs: { content: _vm.$options.levelUpIcon }
-                              }),
-                              _vm._v("\n              Return\n          ")
-                            ],
-                            1
+                              _c(
+                                "span",
+                                {
+                                  attrs: { slot: "noResult" },
+                                  slot: "noResult"
+                                },
+                                [_vm._v("Không tìm thấy dữ liệu")]
+                              )
+                            ]
                           )
-                        : _vm._e(),
-                      _vm._v(" "),
-                      _c(
-                        "CButton",
+                        ],
+                        1
+                      )
+                    : _vm._e(),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group col-sm-3" }, [
+                    _c("label", { attrs: { for: "name" } }, [
+                      _vm._v("Từ khóa")
+                    ]),
+                    _vm._v(" "),
+                    _c("input", {
+                      directives: [
                         {
-                          attrs: { color: "primary" },
-                          on: {
-                            click: function($event) {
-                              return _vm.addFolder()
-                            }
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.searchData.keyword,
+                          expression: "searchData.keyword"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      attrs: {
+                        type: "text",
+                        placeholder: "Tên học sinh, mã học sinh"
+                      },
+                      domProps: { value: _vm.searchData.keyword },
+                      on: {
+                        input: function($event) {
+                          if ($event.target.composing) {
+                            return
                           }
-                        },
-                        [
-                          _c("CIcon", {
-                            attrs: { content: _vm.$options.plusIcon }
-                          }),
-                          _vm._v(" "),
-                          _c("CIcon", {
-                            attrs: { content: _vm.$options.folderIcon }
-                          }),
-                          _vm._v("\n              New folder\n          ")
+                          _vm.$set(
+                            _vm.searchData,
+                            "keyword",
+                            $event.target.value
+                          )
+                        }
+                      }
+                    })
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group col-sm-3" }, [
+                    _c("label", { attrs: { for: "ccmonth" } }, [
+                      _vm._v("Trạng thái")
+                    ]),
+                    _vm._v(" "),
+                    _c(
+                      "select",
+                      {
+                        directives: [
+                          {
+                            name: "model",
+                            rawName: "v-model",
+                            value: _vm.searchData.status,
+                            expression: "searchData.status"
+                          }
                         ],
-                        1
-                      ),
-                      _vm._v(" "),
-                      _c("CIcon", {
-                        attrs: { content: _vm.$options.plusIcon }
-                      }),
-                      _vm._v(" "),
-                      _c("CIcon", {
-                        attrs: { content: _vm.$options.fileIcon }
-                      }),
-                      _vm._v(" "),
-                      _c("CInputFile", {
-                        attrs: { type: "file", placeholder: "New file" },
-                        on: { change: _vm.handleFileUpload }
-                      }),
-                      _vm._v(" "),
-                      _c("CDataTable", {
-                        attrs: {
-                          hover: "",
-                          items: _vm.items,
-                          fields: _vm.fields
-                        },
-                        scopedSlots: _vm._u([
-                          {
-                            key: "name",
-                            fn: function(ref) {
-                              var item = ref.item
-                              return [
-                                item.type == "folder"
-                                  ? _c(
-                                      "td",
-                                      {
-                                        staticClass: "click-file",
-                                        on: {
-                                          click: function($event) {
-                                            return _vm.clickOnElement(
-                                              item.id,
-                                              item.type
-                                            )
-                                          }
-                                        }
-                                      },
-                                      [
-                                        _c("CIcon", {
-                                          attrs: {
-                                            content: _vm.$options.folderIcon
-                                          }
-                                        }),
-                                        _vm._v(
-                                          "\n                  " +
-                                            _vm._s(item.name) +
-                                            "\n                "
-                                        )
-                                      ],
-                                      1
-                                    )
-                                  : _c(
-                                      "td",
-                                      {
-                                        staticClass: "click-file",
-                                        on: {
-                                          click: function($event) {
-                                            return _vm.clickOnElement(
-                                              item.id,
-                                              item.type
-                                            )
-                                          }
-                                        }
-                                      },
-                                      [
-                                        _c("CIcon", {
-                                          attrs: {
-                                            content: _vm.$options.fileIcon
-                                          }
-                                        }),
-                                        _vm._v(
-                                          "\n                  " +
-                                            _vm._s(item.name) +
-                                            "\n                "
-                                        )
-                                      ],
-                                      1
-                                    )
-                              ]
-                            }
-                          },
-                          {
-                            key: "actions",
-                            fn: function(ref) {
-                              var item = ref.item
-                              return [
-                                _c(
-                                  "td",
-                                  [
-                                    _c(
-                                      "CButton",
-                                      {
-                                        attrs: { color: "primary" },
-                                        on: {
-                                          click: function($event) {
-                                            return _vm.renameOpenForm(
-                                              item.id,
-                                              item.type
-                                            )
-                                          }
-                                        }
-                                      },
-                                      [
-                                        _vm._v(
-                                          "\n                      Rename\n                  "
-                                        )
-                                      ]
-                                    ),
-                                    _vm._v(" "),
-                                    _c(
-                                      "CButton",
-                                      {
-                                        attrs: { color: "primary" },
-                                        on: {
-                                          click: function($event) {
-                                            return _vm.moveOpenForm(
-                                              item.id,
-                                              item.type,
-                                              item.name
-                                            )
-                                          }
-                                        }
-                                      },
-                                      [
-                                        _vm._v(
-                                          "\n                      Move\n                  "
-                                        )
-                                      ]
-                                    ),
-                                    _vm._v(" "),
-                                    item.type == "file"
-                                      ? _c(
-                                          "CButton",
-                                          {
-                                            attrs: { color: "primary" },
-                                            on: {
-                                              click: function($event) {
-                                                return _vm.copyFile(item.id)
-                                              }
-                                            }
-                                          },
-                                          [
-                                            _vm._v(
-                                              "\n                      Copy\n                  "
-                                            )
-                                          ]
-                                        )
-                                      : _vm._e(),
-                                    _vm._v(" "),
-                                    item.type == "file"
-                                      ? _c(
-                                          "CButton",
-                                          {
-                                            attrs: { color: "primary" },
-                                            on: {
-                                              click: function($event) {
-                                                return _vm.downloadFile(
-                                                  item.id,
-                                                  item.name
-                                                )
-                                              }
-                                            }
-                                          },
-                                          [
-                                            _vm._v(
-                                              "\n                      Download\n                  "
-                                            )
-                                          ]
-                                        )
-                                      : _vm._e(),
-                                    _vm._v(" "),
-                                    item.type == "file" &&
-                                    item.mime.includes("image/")
-                                      ? _c(
-                                          "CButton",
-                                          {
-                                            attrs: { color: "success" },
-                                            on: {
-                                              click: function($event) {
-                                                return _vm.openCroppFileModal(
-                                                  item.id
-                                                )
-                                              }
-                                            }
-                                          },
-                                          [
-                                            _vm._v(
-                                              "\n                      Cropp\n                  "
-                                            )
-                                          ]
-                                        )
-                                      : _vm._e(),
-                                    _vm._v(" "),
-                                    item.type == "file"
-                                      ? _c(
-                                          "CButton",
-                                          {
-                                            attrs: { color: "danger" },
-                                            on: {
-                                              click: function($event) {
-                                                return _vm.openDeleteDialog(
-                                                  item.id,
-                                                  item.type,
-                                                  item.name
-                                                )
-                                              }
-                                            }
-                                          },
-                                          [
-                                            _vm._v(
-                                              "\n                      Delete\n                  "
-                                            )
-                                          ]
-                                        )
-                                      : _vm._e()
-                                  ],
-                                  1
-                                )
-                              ]
-                            }
+                        staticClass: "form-control",
+                        on: {
+                          change: function($event) {
+                            var $$selectedVal = Array.prototype.filter
+                              .call($event.target.options, function(o) {
+                                return o.selected
+                              })
+                              .map(function(o) {
+                                var val = "_value" in o ? o._value : o.value
+                                return val
+                              })
+                            _vm.$set(
+                              _vm.searchData,
+                              "status",
+                              $event.target.multiple
+                                ? $$selectedVal
+                                : $$selectedVal[0]
+                            )
                           }
+                        }
+                      },
+                      [
+                        _c("option", { attrs: { value: "" } }, [
+                          _vm._v("Chọn trạng thái")
+                        ]),
+                        _vm._v(" "),
+                        _c("option", { attrs: { value: "2" } }, [
+                          _vm._v("Chưa có faceID")
+                        ]),
+                        _vm._v(" "),
+                        _c("option", { attrs: { value: "1" } }, [
+                          _vm._v("Đã có faceID")
                         ])
-                      })
-                    ],
-                    1
-                  )
-                ],
-                1
-              )
-            ],
-            1
-          )
-        ],
-        1
-      ),
-      _vm._v(" "),
-      _c(
-        "CCol",
-        { attrs: { col: "7", xl: "7" } },
-        [
-          _c(
-            "transition",
-            { attrs: { name: "slide" } },
-            [
-              _vm.rightCard == "fileInfo"
-                ? _c(
-                    "CCard",
+                      ]
+                    )
+                  ]),
+                  _vm._v(" "),
+                  _c("div", { staticClass: "form-group col-sm-12" }, [
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-info",
+                        attrs: { type: "submit" },
+                        on: {
+                          click: function($event) {
+                            return _vm.search()
+                          }
+                        }
+                      },
+                      [
+                        _c("i", { staticClass: "fa fa-search" }),
+                        _vm._v(" Tìm kiếm\n              ")
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-secondary",
+                        attrs: { type: "reset" },
+                        on: {
+                          click: function($event) {
+                            return _vm.reset()
+                          }
+                        }
+                      },
+                      [
+                        _c("i", { staticClass: "fas fa-undo-alt" }),
+                        _vm._v(" Reset\n              ")
+                      ]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "button",
+                      {
+                        staticClass: "btn btn-warning",
+                        on: {
+                          click: function($event) {
+                            return _vm.pushAllCameraAI()
+                          }
+                        }
+                      },
+                      [
+                        _c("i", { staticClass: "fas fa-upload" }),
+                        _vm._v(" Đồng bộ dữ liệu CameraAI")
+                      ]
+                    )
+                  ])
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "wrapper2" }, [
+                  _c(
+                    "table",
+                    { staticClass: "table table-striped table-hover" },
                     [
+                      _vm._m(1),
+                      _vm._v(" "),
                       _c(
-                        "CCardBody",
-                        [
-                          _c("CDataTable", {
-                            attrs: {
-                              items: _vm.fileInfo,
-                              fields: _vm.fileInfoHeader
-                            }
-                          })
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.rightCard == "renameFolder"
-                ? _c(
-                    "CCard",
-                    [
-                      _c(
-                        "CCardBody",
-                        [
-                          _c("CInput", {
-                            attrs: {
-                              type: "text",
-                              label: "New name",
-                              placeholder: "Folder name"
-                            },
-                            model: {
-                              value: _vm.name,
-                              callback: function($$v) {
-                                _vm.name = $$v
-                              },
-                              expression: "name"
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c(
-                            "CButton",
-                            {
-                              attrs: { color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  return _vm.renameFolder()
-                                }
-                              }
-                            },
-                            [_vm._v("\n              Save\n          ")]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "CButton",
-                            {
-                              attrs: { color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  _vm.rightCard = "fileInfo"
-                                }
-                              }
-                            },
-                            [_vm._v("\n              Cancel\n          ")]
-                          )
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.rightCard == "renameFile"
-                ? _c(
-                    "CCard",
-                    [
-                      _c(
-                        "CCardBody",
-                        [
-                          _c("CInput", {
-                            attrs: {
-                              type: _vm.text,
-                              label: "New name",
-                              placeholder: "Folder name"
-                            },
-                            model: {
-                              value: _vm.name,
-                              callback: function($$v) {
-                                _vm.name = $$v
-                              },
-                              expression: "name"
-                            }
-                          }),
-                          _vm._v(" "),
-                          _c(
-                            "CButton",
-                            {
-                              attrs: { color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  return _vm.renameFile()
-                                }
-                              }
-                            },
-                            [_vm._v("\n              Save\n          ")]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "CButton",
-                            {
-                              attrs: { color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  _vm.rightCard = "fileInfo"
-                                }
-                              }
-                            },
-                            [_vm._v("\n              Cancel\n          ")]
-                          )
-                        ],
-                        1
-                      )
-                    ],
-                    1
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.rightCard == "moveFolder"
-                ? _c(
-                    "CCard",
-                    [
-                      _c(
-                        "CCardBody",
-                        [
-                          _c("h4", [
-                            _vm._v(
-                              'Move folder "' + _vm._s(_vm.moveObjectName) + '"'
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _vm.parentFolder != "disable"
-                            ? _c("CInputRadio", {
+                        "tbody",
+                        _vm._l(_vm.parents, function(item, index) {
+                          return _c("tr", { key: index }, [
+                            _c("td", [
+                              _vm._v(
+                                "\n                    " +
+                                  _vm._s(
+                                    index +
+                                      1 +
+                                      (_vm.pagination.cpage - 1) *
+                                        _vm.pagination.limit
+                                  ) +
+                                  "\n                  "
+                              )
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _c("img", {
+                                staticClass: "c-avatar-img ",
+                                staticStyle: {
+                                  width: "40px",
+                                  cursor: "pointer"
+                                },
                                 attrs: {
-                                  label: "Move Up",
-                                  type: "radio",
-                                  name: "selectFolderForFolder"
+                                  src: item.avatar_url
+                                    ? item.avatar_url
+                                    : "img/avatars/avatar.png"
                                 },
                                 on: {
-                                  "update:checked": function($event) {
-                                    return _vm.selectFolderRadioInput("moveUp")
+                                  click: function($event) {
+                                    return _vm.showModalImg(item.avatar_url)
                                   }
                                 }
                               })
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm._l(_vm.selectFolderArray, function(item) {
-                            return _c("CInputRadio", {
-                              key: item.id,
-                              attrs: {
-                                label: item.name,
-                                type: "radio",
-                                name: "selectFolderForFolder"
-                              },
-                              on: {
-                                "update:checked": function($event) {
-                                  return _vm.selectFolderRadioInput(item.id)
-                                }
-                              }
-                            })
-                          }),
-                          _vm._v(" "),
-                          _c(
-                            "CButton",
-                            {
-                              staticClass: "mt-4",
-                              attrs: { color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  return _vm.moveFolder()
-                                }
-                              }
-                            },
-                            [_vm._v("\n              Save\n          ")]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "CButton",
-                            {
-                              staticClass: "mt-4",
-                              attrs: { color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  _vm.rightCard = "fileInfo"
-                                }
-                              }
-                            },
-                            [_vm._v("\n              Cancel\n          ")]
-                          )
-                        ],
-                        2
-                      )
-                    ],
-                    1
-                  )
-                : _vm._e(),
-              _vm._v(" "),
-              _vm.rightCard == "moveFile"
-                ? _c(
-                    "CCard",
-                    [
-                      _c(
-                        "CCardBody",
-                        [
-                          _c("h4", [
-                            _vm._v(
-                              'Move file "' + _vm._s(_vm.moveObjectName) + '"'
-                            )
-                          ]),
-                          _vm._v(" "),
-                          _vm.parentFolder != "disable"
-                            ? _c("CInputRadio", {
-                                attrs: {
-                                  label: "Move Up",
-                                  type: "radio",
-                                  name: "selectFolderForFolder"
-                                },
-                                on: {
-                                  "update:checked": function($event) {
-                                    return _vm.selectFolderRadioInput("moveUp")
+                            ]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(item.branch_name))]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(item.name))]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(item.crm_id))]),
+                            _vm._v(" "),
+                            _c("td", [_vm._v(_vm._s(item.face_id))]),
+                            _vm._v(" "),
+                            _c("td", [
+                              _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-sm btn-success",
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.showModalUpdate(item)
+                                    }
                                   }
-                                }
-                              })
-                            : _vm._e(),
-                          _vm._v(" "),
-                          _vm._l(_vm.mediaFolders, function(item) {
-                            return _c("CInputRadio", {
-                              key: item.id,
-                              attrs: {
-                                label: item.name,
-                                type: "radio",
-                                name: "selectFolderForFolder"
-                              },
-                              on: {
-                                "update:checked": function($event) {
-                                  return _vm.selectFolderRadioInput(item.id)
-                                }
-                              }
-                            })
-                          }),
-                          _vm._v(" "),
+                                },
+                                [_c("i", { staticClass: "fa fa-edit" })]
+                              ),
+                              _vm._v(" "),
+                              _c(
+                                "button",
+                                {
+                                  staticClass: "btn btn-sm btn-warning",
+                                  on: {
+                                    click: function($event) {
+                                      return _vm.pushCameraAI(item)
+                                    }
+                                  }
+                                },
+                                [_c("i", { staticClass: "fas fa-upload" })]
+                              )
+                            ])
+                          ])
+                        }),
+                        0
+                      )
+                    ]
+                  )
+                ]),
+                _vm._v(" "),
+                _c("div", { staticClass: "text-center" }, [
+                  _c(
+                    "nav",
+                    { attrs: { "aria-label": "Page navigation" } },
+                    [
+                      _c("paging", {
+                        attrs: {
+                          rootLink: _vm.pagination.url,
+                          id: _vm.pagination.id,
+                          listStyle: _vm.pagination.style,
+                          customClass: _vm.pagination.class,
+                          firstPage: _vm.pagination.spage,
+                          previousPage: _vm.pagination.ppage,
+                          nextPage: _vm.pagination.npage,
+                          lastPage: _vm.pagination.lpage,
+                          currentPage: _vm.pagination.cpage,
+                          pagesItems: _vm.pagination.total,
+                          pagesLimit: _vm.pagination.limit,
+                          pageList: _vm.pagination.pages,
+                          routing: _vm.changePage
+                        }
+                      }),
+                      _vm._v(" "),
+                      _c(
+                        "div",
+                        {
+                          staticClass: "last page",
+                          staticStyle: {
+                            width: "60px",
+                            float: "left",
+                            height: "30px"
+                          }
+                        },
+                        [
                           _c(
-                            "CButton",
+                            "select",
                             {
-                              staticClass: "mt-4",
-                              attrs: { color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  return _vm.moveFile()
+                              directives: [
+                                {
+                                  name: "model",
+                                  rawName: "v-model",
+                                  value: _vm.pagination.limit,
+                                  expression: "pagination.limit"
                                 }
+                              ],
+                              staticStyle: { width: "100%", height: "100%" },
+                              on: {
+                                change: [
+                                  function($event) {
+                                    var $$selectedVal = Array.prototype.filter
+                                      .call($event.target.options, function(o) {
+                                        return o.selected
+                                      })
+                                      .map(function(o) {
+                                        var val =
+                                          "_value" in o ? o._value : o.value
+                                        return val
+                                      })
+                                    _vm.$set(
+                                      _vm.pagination,
+                                      "limit",
+                                      $event.target.multiple
+                                        ? $$selectedVal
+                                        : $$selectedVal[0]
+                                    )
+                                  },
+                                  function($event) {
+                                    return _vm.search()
+                                  }
+                                ]
                               }
                             },
-                            [_vm._v("\n              Save\n          ")]
-                          ),
-                          _vm._v(" "),
-                          _c(
-                            "CButton",
-                            {
-                              staticClass: "mt-4",
-                              attrs: { color: "primary" },
-                              on: {
-                                click: function($event) {
-                                  _vm.rightCard = "fileInfo"
-                                }
-                              }
-                            },
-                            [_vm._v("\n              Cancel\n          ")]
+                            [
+                              _c("option", { attrs: { value: "20" } }, [
+                                _vm._v("20")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "50" } }, [
+                                _vm._v("50")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "100" } }, [
+                                _vm._v("100")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "200" } }, [
+                                _vm._v("200")
+                              ]),
+                              _vm._v(" "),
+                              _c("option", { attrs: { value: "300" } }, [
+                                _vm._v("300")
+                              ])
+                            ]
                           )
-                        ],
-                        2
+                        ]
                       )
                     ],
                     1
                   )
-                : _vm._e()
+                ])
+              ])
             ],
             1
           )
-        ],
-        1
-      ),
+        ])
+      ]),
       _vm._v(" "),
       _c(
         "CModal",
         {
           attrs: {
-            show: _vm.deleteFolderModal,
-            centered: true,
-            title: "Delete folder"
+            title: _vm.modal.title,
+            show: _vm.modal.show,
+            color: _vm.modal.color
           },
           on: {
             "update:show": function($event) {
-              _vm.deleteFolderModal = $event
+              return _vm.$set(_vm.modal, "show", $event)
             }
           },
           scopedSlots: _vm._u([
+            {
+              key: "header",
+              fn: function() {
+                return [
+                  _c("h5", { staticClass: "modal-title" }, [
+                    _vm._v(_vm._s(_vm.modal.title))
+                  ])
+                ]
+              },
+              proxy: true
+            },
             {
               key: "footer",
               fn: function() {
@@ -1251,23 +843,22 @@ var render = function() {
                   _c(
                     "CButton",
                     {
-                      attrs: { color: "primary" },
-                      on: {
-                        click: function($event) {
-                          _vm.deleteFolderModal = false
-                        }
-                      }
+                      attrs: { color: "btn btn-success", type: "button" },
+                      on: { click: _vm.updateAvatar }
                     },
-                    [_vm._v("Cancel")]
+                    [_vm._v("Lưu")]
                   ),
                   _vm._v(" "),
                   _c(
                     "CButton",
                     {
-                      attrs: { color: "danger" },
-                      on: { click: _vm.deleteFolder }
+                      attrs: {
+                        color: "btn btn-" + _vm.modal.color,
+                        type: "button"
+                      },
+                      on: { click: _vm.exit }
                     },
-                    [_vm._v("Delete")]
+                    [_vm._v("Đóng")]
                   )
                 ]
               },
@@ -1276,11 +867,11 @@ var render = function() {
           ])
         },
         [
-          _vm._v(
-            '\n      Are you sure to delete a folder named "' +
-              _vm._s(_vm.moveObjectName) +
-              '"?\n    '
-          )
+          _c("input", {
+            staticClass: "form-control",
+            attrs: { type: "file", id: "fileUploadExcel" },
+            on: { change: _vm.fileChanged }
+          })
         ]
       ),
       _vm._v(" "),
@@ -1288,16 +879,27 @@ var render = function() {
         "CModal",
         {
           attrs: {
-            show: _vm.deleteFileModal,
-            centered: true,
-            title: "Delete file"
+            title: _vm.modal_img.title,
+            show: _vm.modal_img.show,
+            color: _vm.modal_img.color
           },
           on: {
             "update:show": function($event) {
-              _vm.deleteFileModal = $event
+              return _vm.$set(_vm.modal_img, "show", $event)
             }
           },
           scopedSlots: _vm._u([
+            {
+              key: "header",
+              fn: function() {
+                return [
+                  _c("h5", { staticClass: "modal-title" }, [
+                    _vm._v(_vm._s(_vm.modal_img.title))
+                  ])
+                ]
+              },
+              proxy: true
+            },
             {
               key: "footer",
               fn: function() {
@@ -1305,23 +907,17 @@ var render = function() {
                   _c(
                     "CButton",
                     {
-                      attrs: { color: "primary" },
+                      attrs: {
+                        color: "btn btn-" + _vm.modal_img.color,
+                        type: "button"
+                      },
                       on: {
                         click: function($event) {
-                          _vm.deleteFileModal = false
+                          _vm.modal_img.show = false
                         }
                       }
                     },
-                    [_vm._v("Cancel")]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "CButton",
-                    {
-                      attrs: { color: "danger" },
-                      on: { click: _vm.deleteFile }
-                    },
-                    [_vm._v("Delete")]
+                    [_vm._v("Đóng")]
                   )
                 ]
               },
@@ -1329,85 +925,61 @@ var render = function() {
             }
           ])
         },
-        [
-          _vm._v(
-            '\n      Are you sure to delete a file named "' +
-              _vm._s(_vm.moveObjectName) +
-              '"?\n    '
-          )
-        ]
-      ),
-      _vm._v(" "),
-      _c(
-        "CModal",
-        {
-          attrs: {
-            show: _vm.croppModal,
-            centered: true,
-            title: "Cropp image",
-            size: "lg"
-          },
-          on: {
-            "update:show": function($event) {
-              _vm.croppModal = $event
-            }
-          },
-          scopedSlots: _vm._u([
-            {
-              key: "footer",
-              fn: function() {
-                return [
-                  _c(
-                    "CButton",
-                    {
-                      attrs: { color: "primary" },
-                      on: {
-                        click: function($event) {
-                          _vm.croppModal = false
-                        }
-                      }
-                    },
-                    [_vm._v("Cancel")]
-                  ),
-                  _vm._v(" "),
-                  _c(
-                    "CButton",
-                    {
-                      attrs: { color: "primary" },
-                      on: { click: _vm.croppImage }
-                    },
-                    [_vm._v("Cropp")]
-                  )
-                ]
-              },
-              proxy: true
-            }
-          ])
-        },
-        [_c("img", { attrs: { id: "cropp-img-img" } })]
+        [_c("img", { attrs: { src: _vm.modal_img.img_url, width: "100%" } })]
       )
     ],
     1
   )
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("div", { staticClass: "card-header" }, [
+      _c("strong", [_vm._v("Danh sách học sinh")])
+    ])
+  },
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("thead", [
+      _c("tr", [
+        _c("th", [_vm._v("STT")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Avatar")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Trung tâm")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Tên học sinh")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Mã CRM")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Face ID")]),
+        _vm._v(" "),
+        _c("th", [_vm._v("Thao tác")])
+      ])
+    ])
+  }
+]
 render._withStripped = true
 
 
 
 /***/ }),
 
-/***/ "./resources/coreui/src/views/media/Media.vue":
-/*!****************************************************!*\
-  !*** ./resources/coreui/src/views/media/Media.vue ***!
-  \****************************************************/
+/***/ "./resources/coreui/src/views/cameraAI/students.vue":
+/*!**********************************************************!*\
+  !*** ./resources/coreui/src/views/cameraAI/students.vue ***!
+  \**********************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _Media_vue_vue_type_template_id_268102e9___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Media.vue?vue&type=template&id=268102e9& */ "./resources/coreui/src/views/media/Media.vue?vue&type=template&id=268102e9&");
-/* harmony import */ var _Media_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Media.vue?vue&type=script&lang=js& */ "./resources/coreui/src/views/media/Media.vue?vue&type=script&lang=js&");
+/* harmony import */ var _students_vue_vue_type_template_id_75ed15ea___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./students.vue?vue&type=template&id=75ed15ea& */ "./resources/coreui/src/views/cameraAI/students.vue?vue&type=template&id=75ed15ea&");
+/* harmony import */ var _students_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./students.vue?vue&type=script&lang=js& */ "./resources/coreui/src/views/cameraAI/students.vue?vue&type=script&lang=js&");
 /* empty/unused harmony star reexport *//* harmony import */ var _node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../../../../node_modules/vue-loader/lib/runtime/componentNormalizer.js */ "./node_modules/vue-loader/lib/runtime/componentNormalizer.js");
 
 
@@ -1417,9 +989,9 @@ __webpack_require__.r(__webpack_exports__);
 /* normalize component */
 
 var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_js__WEBPACK_IMPORTED_MODULE_2__["default"])(
-  _Media_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
-  _Media_vue_vue_type_template_id_268102e9___WEBPACK_IMPORTED_MODULE_0__["render"],
-  _Media_vue_vue_type_template_id_268102e9___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
+  _students_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_1__["default"],
+  _students_vue_vue_type_template_id_75ed15ea___WEBPACK_IMPORTED_MODULE_0__["render"],
+  _students_vue_vue_type_template_id_75ed15ea___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"],
   false,
   null,
   null,
@@ -1429,38 +1001,38 @@ var component = Object(_node_modules_vue_loader_lib_runtime_componentNormalizer_
 
 /* hot reload */
 if (false) { var api; }
-component.options.__file = "resources/coreui/src/views/media/Media.vue"
+component.options.__file = "resources/coreui/src/views/cameraAI/students.vue"
 /* harmony default export */ __webpack_exports__["default"] = (component.exports);
 
 /***/ }),
 
-/***/ "./resources/coreui/src/views/media/Media.vue?vue&type=script&lang=js&":
-/*!*****************************************************************************!*\
-  !*** ./resources/coreui/src/views/media/Media.vue?vue&type=script&lang=js& ***!
-  \*****************************************************************************/
+/***/ "./resources/coreui/src/views/cameraAI/students.vue?vue&type=script&lang=js&":
+/*!***********************************************************************************!*\
+  !*** ./resources/coreui/src/views/cameraAI/students.vue?vue&type=script&lang=js& ***!
+  \***********************************************************************************/
 /*! exports provided: default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Media_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Media.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/media/Media.vue?vue&type=script&lang=js&");
-/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_Media_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
+/* harmony import */ var _node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_students_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/babel-loader/lib??ref--4-0!../../../../../node_modules/vue-loader/lib??vue-loader-options!./students.vue?vue&type=script&lang=js& */ "./node_modules/babel-loader/lib/index.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/cameraAI/students.vue?vue&type=script&lang=js&");
+/* empty/unused harmony star reexport */ /* harmony default export */ __webpack_exports__["default"] = (_node_modules_babel_loader_lib_index_js_ref_4_0_node_modules_vue_loader_lib_index_js_vue_loader_options_students_vue_vue_type_script_lang_js___WEBPACK_IMPORTED_MODULE_0__["default"]); 
 
 /***/ }),
 
-/***/ "./resources/coreui/src/views/media/Media.vue?vue&type=template&id=268102e9&":
-/*!***********************************************************************************!*\
-  !*** ./resources/coreui/src/views/media/Media.vue?vue&type=template&id=268102e9& ***!
-  \***********************************************************************************/
+/***/ "./resources/coreui/src/views/cameraAI/students.vue?vue&type=template&id=75ed15ea&":
+/*!*****************************************************************************************!*\
+  !*** ./resources/coreui/src/views/cameraAI/students.vue?vue&type=template&id=75ed15ea& ***!
+  \*****************************************************************************************/
 /*! exports provided: render, staticRenderFns */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
-/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Media_vue_vue_type_template_id_268102e9___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./Media.vue?vue&type=template&id=268102e9& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/media/Media.vue?vue&type=template&id=268102e9&");
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Media_vue_vue_type_template_id_268102e9___WEBPACK_IMPORTED_MODULE_0__["render"]; });
+/* harmony import */ var _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_students_vue_vue_type_template_id_75ed15ea___WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! -!../../../../../node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!../../../../../node_modules/vue-loader/lib??vue-loader-options!./students.vue?vue&type=template&id=75ed15ea& */ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/coreui/src/views/cameraAI/students.vue?vue&type=template&id=75ed15ea&");
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "render", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_students_vue_vue_type_template_id_75ed15ea___WEBPACK_IMPORTED_MODULE_0__["render"]; });
 
-/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_Media_vue_vue_type_template_id_268102e9___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
+/* harmony reexport (safe) */ __webpack_require__.d(__webpack_exports__, "staticRenderFns", function() { return _node_modules_vue_loader_lib_loaders_templateLoader_js_vue_loader_options_node_modules_vue_loader_lib_index_js_vue_loader_options_students_vue_vue_type_template_id_75ed15ea___WEBPACK_IMPORTED_MODULE_0__["staticRenderFns"]; });
 
 
 

@@ -512,6 +512,14 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -583,7 +591,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         branch_id: "",
         checkin_at: "",
         student_id: ""
-      }, _defineProperty(_modal_checkin, "error_message", ""), _defineProperty(_modal_checkin, "disabled", false), _modal_checkin),
+      }, _defineProperty(_modal_checkin, "error_message", ""), _defineProperty(_modal_checkin, "disabled", false), _defineProperty(_modal_checkin, "type_product", ""), _modal_checkin),
       parent: {
         id: "",
         gender: "",
@@ -654,12 +662,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
   created: function created() {
     var _this = this;
 
-    var arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
-
-    if (arr_role.indexOf("Supervisor") > -1) {
-      this.disabled_action = true;
-    } // this.$socket.emit('userConnected', localStorage.getItem("user_id"));
-
+    var arr_role = JSON.parse(localStorage.getItem("roles")).split(","); // if(arr_role.indexOf("Supervisor")> -1){
+    //   this.disabled_action = true
+    // }
+    // this.$socket.emit('userConnected', localStorage.getItem("user_id"));
 
     _utilities_utility__WEBPACK_IMPORTED_MODULE_1__["default"].g("/api/user/get-users-manager").then(function (response) {
       _this.users_manager = response.data;
@@ -732,6 +738,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       // document.getElementById('published_date').value=""
       this.modal_care.show = true;
       this.modal_care.error_message = "";
+      this.care.method_id = "";
+      this.care.note = "";
+      this.care.attached_file = "";
+      this.care.file_name = "";
     },
     loadCares: function loadCares(parent_id) {
       var _this3 = this;
@@ -1063,6 +1073,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.modal_checkin.branch_id = this.parent.branch_id;
       this.modal_checkin.checkin_at = "";
       this.modal_checkin.error_message = "";
+      this.modal_checkin.type_product = "";
     },
     checkin: function checkin() {
       var _this16 = this;
@@ -1080,11 +1091,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         resp = false;
       }
 
+      if (this.modal_checkin.type_product == "") {
+        mess += " - Sản phẩm không được để trống<br/>";
+        resp = false;
+      }
+
       if (resp) {
         var data = {
           student_id: this.modal_checkin.student_id,
           branch_id: this.modal_checkin.branch_id,
-          checkin_at: moment__WEBPACK_IMPORTED_MODULE_4___default()(this.modal_checkin.checkin_at).format('YYYY-MM-DD HH:mm')
+          checkin_at: moment__WEBPACK_IMPORTED_MODULE_4___default()(this.modal_checkin.checkin_at).format('YYYY-MM-DD HH:mm'),
+          type_product: this.modal_checkin.type_product
         };
         this.loading.processing = true;
         this.exit("checkin");
@@ -1102,6 +1119,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
       this.modal_checkin.student_id = item.id;
       this.modal_checkin.branch_id = item.checkin_branch_id;
       this.modal_checkin.checkin_at = item.checkin_at;
+      this.modal_checkin.type_product = item.type_product;
       this.modal_checkin.error_message = "";
     },
     fileChanged: function fileChanged(e) {
@@ -1955,7 +1973,7 @@ var render = function() {
                                 }
                               }),
                               _vm._v(" "),
-                              _vm.phone.show_input_note || 1 == 1
+                              _vm.phone.show_input_note
                                 ? _c(
                                     "div",
                                     {
@@ -3101,7 +3119,58 @@ var render = function() {
                     })
                   ],
                   1
-                )
+                ),
+                _vm._v(" "),
+                _c("div", { staticClass: "form-group col-sm-6" }, [
+                  _c("label", { attrs: { for: "nf-email" } }, [
+                    _vm._v("Sản phẩm")
+                  ]),
+                  _vm._v(" "),
+                  _c(
+                    "select",
+                    {
+                      directives: [
+                        {
+                          name: "model",
+                          rawName: "v-model",
+                          value: _vm.modal_checkin.type_product,
+                          expression: "modal_checkin.type_product"
+                        }
+                      ],
+                      staticClass: "form-control",
+                      on: {
+                        change: function($event) {
+                          var $$selectedVal = Array.prototype.filter
+                            .call($event.target.options, function(o) {
+                              return o.selected
+                            })
+                            .map(function(o) {
+                              var val = "_value" in o ? o._value : o.value
+                              return val
+                            })
+                          _vm.$set(
+                            _vm.modal_checkin,
+                            "type_product",
+                            $event.target.multiple
+                              ? $$selectedVal
+                              : $$selectedVal[0]
+                          )
+                        }
+                      }
+                    },
+                    [
+                      _c("option", { attrs: { value: "" } }, [
+                        _vm._v("Chọn sản phẩm")
+                      ]),
+                      _vm._v(" "),
+                      _c("option", { attrs: { value: "1" } }, [_vm._v("CMS")]),
+                      _vm._v(" "),
+                      _c("option", { attrs: { value: "2" } }, [
+                        _vm._v("Accelium")
+                      ])
+                    ]
+                  )
+                ])
               ]),
               _vm._v(" "),
               _c("p", {

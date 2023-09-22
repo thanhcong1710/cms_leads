@@ -191,6 +191,15 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -226,6 +235,7 @@ __webpack_require__.r(__webpack_exports__);
       email: '',
       phone: '',
       hrm_id: '',
+      sip_id: '',
       manager_hrm_id: '',
       password: '',
       showMessage: false,
@@ -255,6 +265,7 @@ __webpack_require__.r(__webpack_exports__);
         self.hrm_id = response.data.hrm_id;
         self.manager_hrm_id = response.data.manager_hrm_id;
         self.branch_id = response.data.branch_id;
+        self.sip_id = response.data.sip_id;
         self.rules_setting = response.data.rules_setting;
         var arr_role = response.data.roles.split(",");
         self.roles.map(function (item) {
@@ -341,6 +352,7 @@ __webpack_require__.r(__webpack_exports__);
         status: this.status,
         hrm_id: this.hrm_id,
         manager_hrm_id: this.manager_hrm_id,
+        sip_id: this.sip_id,
         branch_id: this.branch_id,
         rules_setting: this.rules_setting
       }).then(function (response) {
@@ -803,6 +815,34 @@ var render = function() {
                               ])
                             ]
                           )
+                        ]),
+                        _vm._v(" "),
+                        _c("div", { staticClass: "form-group col-sm-12" }, [
+                          _c("label", { attrs: { for: "nf-email" } }, [
+                            _vm._v("Đầu số SIP")
+                          ]),
+                          _vm._v(" "),
+                          _c("input", {
+                            directives: [
+                              {
+                                name: "model",
+                                rawName: "v-model",
+                                value: _vm.sip_id,
+                                expression: "sip_id"
+                              }
+                            ],
+                            staticClass: "form-control",
+                            attrs: { type: "text", name: "title" },
+                            domProps: { value: _vm.sip_id },
+                            on: {
+                              input: function($event) {
+                                if ($event.target.composing) {
+                                  return
+                                }
+                                _vm.sip_id = $event.target.value
+                              }
+                            }
+                          })
                         ])
                       ])
                     ]),

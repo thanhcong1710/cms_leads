@@ -168,6 +168,16 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 
 
 
@@ -505,6 +515,34 @@ var render = function() {
                                 return
                               }
                               _vm.manager_hrm_id = $event.target.value
+                            }
+                          }
+                        })
+                      ]),
+                      _vm._v(" "),
+                      _c("div", { staticClass: "form-group col-sm-12" }, [
+                        _c("label", { attrs: { for: "nf-email" } }, [
+                          _vm._v("Đầu số SIP")
+                        ]),
+                        _vm._v(" "),
+                        _c("input", {
+                          directives: [
+                            {
+                              name: "model",
+                              rawName: "v-model",
+                              value: _vm.sip_id,
+                              expression: "sip_id"
+                            }
+                          ],
+                          staticClass: "form-control",
+                          attrs: { disabled: "", type: "text", name: "title" },
+                          domProps: { value: _vm.sip_id },
+                          on: {
+                            input: function($event) {
+                              if ($event.target.composing) {
+                                return
+                              }
+                              _vm.sip_id = $event.target.value
                             }
                           }
                         })
