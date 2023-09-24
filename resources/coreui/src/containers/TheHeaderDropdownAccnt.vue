@@ -18,11 +18,11 @@
     <CDropdownHeader tag="div" class="text-center" color="light">
       <strong>{{user_name}}</strong>
     </CDropdownHeader>
-    <div class="dropdown-item">
+    <!-- <div class="dropdown-item">
       <i class="fa fa-phone" style="margin-right:3px"></i> Đầu Số
       <input style="width: 80px; margin-left: 10px" v-model="user_sip"/>
       <button class="btn btn-success" style="padding: 2px 5px;"  @click="updateSipID()">Lưu</button>
-    </div>
+    </div> -->
     <!-- <CDropdownItem>
       <CIcon name="cil-bell"/> Updates
       <CBadge color="info" class="ml-auto">{{ itemsCount }}</CBadge>
