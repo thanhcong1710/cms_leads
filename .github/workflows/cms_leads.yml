@@ -23,9 +23,9 @@ jobs:
     # - name: Install Node
     #   run: npm install
     #   working-directory: /opt/cms_leads_tmp/resources/coreui
-    - name: Build Node
-      run: npm run build
-      working-directory: /opt/cms_leads_tmp/resources/coreui
+    # - name: Build Node
+    #   run: npm run build
+    #   working-directory: /opt/cms_leads_tmp/resources/coreui
     - name: Complete
       run: npm run dev
       working-directory: /opt/cms_leads_tmp
@@ -45,9 +45,9 @@ jobs:
     # - name: Install Node
     #   run: npm install
     #   working-directory: /opt/cms_leads_staging/resources/coreui
-    - name: Build Node
-      run: npm run build
-      working-directory: /opt/cms_leads_staging/resources/coreui
+    # - name: Build Node
+    #   run: npm run build
+    #   working-directory: /opt/cms_leads_staging/resources/coreui
     - name: Complete
       run: npm run dev
       working-directory: /opt/cms_leads_staging
