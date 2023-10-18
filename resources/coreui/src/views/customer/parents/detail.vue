@@ -109,7 +109,7 @@
                       </select>
                       <br>
                       <textarea class="form-control" v-model="phone.note" placeholder="Thêm ghi chú cuộc gọi"></textarea>
-                      <div style="margin-top:5px;text-align:right" v-if="phone.show_input_note">
+                      <div style="margin-top:5px;text-align:right" >
                         <button class="btn btn-success" @click="updateNotePhone"> <i class="fa fa-save"></i> Lưu</button>
                         <!-- <button class="btn btn-secondary" @click="phone.show=false"> <i class="fa fa-times"></i> Đóng</button> -->
                       </div>
@@ -890,6 +890,7 @@ export default {
         this.loading.processing = false;
         this.phone.show = true
         this.phone.status = 0
+        this.phone.select_note = ""
         this.phone.show_input_note = false
         this.phone.css_class= 'alert alert-success'
         this.phone.title = "Đang thực hiện cuộc gọi đi đến SĐT - "+phone+" ..."
@@ -929,20 +930,39 @@ export default {
       }
     },
     updateNotePhone(){
+      // if(this.phone.note){
+      //   const data = {
+      //     care_id: this.phone.care_id,
+      //     note: this.phone.note,
+      //   };
+      //   this.loading.processing = true;
+      //     u.p(`/api/care/udpate_note`,data)
+      //     .then((response) => {
+      //       this.loading.processing = false;
+      //       this.phone.show = false;
+      //       this.loadCares(this.$route.params.id);
+      //     })
+      //     .catch((e) => {
+      //     });
+      // }
       if(this.phone.note){
         const data = {
-          care_id: this.phone.care_id,
-          note: this.phone.note,
+          method_id:1,
+          note:this.phone.note,
+          parent_id:this.parent.id,
+          attached_file:"",
+          file_name:"",
+          care_date:"",
         };
         this.loading.processing = true;
-          u.p(`/api/care/udpate_note`,data)
-          .then((response) => {
-            this.loading.processing = false;
-            this.phone.show = false;
-            this.loadCares(this.$route.params.id);
-          })
-          .catch((e) => {
-          });
+       u.p(`/api/care/add`,data)
+        .then((response) => {
+          this.loading.processing = false;
+          this.phone.show = false;
+          this.loadCares(this.$route.params.id);
+        })
+        .catch((e) => {
+        });
       }
     },
     showSendSms(phone){

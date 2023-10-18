@@ -14,29 +14,30 @@ class ParentCareController extends Controller
     {
         $dataRequest = $request->all();
         $attachedFile = $dataRequest['attached_file'];
-        if (!$attachedFile) {
-            $data = (object)[
-                'status' => 0 ,
-                'message' => "File upload không hợp lệ",
-            ];
-            return response()->json($data);
+        // if (!$attachedFile) {
+        //     $data = (object)[
+        //         'status' => 0 ,
+        //         'message' => "File upload không hợp lệ",
+        //     ];
+        //     return response()->json($data);
+        // }
+        if ($attachedFile) {
+            // SAVE FILES TO SERVER
+            $explod = explode(',', $attachedFile);
+            $decod = base64_decode($explod[1]);
+            if ( in_array(strtolower($explod[0]),['data:image/png;base64','data:image/jpg;base64','data:image/jpeg;base64'])) {
+                $extend = 'jpg';
+            } else {
+                $data = (object)[
+                    'status' => 0 ,
+                    'message' => "File upload không hợp lệ. chỉ hỗ trợ định dạng JPG, PNG",
+                ];
+                return response()->json($data);
+            }
+            $fileAttached = 'customer_care_'.md5($request->attached_file.date('YmdHis')).'.'.$extend;
+            $p = __DIR__.'/../../../public/static/upload/'.$fileAttached;
+            file_put_contents($p, $decod);
         }
-
-        // SAVE FILES TO SERVER
-        $explod = explode(',', $attachedFile);
-        $decod = base64_decode($explod[1]);
-        if ( in_array(strtolower($explod[0]),['data:image/png;base64','data:image/jpg;base64','data:image/jpeg;base64'])) {
-            $extend = 'jpg';
-        } else {
-            $data = (object)[
-                'status' => 0 ,
-                'message' => "File upload không hợp lệ. chỉ hỗ trợ định dạng JPG, PNG",
-            ];
-            return response()->json($data);
-        }
-        $fileAttached = 'customer_care_'.md5($request->attached_file.date('YmdHis')).'.'.$extend;
-        $p = __DIR__.'/../../../public/static/upload/'.$fileAttached;
-        file_put_contents($p, $decod);
         $id = u::insertSimpleRow(array(
             'parent_id'=>$request->parent_id,
             'note'=>$request->note,
@@ -45,7 +46,7 @@ class ParentCareController extends Controller
             'created_at' => date('Y-m-d H:i:s'),
             'creator_id' => Auth::user()->id,
             'branch_id' => Auth::user()->branch_id,
-            'attached_file'=>'static/upload/'.$fileAttached,
+            'attached_file'=>$attachedFile ? 'static/upload/'.$fileAttached : '',
         ), 'cms_customer_care');
         $data = (object)[
             'status' => 1 ,

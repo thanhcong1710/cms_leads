@@ -17,10 +17,13 @@ class VoipController extends Controller
      */
     public function __construct()
     {
-        $this->baseUri = "103.226.250.52";
-        $this->voip24 = "http://dial.voip24h.vn/dial";
-        $this->voip24_key = "cb7320a02d1bf15651002cac0fe56523e13d7298";
-        $this->voip24_secret = "0e43c1bc6caeb10fc22a3ca43cc29b99";
+        // $this->baseUri = "103.226.250.52";
+        // $this->voip24 = "http://dial.voip24h.vn/dial";
+        // $this->voip24_key = "cb7320a02d1bf15651002cac0fe56523e13d7298";
+        // $this->voip24_secret = "0e43c1bc6caeb10fc22a3ca43cc29b99";
+
+        $this->voip24 = "https://voice.diginext.com.vn/api";
+        $this->voip24_key = "diginext8mk50oaao968";
     }
     public function webhook(Request $request)
     {
@@ -91,16 +94,31 @@ class VoipController extends Controller
     }
     public function makeToCall($phone,$sip=651)
     {
-        $method = "GET";
-        $http_data = array(
-            'voip' => $this->voip24_key,
-            'secret' => $this->voip24_secret,
-            'sip' => $sip ? $sip : '651',
-            'phone' =>$phone
+        // $method = "GET";
+        // $http_data = array(
+        //     'voip' => $this->voip24_key,
+        //     'secret' => $this->voip24_secret,
+        //     'sip' => $sip ? $sip : '651',
+        //     'phone' =>$phone
+        // );
+        // $url = sprintf('%s?%s',$this->voip24, http_build_query($http_data));
+        // $res = curl::curl($url, $method);
+        // u::logRequest($url,$method,[],[],$res,'log_request_outbound');
+        // return "ok";
+        $header=[
+            "Content-Type: application/json",
+            "Secret-Key: ".$this->voip24_key
+        ];
+        $method = "POST";
+        $params = array(
+            'ma_dn' => 'DN0002',
+            'dauso' => '842488881505',
+            'mayle' => $sip ? $sip : '651',
+            'sokhachhang' =>$phone
         );
-        $url = sprintf('%s?%s',$this->voip24, http_build_query($http_data));
-        $res = curl::curl($url, $method);
-        u::logRequest($url,$method,[],[],$res,'log_request_outbound');
+        $url = $url = sprintf('%s/click-to-call',$this->voip24);
+        $res = curl::curl($url, $method, $header, $params);
+        u::logRequest($url,$method,$header,$params,$res,'log_request_outbound');
         return "ok";
     }
     public function socketIo($user_id,$event,$data){
