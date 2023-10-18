@@ -299,4 +299,39 @@ class ReportsController extends Controller
         $data = u::makingPagination($list, $total->total, $page, $limit);
         return response()->json($data);
     }
+    public function report05(Request $request)
+    {
+        $keyword = isset($request->keyword) ? $request->keyword : '';
+        
+        $pagination = (object)$request->pagination;
+        $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
+        $limit = isset($pagination->limit) ? (int) $pagination->limit : 20;
+        $offset = $page == 1 ? 0 : $limit * ($page-1);
+        $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
+        $cond = "1";
+        if($keyword!==''){
+            $cond .= " AND (p.mobile_1 LIKE '%$keyword%' OR p.mobile_2 LIKE '%$keyword%')";
+        }
+        if (!empty($request->branch_id)) {
+            $cond.= " AND (o.last_branch_id IN (".implode(",",$request->branch_id).") OR o.branch_id IN (".implode(",",$request->branch_id)."))";
+        }
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
+            $cond .= " AND (o.last_owner_id IN (".$request->user_info->users_manager.") OR o.owner_id IN (".$request->user_info->users_manager."))";
+        }
+        $total = u::first("SELECT count(o.id) AS total FROM cms_parent_overwrite AS o
+                LEFT JOIN cms_parents AS p ON p.id=o.parent_id  
+            WHERE $cond  ");
+        $list = u::query("SELECT p.mobile_1,CONCAT(u.name,' - ',u.hrm_id) AS last_owner_name,b.name AS last_branch_name,
+                CONCAT(u1.name,' - ',u1.hrm_id) AS owner_name,b1.name AS branch_name,o.last_care_date,o.created_at
+            FROM cms_parent_overwrite AS o
+                LEFT JOIN cms_parents AS p ON p.id=o.parent_id
+                LEFT JOIN users AS u ON u.id=o.last_owner_id 
+                LEFT JOIN cms_branches AS b ON b.id=last_branch_id
+                LEFT JOIN users AS u1 ON u1.id=o.owner_id 
+                LEFT JOIN cms_branches AS b1 ON b1.id= o.branch_id
+            WHERE $cond ORDER BY o.id DESC $limitation");
+
+        $data = u::makingPagination($list, $total->total, $page, $limit);
+        return response()->json($data);
+    }
 }

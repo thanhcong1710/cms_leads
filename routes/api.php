@@ -139,6 +139,8 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('/export/report03/{key}/{value}', 'ExportController@report03');
         Route::post('/reports/04', 'ReportsController@report04');
         Route::get('/export/report04/{key}/{value}', 'ExportController@report04');
+        Route::post('/reports/05', 'ReportsController@report05');
+        Route::get('/export/report05/{key}/{value}', 'ExportController@report05');
 
         Route::post('/camera-ai/list-action', 'CameraAIController@listAction');
         Route::post('/camera-ai/list-student', 'CameraAIController@listStudent');

@@ -153,7 +153,7 @@
                     <th>Lịch sử chăm sóc</th>
                     <th>Thời gian chăm sóc gần nhất</th>
                     <th>Trạng thái</th>
-                    <th  v-if="!disabled_action" class="sticky-col last-col">Thao tác</th>
+                    <th v-if="!disabled_action" class="sticky-col last-col">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -181,7 +181,7 @@
                     <td>{{ item.last_care }}</td>
                     <td>{{ item.last_time_care }}</td>
                     <td>{{ item.status | getStatusName }}</td>
-                    <td  v-if="!disabled_action" class="sticky-col last-col">
+                    <td v-if="!disabled_action" class="sticky-col last-col">
                       <router-link
                         class="btn btn-sm btn-success"
                         :to="`/parents/${item.id}/edit`"

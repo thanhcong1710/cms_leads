@@ -339,7 +339,7 @@ class ParentsController extends Controller
     }
     public function overwrite(Request $request){
         $phone = isset($request->phone) ? $request->phone : '';
-        $parent_info = u::first("SELECT * FROM cms_parents WHERE mobile_1='$phone'");
+        $parent_info = u::first("SELECT p.*, (SELECT branch_id FROM users WHERE id=p.owner_id) AS branch_id FROM cms_parents AS p WHERE p.mobile_1='$phone'");
         if($parent_info){
             u::updateSimpleRow(array(
                 'updated_at' => date('Y-m-d H:i:s'),
@@ -348,12 +348,16 @@ class ParentsController extends Controller
                 'last_assign_date'=> date('Y-m-d H:i:s'),
                 'is_lock'=>1,
             ), array('id' => $parent_info->id), 'cms_parents');
+            $care_info = u::first("SELECT care_date FROM cms_customer_care WHERE parent_id=$parent_info->id AND status=1 AND creator_id=$parent_info->owner_id");
             u::insertSimpleRow(array(
                 'parent_id'=>$parent_info->id,
                 'last_owner_id'=>$parent_info->owner_id,
+                'last_branch_id'=>$parent_info->branch_id,
                 'owner_id'=>Auth::user()->id,
+                'branch_id'=>Auth::user()->branch_id,
                 'created_at'=>date('Y-m-d H:i:s'),
                 'creator_id'=>Auth::user()->id,
+                'last_care_date'=>$care_info ? $care_info->care_date: NULL,
             ), 'cms_parent_overwrite');
             LogParents::logAssign($parent_info->id,$parent_info->owner_id,Auth::user()->id,Auth::user()->id,true);
         }

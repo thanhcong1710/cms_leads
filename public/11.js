@@ -333,6 +333,71 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
       fileReader.onload = function (e) {
         _this2.attached_file = e.target.result;
       };
+      if (this.parent.gender == "") {
+        mess += " - Danh xưng không được để trống<br/>";
+        resp = false;
+      }
+
+      if (this.parent.name == "") {
+        mess += " - Họ tên không được để trống<br/>";
+        resp = false;
+      }
+
+      if (this.parent.mobile_1 == "") {
+        mess += " - Số điện thoại không được để trống<br/>";
+        resp = false;
+      }
+
+      if (this.parent.mobile_1 != "" && !_utilities_utility__WEBPACK_IMPORTED_MODULE_1__["default"].vld.phone(this.parent.mobile_1)) {
+        mess += " - Số điện thoại không đúng định dạng<br/>";
+        resp = false;
+      }
+
+      if (this.parent.mobile_2 != "" && !_utilities_utility__WEBPACK_IMPORTED_MODULE_1__["default"].vld.phone(this.parent.mobile_2)) {
+        mess += " - Số điện thoại 2 không đúng định dạng<br/>";
+        resp = false;
+      }
+
+      if (this.parent.owner_id == "") {
+        mess += " - Người phụ trách không được để trống<br/>";
+        resp = false;
+      }
+
+      if (this.parent.source_id == "") {
+        mess += " - Nguồn không được để trống<br/>";
+        resp = false;
+      }
+
+      if (!resp) {
+        this.modal.color = "warning";
+        this.modal.body = mess;
+        this.modal.show = true;
+        this.modal.action_exit = "close";
+        return false;
+      }
+
+      this.loading.processing = true;
+      _utilities_utility__WEBPACK_IMPORTED_MODULE_1__["default"].p("/api/parents/add", this.parent).then(function (response) {
+        _this2.loading.processing = false;
+
+        if (response.status == 200) {
+          _this2.modal.color = "success";
+          _this2.modal.body = "Thêm mới khách hàng thành công";
+          _this2.modal.show = true;
+          _this2.modal.action_exit = "exit";
+        }
+      })["catch"](function (e) {
+        _utilities_utility__WEBPACK_IMPORTED_MODULE_1__["default"].processAuthen(e);
+      });
+    },
+    exit: function exit() {
+      if (this.modal.action_exit == "exit") {
+        this.$router.push({
+          path: "/parents"
+        });
+      } else {
+        this.modal.show = false;
+      }
     },
     btnUpload: function btnUpload() {
       var _this3 = this;

@@ -60,10 +60,14 @@ class ParentCareController extends Controller
         if(! ($request->user()->hasRole('admin') || in_array($request->user()->id,[39,40,152])) ){
             $cond = "AND c.status=1";
         }
+        $is_leader = 0;
+        if($request->user()->hasRole('admin') || $request->user()->hasRole('Leader')){
+            $is_leader = 1;
+        }
         $data = u::query("SELECT c.*, (SELECT CONCAT(name,' - ',hrm_id) FROM users WHERE id=c.creator_id) AS creator_name,
                 (SELECT name FROM cms_contact_methods WHERE id=c.method_id) AS method_name ,
                 (SELECT type FROM voip24h_data WHERE id= c.data_id) AS type_call,
-                (SELECT link_record FROM voip24h_data WHERE id = c.data_id) AS link_record,
+                (SELECT IF(user_id = ".$request->user()->id." OR $is_leader=1 , link_record , '') FROM voip24h_data WHERE id = c.data_id) AS link_record,
                 (SELECT name FROM cms_branches WHERE id=c.branch_id) AS branch_name
             FROM cms_customer_care AS c WHERE parent_id=$parent_id $cond ORDER BY c.care_date DESC");
         return response()->json($data);
