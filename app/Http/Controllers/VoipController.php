@@ -23,7 +23,7 @@ class VoipController extends Controller
         // $this->voip24_secret = "0e43c1bc6caeb10fc22a3ca43cc29b99";
 
         $this->voip24 = "https://voice.diginext.com.vn/api";
-        $this->voip24_key = "diginext8mk50oaao968";
+        $this->voip24_key = "d5fa5d0b5b0d793a4c9dc80c4c23e5a1347a177704c03b450bf431606a8c1ec0";
     }
     public function webhook(Request $request)
     {
