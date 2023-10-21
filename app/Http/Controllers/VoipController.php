@@ -24,13 +24,13 @@ class VoipController extends Controller
         if(env('APP_ENV', 'staging')=='production'){
             $this->voip24 = "https://voice.diginext.com.vn/api";
             $this->voip24_key = "d5fa5d0b5b0d793a4c9dc80c4c23e5a1347a177704c03b450bf431606a8c1ec0";
-            $this->ma_dn = "DN0002";
-            $this->dauso = "842488881505";
+            $this->ma_dn = "test2dn00000";
+            $this->dauso = "842488886505";
         }else{
             $this->voip24 = "https://voice.diginext.com.vn/api";
             $this->voip24_key = "d5fa5d0b5b0d793a4c9dc80c4c23e5a1347a177704c03b450bf431606a8c1ec0";
-            $this->ma_dn = "DN0002";
-            $this->dauso = "842488881505";
+            $this->ma_dn = "test2dn00000";
+            $this->dauso = "842488886505";
         }
     }
     public function webhook(Request $request)
