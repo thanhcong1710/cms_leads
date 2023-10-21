@@ -100,7 +100,7 @@ class VoipController extends Controller
         
         return response()->json("ok");
     }
-    public function makeToCall($phone,$sip=651)
+    public function makeToCall($phone,$sip=0)
     {
         // $method = "GET";
         // $http_data = array(
