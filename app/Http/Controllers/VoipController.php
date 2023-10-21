@@ -21,9 +21,17 @@ class VoipController extends Controller
         // $this->voip24 = "http://dial.voip24h.vn/dial";
         // $this->voip24_key = "cb7320a02d1bf15651002cac0fe56523e13d7298";
         // $this->voip24_secret = "0e43c1bc6caeb10fc22a3ca43cc29b99";
-
-        $this->voip24 = "https://voice.diginext.com.vn/api";
-        $this->voip24_key = "d5fa5d0b5b0d793a4c9dc80c4c23e5a1347a177704c03b450bf431606a8c1ec0";
+        if(env('APP_ENV', 'staging')=='production'){
+            $this->voip24 = "https://voice.diginext.com.vn/api";
+            $this->voip24_key = "d5fa5d0b5b0d793a4c9dc80c4c23e5a1347a177704c03b450bf431606a8c1ec0";
+            $this->ma_dn = "DN0002";
+            $this->dauso = "842488881505";
+        }else{
+            $this->voip24 = "https://voice.diginext.com.vn/api";
+            $this->voip24_key = "d5fa5d0b5b0d793a4c9dc80c4c23e5a1347a177704c03b450bf431606a8c1ec0";
+            $this->ma_dn = "DN0002";
+            $this->dauso = "842488881505";
+        }
     }
     public function webhook(Request $request)
     {
@@ -111,9 +119,9 @@ class VoipController extends Controller
         ];
         $method = "POST";
         $params = array(
-            'ma_dn' => 'DN0002',
-            'dauso' => '842488881505',
-            'mayle' => $sip ? $sip : '651',
+            'ma_dn' => $this->ma_dn,
+            'dauso' => $this->dauso,
+            'mayle' => $sip ? $sip : '1001',
             'sokhachhang' =>$phone
         );
         $url = $url = sprintf('%s/click-to-call',$this->voip24);
