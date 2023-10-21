@@ -121,7 +121,7 @@ class VoipController extends Controller
         $params = array(
             'ma_dn' => $this->ma_dn,
             'dauso' => $this->dauso,
-            'mayle' => $sip ? $sip : '1001',
+            'mayle' => $sip ? $sip : '0',
             'sokhachhang' =>$phone
         );
         $url = $url = sprintf('%s/click-to-call',$this->voip24);
