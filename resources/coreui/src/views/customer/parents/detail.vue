@@ -103,11 +103,11 @@
                     <hr>
                     <div v-html="phone.description"></div>
                     <div>
-                      <select class="form-control" @change="phone.note = phone.select_note" v-model="phone.select_note">
+                      <!-- <select class="form-control" @change="phone.note = phone.select_note" v-model="phone.select_note">
                         <option value="">Sử dụng mẫu trả lời</option>
                         <option :value="item.title" v-for="(item, index) in template_note" :key="index">{{item.title}}</option>
                       </select>
-                      <br>
+                      <br> -->
                       <textarea class="form-control" v-model="phone.note" placeholder="Thêm ghi chú cuộc gọi"></textarea>
                       <div style="margin-top:5px;text-align:right" >
                         <button class="btn btn-success" @click="updateNotePhone"> <i class="fa fa-save"></i> Lưu</button>
