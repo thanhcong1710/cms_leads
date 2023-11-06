@@ -24,7 +24,7 @@ class VoipController extends Controller
         if(env('APP_ENV', 'staging')=='production'){
             $this->voip24 = "https://voice.diginext.com.vn/api";
             $this->voip24_key = "d5fa5d0b5b0d793a4c9dc80c4c23e5a1347a177704c03b450bf431606a8c1ec0";
-            $this->ma_dn = "test2dn00000";
+            $this->ma_dn = "dn00196";
             $this->dauso = "842488886505";
         }else{
             $this->voip24 = "https://voice.diginext.com.vn/api";
@@ -120,7 +120,7 @@ class VoipController extends Controller
         $method = "POST";
         $params = array(
             'ma_dn' => $this->ma_dn,
-            'dauso' => $this->dauso,
+            'dauso' => $this->getDauSoByShip($sip),
             'mayle' => $sip ? $sip : '0',
             'sokhachhang' =>$phone
         );
@@ -171,5 +171,36 @@ class VoipController extends Controller
                 'phone'=>'0967973295')
         ];
         $this->socketIo($arr['user_id'],$arr['event'],$arr['data']);
+    }
+    public static function getDauSoByShip($sip){
+        if ($sip >=1000 && $sip <1100) {
+            return "842488881100";
+        } elseif ($sip >=1100 && $sip <1200) {
+            return "842488881101";
+        } elseif ($sip >=1200 && $sip <1400) {
+            return "842488881102";
+        } elseif ($sip >=1400 && $sip <1500) {
+            return "842488881104";
+        } elseif ($sip >=1500 && $sip <1600) {
+            return "842488881105";
+        } elseif ($sip >=1600 && $sip <1700) {
+            return "842488881106";
+        } elseif ($sip >=1700 && $sip <1800) {
+            return "842488881107";
+        } elseif ($sip >=1800 && $sip <1900) {
+            return "842488881108";
+        } elseif ($sip >=1900 && $sip <2000) {
+            return "842488881109";
+        } elseif ($sip >=2000 && $sip <2100) {
+            return "842888881100";
+        } elseif ($sip >=2100 && $sip <2200) {
+            return "842888881101";
+        } elseif ($sip >=3100 && $sip <3200) {
+            return "842488881120";
+        } elseif ($sip >=3200 && $sip <3300) {
+            return "842488881121";
+        } else {
+            return "0";
+        }
     }
 }
