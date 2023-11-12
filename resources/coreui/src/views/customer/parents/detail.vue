@@ -98,17 +98,48 @@
                         <button class="btn btn-secondary" @click="sms.show=false"> <i class="fa fa-times"></i> Hủy</button>
                       </div>
                   </div>
-                  <div :class="phone.css_class" role="alert" v-if="phone.show">
+                  <div :class="phone.css_class" role="alert" v-if="phone.show || 1==1">
                     <h5 class="alert-heading"> <i class="fa fa-phone" style="margin-right:10px"></i> {{phone.title}}</h5>
                     <hr>
                     <div v-html="phone.description"></div>
                     <div>
-                      <!-- <select class="form-control" @change="phone.note = phone.select_note" v-model="phone.select_note">
-                        <option value="">Sử dụng mẫu trả lời</option>
-                        <option :value="item.title" v-for="(item, index) in template_note" :key="index">{{item.title}}</option>
+                      <label for="nf-email">Trạng thái cuộc gọi <span class="text-danger"> (*)</span></label>
+                      <select class="form-control" v-model="phone.select_note_status">
+                        <option value="">Chọn trạng thái</option>
+                        <option value="1">Blank</option>
+                        <option value="2">Thuê bao - Tắt máy - Sai số</option>
+                        <option value="3">Location</option>
+                        <option value="4">Máy bận - Không nghe máy</option>
+                        <option value="5">KH hẹn gọi lại sau</option>
+                        <option value="6">KH Từ chối nói chuyện</option>
+                        <option value="7">KH không phù hợp</option>
+                        <option value="8">KH tiềm năng</option>
                       </select>
-                      <br> -->
+                      <br>
+                      <div v-if="['6','7','8'].indexOf(phone.select_note_status) > -1">
+                        <label >Chi tiết trạng thái cuộc gọi <span class="text-danger"> (*)</span></label>
+                        <select class="form-control" v-model="phone.select_note_status_sub">
+                          <option value="">Chọn chi tiết trạng thái</option>
+                          <option value="1" v-if="phone.select_note_status==6">KH đã từng sử dụng dịch vụ</option>
+                          <option value="2" v-if="phone.select_note_status==6">KH không quan tâm</option>
+                          <option value="3" v-if="phone.select_note_status==6">KH thực sự không muốn nói chuyện</option>
+                          <option value="4" v-if="phone.select_note_status==7">Không có con</option>
+                          <option value="5" v-if="phone.select_note_status==7">Lý do khác</option>
+                          <option value="6" v-if="phone.select_note_status==8">KH đang cân nhắc</option>
+                          <option value="7" v-if="phone.select_note_status==8">KH hẹn thời gian khác</option>
+                          <option value="8" v-if="phone.select_note_status==8">KH ko muốn làm phiền</option>
+                          <option value="9" v-if="phone.select_note_status==8">Confirm 1</option>
+                        </select>
+                        <br>
+                      </div>
+                      <div v-if="['3','4', '7'].indexOf(phone.select_note_status) > -1">
+                        <label>Lịch chăm sóc tiếp <span class="text-danger"> (*)</span></label>
+                        <input class="form-control" type="datetime-local" :value="phone.next_care_date" id="phone_next_care_date">
+                        <br>
+                      </div>
+                      <label >Ghi chú cuộc gọi <span class="text-danger"> (*)</span></label>
                       <textarea class="form-control" v-model="phone.note" placeholder="Thêm ghi chú cuộc gọi"></textarea>
+                      <p v-if="phone.error_message" style="color:red; margin-top:8px" v-html="phone.error_message"></p>
                       <div style="margin-top:5px;text-align:right" >
                         <button class="btn btn-success" @click="updateNotePhone"> <i class="fa fa-save"></i> Lưu</button>
                         <!-- <button class="btn btn-secondary" @click="phone.show=false"> <i class="fa fa-times"></i> Đóng</button> -->
@@ -591,7 +622,11 @@ export default {
         show_input_note:false,
         care_id:'',
         note:'',
-        select_note:''
+        select_note:'',
+        select_note_status:'',
+        select_note_status_sub:'',
+        next_care_date:'',
+        error_message:''
       },
       sms:{
         content:'',
@@ -930,22 +965,26 @@ export default {
       }
     },
     updateNotePhone(){
-      // if(this.phone.note){
-      //   const data = {
-      //     care_id: this.phone.care_id,
-      //     note: this.phone.note,
-      //   };
-      //   this.loading.processing = true;
-      //     u.p(`/api/care/udpate_note`,data)
-      //     .then((response) => {
-      //       this.loading.processing = false;
-      //       this.phone.show = false;
-      //       this.loadCares(this.$route.params.id);
-      //     })
-      //     .catch((e) => {
-      //     });
-      // }
-      if(this.phone.note){
+      let mess = "";
+      let resp = true;
+      this.phone.error_message = "";
+      if (this.phone.select_note_status == "") {
+        mess += " - Trạng thái cuộc gọi không được để trống<br/>";
+        resp = false;
+      }
+      if (['5','6','7'].indexOf(this.phone.select_note_status) > -1 && this.phone.select_note_status_sub =='') {
+        mess += " - Chi tiết trạng thái cuộc gọi không được để trống<br/>";
+        resp = false;
+      }
+      if (['3','4','7'].indexOf(this.phone.select_note_status) > -1 && this.phone.select_note_status_sub!=8 && this.phone.next_care_date=='') {
+        mess += " - Lịch chăm sóc tiếp không được để trống<br/>";
+        resp = false;
+      }
+      if (this.phone.note == "") {
+        mess += " - Ghi chú cuộc gọi không được để trống<br/>";
+        resp = false;
+      }
+      if(resp){
         const data = {
           method_id:1,
           note:this.phone.note,
@@ -955,7 +994,7 @@ export default {
           care_date:"",
         };
         this.loading.processing = true;
-       u.p(`/api/care/add`,data)
+      u.p(`/api/care/add`,data)
         .then((response) => {
           this.loading.processing = false;
           this.phone.show = false;
@@ -963,6 +1002,8 @@ export default {
         })
         .catch((e) => {
         });
+      }else{
+        this.phone.error_message = mess
       }
     },
     showSendSms(phone){
