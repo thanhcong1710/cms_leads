@@ -100,7 +100,7 @@
                         <button class="btn btn-secondary" @click="sms.show=false"> <i class="fa fa-times"></i> Hủy</button>
                       </div>
                   </div>
-                  <div :class="phone.css_class" role="alert" v-if="phone.show || 1==1">
+                  <div :class="phone.css_class" role="alert" v-if="phone.show">
                     <h5 class="alert-heading"> <i class="fa fa-phone" style="margin-right:10px"></i> {{phone.title}}</h5>
                     <hr>
                     <div v-html="phone.description"></div>
