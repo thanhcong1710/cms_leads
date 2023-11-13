@@ -37,18 +37,20 @@
                 <p>Trạng thái</p>
                 <p> 
                   <select class="form-control" @change="showModalChangeStatus" v-model="tmp_status" :disabled="disabled_action" >
-                    <option value="1">KH mới</option>
-                    <option value="2">KH tiềm năng</option>
-                    <option value="3">KH tiềm năng cần follow up</option>
-                    <option value="4">KH bận gọi lại sau</option>
-                    <option value="5">KH không nghe máy</option>
-                    <option value="6">KH đồng ý đặt lịch checkin</option>
-                    <option value="7">KH đã đến checkin</option>
-                    <option value="8">KH đã mua gói phí</option>
-                    <option value="9">KH không có nhu cầu</option>
-                    <option value="10">KH không tiềm năng</option>
-                    <option value="11">KH đến hạn tái tục</option>
-                    <option value="12">Danh sách đen</option>
+                    <option value="0" v-if="tmp_status<70">0. KH mới</option>
+                    <option value="10" v-if="tmp_status<70">1. KH không liên lạc được</option>
+                    <option value="20" v-if="tmp_status<70">2. KH ở vùng CMS không có cơ sở</option>
+                    <option value="30" v-if="tmp_status<70">3. KH không nghe máy</option>
+                    <option value="40" v-if="tmp_status<70">4. KH hẹn gọi lại sau</option>
+                    <option value="50" v-if="tmp_status<70">5. KH không quan tâm</option>
+                    <option value="60" v-if="tmp_status<70">6. KH không tiềm năng</option>
+                    <option value="71">7.1. KH quan tâm, cần follow up date</option>
+                    <option value="72">7.2. KH tiềm năng nhưng không muốn làm phiền</option>
+                    <option value="73">7.3. KH đồng ý đặt lịch Checkin</option>
+                    <option value="81">8.1. KH đã đến checkin</option>
+                    <option value="82">8.2. KH đã mua gói phí</option>
+                    <option value="83">8.3. KH đến hạn tái tục</option>
+                    <option value="90">9. Danh sách đen</option>
                   </select>
                 </p>  
               </div>
@@ -98,17 +100,49 @@
                         <button class="btn btn-secondary" @click="sms.show=false"> <i class="fa fa-times"></i> Hủy</button>
                       </div>
                   </div>
-                  <div :class="phone.css_class" role="alert" v-if="phone.show">
+                  <div :class="phone.css_class" role="alert" v-if="phone.show || 1==1">
                     <h5 class="alert-heading"> <i class="fa fa-phone" style="margin-right:10px"></i> {{phone.title}}</h5>
                     <hr>
                     <div v-html="phone.description"></div>
                     <div>
-                      <!-- <select class="form-control" @change="phone.note = phone.select_note" v-model="phone.select_note">
-                        <option value="">Sử dụng mẫu trả lời</option>
-                        <option :value="item.title" v-for="(item, index) in template_note" :key="index">{{item.title}}</option>
+                      <label for="nf-email">Trạng thái cuộc gọi <span class="text-danger"> (*)</span></label>
+                      <select class="form-control" v-model="phone.select_note_status">
+                        <option value="">Chọn trạng thái</option>
+                        <option value="0">Blank</option>
+                        <option value="1">Thuê bao - Tắt máy - Sai số</option>
+                        <option value="2">Location</option>
+                        <option value="3">Máy bận - Không nghe máy</option>
+                        <option value="4">KH hẹn gọi lại sau</option>
+                        <option value="5">KH Từ chối nói chuyện</option>
+                        <option value="6">KH không phù hợp</option>
+                        <option value="7">KH tiềm năng</option>
+                        <option value="9">Blacklist</option>
                       </select>
-                      <br> -->
+                      <br>
+                      <div v-if="['5','6','7'].indexOf(phone.select_note_status) > -1">
+                        <label >Chi tiết trạng thái cuộc gọi <span class="text-danger"> (*)</span></label>
+                        <select class="form-control" v-model="phone.select_note_status_sub">
+                          <option value="">Chọn chi tiết trạng thái</option>
+                          <option value="51" v-if="phone.select_note_status==5">KH đã từng sử dụng dịch vụ</option>
+                          <option value="52" v-if="phone.select_note_status==5">KH không quan tâm</option>
+                          <option value="53" v-if="phone.select_note_status==5">KH thực sự không muốn nói chuyện</option>
+                          <option value="61" v-if="phone.select_note_status==6">Không có con</option>
+                          <option value="62" v-if="phone.select_note_status==6">Lý do khác</option>
+                          <option value="71" v-if="phone.select_note_status==7">KH đang cân nhắc</option>
+                          <option value="72" v-if="phone.select_note_status==7">KH hẹn thời gian khác</option>
+                          <option value="73" v-if="phone.select_note_status==7">KH ko muốn làm phiền</option>
+                          <option value="74" v-if="phone.select_note_status==7">Confirm 1</option>
+                        </select>
+                        <br>
+                      </div>
+                      <div v-if="['3','4', '7'].indexOf(phone.select_note_status) > -1">
+                        <label>Lịch chăm sóc tiếp <span class="text-danger"> (*)</span></label>
+                        <input class="form-control" type="datetime-local" :value="phone.next_care_date" id="phone_next_care_date">
+                        <br>
+                      </div>
+                      <label >Ghi chú cuộc gọi <span class="text-danger"> (*)</span></label>
                       <textarea class="form-control" v-model="phone.note" placeholder="Thêm ghi chú cuộc gọi"></textarea>
+                      <p v-if="phone.error_message" style="color:red; margin-top:8px" v-html="phone.error_message"></p>
                       <div style="margin-top:5px;text-align:right" >
                         <button class="btn btn-success" @click="updateNotePhone"> <i class="fa fa-save"></i> Lưu</button>
                         <!-- <button class="btn btn-secondary" @click="phone.show=false"> <i class="fa fa-times"></i> Đóng</button> -->
@@ -139,7 +173,7 @@
                             <th width="10%">Phụ trách</th>
                             <th width="10%">Trung tâm</th>
                             <th width="10%">Phương thức</th>
-                            <th width="10%">Trạng thái</th>
+                            <th width="10%">Trạng thái cuộc gọi</th>
                             <th width="25%">Chi tiết</th>
                           </tr>
                         </thead>
@@ -149,7 +183,7 @@
                             <td width="10%">{{ item.creator_name }}</td>
                             <td width="10%">{{ item.branch_name }}</td>
                             <td width="10%">{{ item.method_name}}{{item.type_call?" - "+item.type_call:''}}</td>
-                            <td width="10%">{{ genStateCall(item.data_state) }} <span v-if="item.status==0"> - Không kích hoạt</span></td>
+                            <td width="10%">{{ item.call_status_label }} </td>
                             <td width="25%">
                               <p v-if="item.link_record">
                                 <audio controls style="height: 40px; width: 256px; border: 1px solid #ccc;">
@@ -591,7 +625,11 @@ export default {
         show_input_note:false,
         care_id:'',
         note:'',
-        select_note:''
+        select_note:'',
+        select_note_status:'',
+        select_note_status_sub:'',
+        next_care_date:'',
+        error_message:''
       },
       sms:{
         content:'',
@@ -930,22 +968,27 @@ export default {
       }
     },
     updateNotePhone(){
-      // if(this.phone.note){
-      //   const data = {
-      //     care_id: this.phone.care_id,
-      //     note: this.phone.note,
-      //   };
-      //   this.loading.processing = true;
-      //     u.p(`/api/care/udpate_note`,data)
-      //     .then((response) => {
-      //       this.loading.processing = false;
-      //       this.phone.show = false;
-      //       this.loadCares(this.$route.params.id);
-      //     })
-      //     .catch((e) => {
-      //     });
-      // }
-      if(this.phone.note){
+      let mess = "";
+      let resp = true;
+      let phone_next_care_date = document.getElementById('phone_next_care_date').value
+      this.phone.error_message = "";
+      if (this.phone.select_note_status == "") {
+        mess += " - Trạng thái cuộc gọi không được để trống<br/>";
+        resp = false;
+      }
+      if (['5','6','7'].indexOf(this.phone.select_note_status) > -1 && this.phone.select_note_status_sub =='') {
+        mess += " - Chi tiết trạng thái cuộc gọi không được để trống<br/>";
+        resp = false;
+      }
+      if (['3','4','7'].indexOf(this.phone.select_note_status) > -1 && this.phone.select_note_status_sub!=73 && phone_next_care_date=='') {
+        mess += " - Lịch chăm sóc tiếp không được để trống<br/>";
+        resp = false;
+      }
+      if (this.phone.note == "") {
+        mess += " - Ghi chú cuộc gọi không được để trống<br/>";
+        resp = false;
+      }
+      if(resp){
         const data = {
           method_id:1,
           note:this.phone.note,
@@ -953,9 +996,12 @@ export default {
           attached_file:"",
           file_name:"",
           care_date:"",
+          next_care_date:phone_next_care_date,
+          call_status_sub:this.phone.select_note_status_sub,
+          call_status:this.phone.select_note_status
         };
         this.loading.processing = true;
-       u.p(`/api/care/add`,data)
+      u.p(`/api/care/add`,data)
         .then((response) => {
           this.loading.processing = false;
           this.phone.show = false;
@@ -963,6 +1009,8 @@ export default {
         })
         .catch((e) => {
         });
+      }else{
+        this.phone.error_message = mess
       }
     },
     showSendSms(phone){

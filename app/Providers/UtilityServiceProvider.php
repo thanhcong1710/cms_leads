@@ -296,43 +296,115 @@ class UtilityServiceProvider extends ServiceProvider
 		// $str = preg_replace("/( )/", '-', $str);
 		return $str;
     }
+    public static function genStatusByCallStatus($call_status, $call_status_sub){
+        if($call_status == 0){
+            return 0;
+        } elseif($call_status == 1){
+            return 10;
+        } elseif($call_status == 2){
+            return 20;
+        } elseif($call_status == 3){
+            return 30;
+        } elseif($call_status == 4){
+            return 40;
+        } elseif($call_status == 5){
+            return 50;
+        }elseif($call_status == 6){
+            return 60;
+        }  elseif($call_status == 7){
+            if($call_status_sub == 71 || $call_status_sub == 72){
+                return 71;
+            }elseif($call_status_sub == 73){
+                return 72;
+            }elseif($call_status_sub == 74){
+                return 73;
+            }
+        } elseif($call_status == 9){
+            return 90;
+        } 
+    }
+    public static function getTitleCallStatus($call_status, $call_status_sub){
+        if($call_status === 0){
+            return 'Blank';
+        } elseif($call_status == 1){
+            return 'Thuê bao - Tắt máy - Sai số';
+        } elseif($call_status == 2){
+            return 'Location';
+        } elseif($call_status == 3){
+            return 'Máy bận - Không nghe máy';
+        } elseif($call_status == 4){
+            return 'KH hẹn gọi lại sau';
+        } elseif($call_status == 5){
+            if($call_status_sub == 51){
+                return 'KH đã từng sử dụng dịch vụ';
+            }elseif($call_status_sub == 52){
+                return 'KH không quan tâm';
+            }elseif($call_status_sub == 53){
+                return 'KH thực sự không muốn nói chuyện';
+            }
+        }elseif($call_status == 6){
+            if($call_status_sub == 61){
+                return 'Không có con';
+            }elseif($call_status_sub == 62){
+                return 'Lý do khác';
+            }
+        } elseif($call_status == 7){
+            if($call_status_sub == 71){
+                return 'KH đang cân nhắc';
+            }elseif($call_status_sub == 72){
+                return 'KH hẹn thời gian khác';
+            }elseif($call_status_sub == 73){
+                return 'KH ko muốn làm phiền';
+            }elseif($call_status_sub == 74){
+                return 'Confirm 1';
+            }
+        } elseif($call_status == 9){
+            return 'Blacklist';
+        }  
+    }
     public static function getStatus($status){
         $tmp ="";
         switch ($status) {
-            case 1:
+            case 0:
                 $tmp = 'KH mới';
                 break;
-            case 2:
-                $tmp = 'KH tiềm năng';
+            case 10:
+                $tmp = 'KH không liên lạc được';
                 break;
-            case 3:
-                $tmp = 'KH tiềm năng cần follow up';
+            case 20:
+                $tmp = 'KH ở vùng CMS không có cơ sở';
                 break;
-            case 4:
-                $tmp = 'KH bận gọi lại sau';
-                break;
-            case 5:
+            case 30:
                 $tmp = 'KH không nghe máy';
                 break;
-            case 6:
-                $tmp = 'KH đồng ý đặt lịch checkin';
+            case 40:
+                $tmp = 'KH hẹn gọi lại sau';
                 break;
-            case 7:
-                $tmp = 'KH đã đến checkin';
+            case 50:
+                $tmp = 'KH không quan tâm';
                 break;
-            case 8:
-                $tmp = 'KH đã mua gói phí';
-                break;
-            case 9:
-                $tmp = 'KH không có nhu cầu';
-                break;
-            case 10:
+            case 60:
                 $tmp = 'KH không tiềm năng';
                 break;
-            case 11:
+            case 71:
+                $tmp = 'KH quan tâm, cần follow up date';
+                break;
+            case 72:
+                $tmp = 'KH tiềm năng nhưng không muốn làm phiền';
+                break;
+            case 73:
+                $tmp = 'KH đồng ý đặt lịch Checkin';
+                break;
+            case 81:
                 $tmp = 'KH đến hạn tái tục';
                 break;
-            case 12:
+            case 82:
+                $tmp = 'KH đã mua gói phí';
+                break;
+            case 83:
+                $tmp = 'KH đến hạn tái tục';
+                break;
+            case 90:
                 $tmp = 'Danh sách đen';
                 break;
             default:

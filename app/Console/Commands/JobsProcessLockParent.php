@@ -44,6 +44,7 @@ class JobsProcessLockParent extends Command
     {
         $import = new ParentsController();
         $import->processParentLock();
+        $import->processGetStatus();
         
         //delete file attach cms_customer_care
         $care = new ParentCareController();

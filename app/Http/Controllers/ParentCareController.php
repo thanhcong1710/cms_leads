@@ -47,12 +47,36 @@ class ParentCareController extends Controller
             'creator_id' => Auth::user()->id,
             'branch_id' => Auth::user()->branch_id,
             'attached_file'=>$attachedFile ? 'static/upload/'.$fileAttached : '',
+            'next_care_date' =>  data_get($dataRequest, 'next_care_date' )?  date('Y-m-d H:i:s',strtotime(data_get($dataRequest, 'next_care_date' ))) : null,
+            'call_status' => data_get($dataRequest, 'call_status' ),
+            'call_status_sub' => data_get($dataRequest, 'call_status_sub' ),
         ), 'cms_customer_care');
         $data = (object)[
             'status' => 1 ,
             'message' => "Thành công",
             'data'=>$id
         ];
+        if(data_get($dataRequest, 'call_status')){
+            $parent_info = u::first("SELECT * FROM cms_parents WHERE id=$request->parent_id");
+            $parent_status = u::genStatusByCallStatus(data_get($dataRequest, 'call_status'), data_get($dataRequest, 'call_status_sub' ));
+            if(($parent_info->status < 70 && $parent_info->status!=$parent_status) || $parent_status > $parent_info->status){
+                if( data_get($dataRequest, 'next_care_date' )){
+                    $data=u::updateSimpleRow(array(
+                        'updated_at' => date('Y-m-d H:i:s'),
+                        'updator_id' => $request->user()->id,
+                        'next_care_date'=>date('Y-m-d H:i:s',strtotime($request->next_care_date)),
+                        'status' => $parent_status
+                    ), array('id' => $request->parent_id), 'cms_parents');
+                }else{
+                    $data=u::updateSimpleRow(array(
+                        'updated_at' => date('Y-m-d H:i:s'),
+                        'updator_id' => $request->user()->id,
+                        'status' => $parent_status
+                    ), array('id' => $request->parent_id), 'cms_parents');
+                }
+            }
+        }
+       
         ParentsController::processParentLockById($request->parent_id);
         return response()->json($data);
     }
@@ -71,6 +95,9 @@ class ParentCareController extends Controller
                 (SELECT IF(user_id = ".$request->user()->id." OR $is_leader=1 , link_record , '') FROM voip24h_data WHERE id = c.data_id) AS link_record,
                 (SELECT name FROM cms_branches WHERE id=c.branch_id) AS branch_name
             FROM cms_customer_care AS c WHERE parent_id=$parent_id $cond ORDER BY c.care_date DESC");
+        foreach($data AS $k=> $row){
+            $data[$k]->call_status_label = u::getTitleCallStatus($row->call_status,$row->call_status_sub);
+        }
         return response()->json($data);
     }
     public function getInfoCall($care_id){
