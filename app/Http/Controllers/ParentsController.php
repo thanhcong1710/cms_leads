@@ -494,19 +494,17 @@ class ParentsController extends Controller
         u::query("UPDATE cms_parents SET is_lock = 1");
         u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id");
         u::query("UPDATE cms_parents AS p SET p.care_date=(SELECT  IF(care_date IS NULL, p.care_date,care_date) FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1)");
-        u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1) WHERE  p.status NOT IN(12,8,10)");
+        u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1) WHERE  p.status NOT IN( 90, 81, 82, 83, 73)");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE last_care_date IS NULL 
                 AND last_assign_date IS NOT NULL 
-                AND is_lock=1 AND status NOT IN(12,8)
-                -- AND tmp_branch_id NOT IN (5,9)
+                AND is_lock=1 AND status NOT IN( 90, 81, 82, 83, 73)
                 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE
                 last_care_date IS NOT NULL 
                 AND last_assign_date IS NOT NULL 
-                -- AND tmp_branch_id NOT IN (5,9)
-                AND is_lock=1 AND status NOT IN(12,8)
+                AND is_lock=1 AND status NOT IN( 90, 81, 82, 83, 73)
                 AND DATEDIFF( CURRENT_DATE, last_care_date )> 60
                 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
         return "ok";
@@ -518,19 +516,17 @@ class ParentsController extends Controller
                 p.care_date=(SELECT IF(care_date IS NULL, p.care_date,care_date) FROM cms_customer_care WHERE parent_id=p.id AND `status`=1 ORDER BY id DESC LIMIT 1)
             WHERE p.id=$parent_id ");
         u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id,p.is_lock = 1
-            WHERE p.id=$parent_id AND p.status NOT IN(12,8,10)");
+            WHERE p.id=$parent_id AND p.status NOT IN( 90, 81, 82, 83, 73)");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE last_care_date IS NULL  AND id=$parent_id
                 AND last_assign_date IS NOT NULL 
-                AND is_lock=1 AND status NOT IN(12,8)
-                -- AND tmp_branch_id NOT IN (5,9)
+                AND is_lock=1 AND status NOT IN( 90, 81, 82, 83, 73)
                 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE
                 last_care_date IS NOT NULL  AND id=$parent_id
                 AND last_assign_date IS NOT NULL 
-                -- AND tmp_branch_id NOT IN (5,9)
-                AND is_lock=1 AND status NOT IN(12,8)
+                AND is_lock=1 AND status NOT IN( 90, 81, 82, 83, 73)
                 AND DATEDIFF( CURRENT_DATE, last_care_date )> 60
                 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
         return true;
@@ -548,5 +544,62 @@ class ParentsController extends Controller
             LogParents::logUpdateInfo($parent_info,$data_update,Auth::user()->id);
         }
         return "ok";
+    }
+
+    public static function processGetStatus(){
+        u::query("DELETE FROM tmp_cms_parents");
+        $list_student =  u::queryCRM("SELECT DISTINCT
+                gud_mobile1 ,gud_mobile2,
+                checked,
+                ( SELECT count( id ) FROM contracts WHERE student_id = s.id AND type > 0) AS contract_total,
+                ( SELECT count( id ) FROM contracts WHERE student_id = s.id AND type > 0 AND status!=7) AS contract_active
+            FROM
+                students AS s 
+            WHERE
+                s.checked = 1 
+                OR ( SELECT count( id ) FROM contracts WHERE student_id = s.id AND type > 0 )>0"); 
+        self::addItemsTmpCmsParents($list_student);
+        
+        u::query(" UPDATE cms_parents AS p
+            LEFT JOIN tmp_cms_parents AS t ON t.gud_mobile2 = p.mobile_1 AND t.gud_mobile2!='' AND t.gud_mobile2 IS NOT NULL
+        SET p.`status` = IF(
+            t.contract_active > 0, 82,
+                IF(t.contract_total>0, 83,
+                    IF(t.checked>0,81, p.`status`)
+                )
+         )
+        WHERE t.id IS NOT NULL AND p.status!=90 ");
+
+        u::query(" UPDATE cms_parents AS p
+            LEFT JOIN tmp_cms_parents AS t ON t.gud_mobile1 = p.mobile_1 AND t.gud_mobile1!='' AND t.gud_mobile1 IS NOT NULL
+        SET p.`status` = IF(
+            t.contract_active > 0, 82,
+                IF(t.contract_total>0, 83,
+                    IF(t.checked>0,81, p.`status`)
+                )
+        )
+        WHERE t.id IS NOT NULL AND p.status!=90 ");
+    }
+
+    public static function addItemsTmpCmsParents($list) {
+        if ($list) {
+            $updated_at = date('Y-m-d H:i:s');
+            $query = "INSERT INTO tmp_cms_parents (gud_mobile1, gud_mobile2, checked, contract_total, contract_active, updated_at) VALUES ";
+            if (count($list) > 5000) {
+                for($i = 0; $i < 5000; $i++) {
+                    $item = $list[$i];
+                    $query.= "('$item->gud_mobile1', '$item->gud_mobile2', '$item->checked', '$item->contract_total', '$item->contract_active', '$updated_at' ),";
+                }
+                $query = substr($query, 0, -1);
+                u::query($query);
+                self::addItemsTmpCmsParents(array_slice($list, 5000));
+            } else {
+                foreach($list as $item) {
+                    $query.= "('$item->gud_mobile1', '$item->gud_mobile2', '$item->checked', '$item->contract_total', '$item->contract_active', '$updated_at' ),";
+                }
+                $query = substr($query, 0, -1);
+                u::query($query);
+            }
+        }
     }
 }
