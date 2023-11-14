@@ -137,7 +137,7 @@
                       </div>
                       <div v-if="['3','4', '7'].indexOf(phone.select_note_status) > -1">
                         <label>Lịch chăm sóc tiếp <span class="text-danger"> (*)</span></label>
-                        <input class="form-control" type="datetime-local" :value="phone.next_care_date" id="phone_next_care_date">
+                        <input class="form-control" type="datetime-local" id="phone_next_care_date">
                         <br>
                       </div>
                       <label >Ghi chú cuộc gọi <span class="text-danger"> (*)</span></label>
@@ -934,6 +934,10 @@ export default {
         this.phone.title = "Đang thực hiện cuộc gọi đi đến SĐT - "+phone+" ..."
         this.phone.care_id = ''
         this.phone.note=''
+        this.phone.select_note_status='',
+        this.phone.select_note_status_sub='',
+        this.phone.next_care_date='',
+        this.phone.error_message=''
       })
       .catch((e) => {
       });
@@ -970,7 +974,7 @@ export default {
     updateNotePhone(){
       let mess = "";
       let resp = true;
-      let phone_next_care_date = document.getElementById('phone_next_care_date').value
+      let phone_next_care_date = ['3','4','7'].indexOf(this.phone.select_note_status) > -1 ?document.getElementById('phone_next_care_date').value : ''
       this.phone.error_message = "";
       if (this.phone.select_note_status == "") {
         mess += " - Trạng thái cuộc gọi không được để trống<br/>";
