@@ -213,4 +213,42 @@ class SystemInfoController extends Controller
         ), array('id'=>$target_id),'cms_report_target');
         return response()->json($id);
     }
+
+    public function getListExtPhone(Request $request)
+    {
+        $pagination = (object)$request->pagination;
+        $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
+        $limit = isset($pagination->limit) ? (int) $pagination->limit : 20;
+        $offset = $page == 1 ? 0 : $limit * ($page-1);
+        $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
+        $cond = " 1 ";
+        $total = u::first("SELECT count(id) AS total FROM config_ext_phone AS s WHERE $cond ");
+        $list = u::query("SELECT s.*
+            FROM config_ext_phone AS s WHERE $cond ORDER BY s.id DESC $limitation");
+        $data = u::makingPagination($list, $total->total, $page, $limit);
+        return response()->json($data);
+    }
+    public function addExtPhone(Request $request)
+    {
+        $id = u::insertSimpleRow(array(
+            'ext_start'=>$request->ext_start,
+            'ext_end' => $request->ext_end,
+            'ext_phone' => $request->ext_phone
+        ), 'config_ext_phone');
+        return response()->json($id);
+    }
+    public function infoExtPhone(Request $request,$ext_phone_id)
+    {
+        $data = u::first("SELECT * FROM config_ext_phone WHERE id=$ext_phone_id");
+        return response()->json($data);
+    }
+    public function updateExtPhone(Request $request,$ext_phone_id)
+    {
+        $id = u::updateSimpleRow(array(
+            'ext_start'=>$request->ext_start,
+            'ext_end' => $request->ext_end,
+            'ext_phone' => $request->ext_phone
+        ), array('id'=>$ext_phone_id),'config_ext_phone');
+        return response()->json($id);
+    }
 }

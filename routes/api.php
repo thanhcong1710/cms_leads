@@ -147,6 +147,11 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('/camera-ai/push-all-data', 'CameraAIController@pushAllData');
 
         Route::post('/user/update-sip', 'UsersController@updateSipId');
+
+        Route::post('/ext_phone/list', 'SystemInfoController@getListExtPhone');
+        Route::post('/ext_phone/add', 'SystemInfoController@addExtPhone');
+        Route::get('/ext_phone/show/{ext_phone_id}', 'SystemInfoController@infoExtPhone');
+        Route::post('/ext_phone/update/{ext_phone_id}', 'SystemInfoController@updateExtPhone');
     });
 });
 Route::post('/camera/ipn', 'CameraAIController@ipn');
