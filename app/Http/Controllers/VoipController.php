@@ -177,7 +177,7 @@ class VoipController extends Controller
             return "842488881100";
         } elseif ($sip >=1100 && $sip <1200) {
             // return "842488881101";
-            return "842499991110";
+            return "842488881110";
         } elseif ($sip >=1200 && $sip <1400) {
 
             // return "842488881102";
@@ -190,11 +190,11 @@ class VoipController extends Controller
             return "842488881106";
         } elseif ($sip >=1700 && $sip <1800) {
             // return "842488881107";
-            return "842499991110";
+            return "842488881110";
         } elseif ($sip >=1800 && $sip <1900) {
             // return "842488881108";
             // return "842488881109";
-            return "842499991110";
+            return "842488881110";
         } elseif ($sip >=1900 && $sip <2000) {
             return "842488881109";
         } elseif ($sip >=2000 && $sip <2100) {
