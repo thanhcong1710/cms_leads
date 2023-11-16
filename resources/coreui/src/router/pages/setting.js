@@ -5,6 +5,9 @@ const SourceDetailEdit = () => import('../../views/setting/source_detail/edit')
 const TargetList = () => import('../../views/setting/target/list')
 const TargetAdd = () => import('../../views/setting/target/add')
 const TargetEdit = () => import('../../views/setting/target/edit')
+const ExtPhoneList = () => import('../../views/setting/ext_phone/list')
+const ExtPhoneAdd = () => import('../../views/setting/ext_phone/add')
+const ExtPhoneEdit = () => import('../../views/setting/ext_phone/edit')
 
 export default {
   router: {
@@ -45,7 +48,22 @@ export default {
         path: '/setting/target/:id/edit',
         name: 'Cập Nhật Mục Tiêu Tuần',
         component: TargetEdit
-      }
+      },
+      {
+        path: '/setting/ext_phone',
+        name: 'Danh Sách Dải Đầu Số',
+        component: ExtPhoneList
+      },
+      {
+        path: '/setting/ext_phone/add',
+        name: 'Thêm Mới Dải Đầu Số',
+        component: ExtPhoneAdd
+      },
+      {
+        path: '/setting/ext_phone/:id/edit',
+        name: 'Cập Nhật Dải Đầu Số',
+        component: ExtPhoneEdit
+      },
     ]
   }
 }
