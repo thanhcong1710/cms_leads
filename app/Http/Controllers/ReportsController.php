@@ -98,109 +98,6 @@ class ReportsController extends Controller
         $data->label_report=$tmp_report_week->label;
         return response()->json($data);
     }
-    public function report03(Request $request)
-    {
-        // call, talk_time
-        u::query("UPDATE voip24h_data AS v
-                LEFT JOIN cms_parents AS p ON p.mobile_1 = v.phone 
-                LEFT JOIN users AS u ON u.sip_id = v.sip_id 
-                SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
-            WHERE v.user_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
-        u::query("UPDATE voip24h_data AS v
-                LEFT JOIN cms_parents AS p ON p.mobile_2 = v.phone 
-                LEFT JOIN users AS u ON u.sip_id = v.sip_id 
-                SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
-            WHERE v.user_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
-        u::query("UPDATE voip24h_data AS v
-            LEFT JOIN cms_customer_care AS c ON c.data_id = v.id 
-            SET v.STATUS = c.STATUS WHERe v.status!=c.status");
-        $keyword = isset($request->keyword) ? $request->keyword : '';
-        
-        $pagination = (object)$request->pagination;
-        $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
-        $limit = isset($pagination->limit) ? (int) $pagination->limit : 20;
-        $offset = $page == 1 ? 0 : $limit * ($page-1);
-        $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
-        $cond = "1";
-        $cond1 = "1";
-        if($keyword!==''){
-            $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%')";
-        }
-        $cond2 ="";
-        if(in_array(1,$request->type_status)){
-            $cond2 .= $cond2 ? " OR disposition = 'ANSWERED'" : "disposition = 'ANSWERED'";
-        }
-        if(in_array(2,$request->type_status)){
-            $cond2 .= $cond2 ? " OR disposition = 'NO ANSWER'" : "disposition = 'NO ANSWER'";
-        }
-        if(in_array(3,$request->type_status)){
-            $cond2 .= $cond2 ? " OR disposition = 'BUSY'" : "disposition = 'BUSY'";
-        }
-        if($cond2){
-            $cond1.=" AND ( $cond2 ) ";
-        }
-        if (!empty($request->branch_id)) {
-            $cond .= " AND u.branch_id IN (".implode(",",$request->branch_id).")";
-        }
-        if($request->from_date){
-            $request->type_date = 0;
-            $cond1 .= " AND start_time >= '".date('Y-m-d H:i:s',strtotime($request->from_date))."'";
-        }
-        if($request->to_date){
-            $request->type_date = 0;
-            $cond1 .= " AND start_time <= '".date('Y-m-d H:i:s',strtotime($request->to_date))."'";
-        }
-        if(date("l")=='Monday'){
-            $tmp_last_monday = date('Y-m-d 00:00:00');
-        }else{
-            $tmp_last_monday = date('Y-m-d 00:00:00',strtotime("last Monday"));
-        }
-        if($request->type_date == 1){
-            $cond1 .= " AND start_time >= '".date('Y-m-d 00:00:00')."'";
-        }elseif($request->type_date == 2){
-            $cond1 .= " AND start_time < '".date('Y-m-d 00:00:00')."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime ( '-1 day' , time() ) )."'";
-        }elseif($request->type_date == 3){
-            $cond1 .= " AND start_time >= '".$tmp_last_monday."'";
-        }elseif($request->type_date == 4){
-            $cond1 .= " AND start_time < '".$tmp_last_monday."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime($tmp_last_monday)-24*7*3600)."'";
-        }elseif($request->type_date == 5){
-            $cond1 .= " AND start_time >= '".date('Y-m-01 00:00:00')."'";
-        }elseif($request->type_date == 6){
-            $cond1 .= " AND start_time < '".date('Y-m-01 00:00:00')."' AND start_time >= '".date('Y-m-01 00:00:00',strtotime('-1 month'))."'";
-        }
-        
-        // if($request->user()->id==21){
-        //     $cond .= " AND (u.id IN (".$request->user_info->users_manager.") AND u.id NOT IN (".$request->user_info->tmp_users_manager.")) ";
-        // }else
-        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
-            $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
-        }
-        
-        $total = u::first("SELECT count(u.id) AS total FROM users AS u 
-            WHERE u.status=1 AND $cond ");
-        $list = u::query("SELECT CONCAT(u.sip_id,' - ',u.name,' - ',u.hrm_id) AS sip_name,
-                (SELECT name FROM cms_branches WHERE id=u.branch_id) AS branch_name,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND status=1 AND $cond1) AS total_inbound,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND status=1 AND $cond1) AS total_outbound,
-                -- (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='inbound' AND status=1 AND $cond1) AS total_duration_inbound,
-                -- (SELECT SUM(duration) FROM voip24h_data WHERE user_id=u.id AND `type`='outbound' AND status=1 AND $cond1) AS total_duration_outbound,
-                -- 0 As duration_inbound,
-                -- 0 AS duration_outbound
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1  AND  disposition = 'ANSWERED' AND $cond1) AS total_call_success,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1 AND disposition != 'ANSWERED' AND $cond1) AS total_call_fail
-            FROM users AS u 
-            WHERE u.status=1 AND $cond AND sip_id IS NOT NULL
-            ORDER BY u.id DESC $limitation");
-        // foreach($list AS $k=>$row){
-        //     $list[$k]->duration_inbound = gmdate("H:i:s", ($row->total_inbound ? $row->total_duration_inbound / $row->total_inbound :0));
-        //     $list[$k]->duration_outbound = gmdate("H:i:s", ($row->total_outbound ? $row->total_duration_outbound/ $row->total_outbound :0));
-        //     $list[$k]->total_duration_inbound = gmdate("H:i:s", $row->total_duration_inbound);
-        //     $list[$k]->total_duration_outbound = gmdate("H:i:s", $row->total_duration_outbound);
-        // }
-            
-        $data = u::makingPagination($list, $total->total, $page, $limit);
-        return response()->json($data);
-    }
     public function report04(Request $request)
     {
         // call, talk_time
@@ -299,6 +196,7 @@ class ReportsController extends Controller
         $data = u::makingPagination($list, $total->total, $page, $limit);
         return response()->json($data);
     }
+
     public function report05(Request $request)
     {
         $keyword = isset($request->keyword) ? $request->keyword : '';
@@ -332,6 +230,66 @@ class ReportsController extends Controller
             WHERE $cond ORDER BY o.id DESC $limitation");
 
         $data = u::makingPagination($list, $total->total, $page, $limit);
+        return response()->json($data);
+    }
+
+    public function report03(Request $request)
+    {
+        $cond = "";
+        $cond1 = "";
+       
+        if (!empty($request->branch_id)) {
+            $cond .= " AND u.branch_id = ".$request->branch_id;
+            $cond1 .= " AND u.branch_id = ".$request->branch_id;
+        }
+        if($request->start_date){
+            $cond .= " AND p.last_assign_date >= '".date('Y-m-d 00:00:00',strtotime($request->start_date))."'";
+            $cond1 .= " AND c.created_at >= '".date('Y-m-d 00:00:00',strtotime($request->start_date))."'";
+        }
+        if($request->end_date){
+            $cond .= " AND p.last_assign_date <= '".date('Y-m-d 00:00:00',strtotime($request->end_date))."'";
+            $cond1 .= " AND c.created_at <= '".date('Y-m-d 00:00:00',strtotime($request->end_date))."'";
+        }
+        if (!empty($request->owner_id)) {
+            $cond .= " AND  u.id IN (".implode(",",$request->owner_id).")" ;
+            $cond1 .= " AND  u.id IN (".implode(",",$request->owner_id).")" ;
+        }
+        if (!empty($request->source_id)) {
+            $cond .= " AND p.source_id IN (".implode(",",$request->source_id).")";
+            $cond1 .= " AND p.source_id IN (".implode(",",$request->source_id).")";
+        }
+        if (!empty($request->source_detail_id)) {
+            $cond .= " AND p.source_detail_id IN (".implode(",",$request->source_detail_id).")";
+            $cond1 .= " AND p.source_detail_id IN (".implode(",",$request->source_detail_id).")";
+        }
+        
+       
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
+            $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
+            $cond1 .= " AND u.id IN (".$request->user_info->users_manager.")";
+        }
+        $data = u::first("SELECT (SELECT COUNT(p.id) FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id WHERE p.status=0 AND (p.last_care_date ='' OR  p.last_care_date IS NULL) $cond ) AS total_new,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status IN (4,5,6,7) $cond) AS total_connect,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status IN (1,2,3) $cond) AS total_not_connect,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 0 $cond) AS detail_0,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 1 $cond) AS detail_1,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 2 $cond) AS detail_2,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 3 $cond) AS detail_3,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 4 $cond) AS detail_4,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 5 $cond) AS detail_5,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 6 $cond) AS detail_6,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 7 $cond) AS detail_7,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 5 AND c.call_status_sub = 51 $cond) AS detail_51,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 5 AND c.call_status_sub = 52 $cond) AS detail_52,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 5 AND c.call_status_sub = 53 $cond) AS detail_53,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 6 AND c.call_status_sub = 61 $cond) AS detail_61,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 6 AND c.call_status_sub = 62 $cond) AS detail_62,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 7 AND c.call_status_sub = 71 $cond) AS detail_71,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 7 AND c.call_status_sub = 72 $cond) AS detail_72,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 7 AND c.call_status_sub = 73 $cond) AS detail_73,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 7 AND c.call_status_sub = 74 $cond) AS detail_74
+                ");
+            
         return response()->json($data);
     }
 }

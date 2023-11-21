@@ -67,7 +67,7 @@ class ParentsController extends Controller
             $cond .= " AND p.next_care_date > '$start_date 00:00:00'";
         }
         //type_search=1
-        $cond_1 = " AND p.care_date IS NULL AND p.status != 8 ";
+        $cond_1 = " AND p.care_date IS NULL AND p.status <80 ";
         //type_search=2
         $cond_2 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') = '".date('Y-m-d')."'";
         $cond_3 = " AND next_care_date < '".date('Y-m-d')."' 
@@ -319,7 +319,7 @@ class ParentsController extends Controller
                         $thoi_gian_con = 16 - floor((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
                         $text.="<br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }
-                    if(in_array($duplicate_info->status,[12,8])){
+                    if($duplicate_info->status < 80 && $duplicate_info->status!=73){
                         $text="<br> Khách hàng thuộc các trường hợp không được phép ghi đè - ".u::getStatus($duplicate_info->status);
                     }
                     $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name .".$text;

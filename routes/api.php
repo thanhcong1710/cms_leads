@@ -121,6 +121,7 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::post('/imports/upload', 'ImportsController@upload');
         Route::post('/imports/assign', 'ImportsController@assign');
         Route::get('/user/get-users-manager', 'UsersController@getUserAssgin');
+        Route::get('/user/get-users-by-branch/{branch_id}', 'UsersController@getUserByBranch');
         Route::post('/source_detail/list', 'SystemInfoController@getListSourceDetail');
         Route::post('/source_detail/add', 'SystemInfoController@addSourceDetail');
         Route::get('/source_detail/show/{source_detail_id}', 'SystemInfoController@infoSourceDetail');
