@@ -183,6 +183,10 @@ class UsersController extends Controller
         $data = u::query("SELECT *,IF(branch_name IS NOT NULL, CONCAT(name,' - ',hrm_id, ' - ', branch_name), CONCAT(name,' - ',hrm_id)) AS label_name FROM users WHERE status=1 AND id IN (".$request->user_info->users_manager.")");
         return response()->json($data);
     }
+    public function getUserByBranch(Request $request){
+        $data = u::query("SELECT *,IF(branch_name IS NOT NULL, CONCAT(name,' - ',hrm_id, ' - ', branch_name), CONCAT(name,' - ',hrm_id)) AS label_name FROM users WHERE status=1 AND branch_id IN (".$request->branch_id.") AND id IN (".$request->user_info->users_manager.")");
+        return response()->json($data);
+    }
     public function list(Request $request)
     {
         $status = isset($request->status) ? $request->status : '';

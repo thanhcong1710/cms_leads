@@ -7,10 +7,10 @@
             <strong>DANH SÁCH BÁO CÁO</strong>
           </div>
           <div class="card-body report-list">
-            <p class="h6"><router-link to="/reports/01" v-if="showBC01" >01. Báo cáo thông tin khách hàng</router-link></p>
-            <p class="h6"><router-link to="/reports/02" v-if="showBC02" >02. Báo cáo tuần Sale HUB</router-link></p>
-            <p class="h6"><router-link to="/reports/03" v-if="showBC03" >03. Báo cáo cuộc gọi</router-link></p>
-            <p class="h6"><router-link to="/reports/04" v-if="showBC04" >04. Báo cáo chi tiết cuộc gọi</router-link></p>
+            <!-- <p class="h6"><router-link to="/reports/01" v-if="showBC01" >01. Báo cáo thông tin khách hàng</router-link></p>
+            <p class="h6"><router-link to="/reports/02" v-if="showBC02" >02. Báo cáo tuần Sale HUB</router-link></p> -->
+            <p class="h6"><router-link to="/reports/03" v-if="showBC03" >01. Báo cáo cuộc gọi</router-link></p>
+            <!-- <p class="h6"><router-link to="/reports/04" v-if="showBC04" >04. Báo cáo chi tiết cuộc gọi</router-link></p> -->
           </div>
         </div>
       </div>

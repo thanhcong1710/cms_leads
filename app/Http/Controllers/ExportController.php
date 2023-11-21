@@ -305,114 +305,7 @@ class ExportController extends Controller
             throw $exception;
         }
     }
-    public function report03(Request $request , $key,$value) {
-        set_time_limit(300);
-        ini_set('memory_limit', '-1');
-        $cond = "1";
-        $cond1 = "1";
-        $arr_key =explode(',',$key);
-        $arr_value =explode(',',$value);
-        $disabled_type_date = 0;
-        foreach($arr_key AS $k=>$key){
-            if($key=='from_date'||$key=='to_date'){
-                $disabled_type_date = 1;
-            }
-        }
-        foreach($arr_key AS $k=>$key){
-            if($key=='keyword'){
-                $keyword = $arr_value[$k];
-                $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%')";;
-            }
-            if($key=='type_status'){
-                $arr_type_status = explode('-',$arr_value[$k]);
-                $cond2 ="";
-                if(in_array(1,$arr_type_status)){
-                    $cond2 .= $cond2 ? " OR disposition = 'ANSWERED'" : "disposition = 'ANSWERED'";
-                }
-                if(in_array(2,$arr_type_status)){
-                    $cond2 .= $cond2 ? " OR disposition = 'NO ANSWER'" : "disposition = 'NO ANSWER'";
-                }
-                if(in_array(3,$arr_type_status)){
-                    $cond2 .= $cond2 ? " OR disposition = 'BUSY'" : "disposition = 'BUSY'";
-                }
-                if($cond2){
-                    $cond1.=" AND ( $cond2 ) ";
-                }
-            }
-            if($key=='from_date'){
-                $cond1 .= " AND start_time >= '".date('Y-m-d H:i:s',strtotime($arr_value[$k]))."'";
-            }
-            if($key=='to_date'){
-                $cond1 .= " AND start_time <= '".date('Y-m-d H:i:s',strtotime($arr_value[$k]))."'";
-            }
-            if($key=='type_date' && !$disabled_type_date){
-                if($arr_value[$k] == 1){
-                    $cond1 .= " AND start_time >= '".date('Y-m-d 00:00:00')."'";
-                }elseif($arr_value[$k] == 2){
-                    $cond1 .= " AND start_time < '".date('Y-m-d 00:00:00')."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime ( '-1 day' , time() ) )."'";
-                }elseif($arr_value[$k] == 3){
-                    $cond1 .= " AND start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday"))."'";
-                }elseif($arr_value[$k] == 4){
-                    $cond1 .= " AND start_time < '".date('Y-m-d 00:00:00',strtotime("last Monday"))."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday")-24*7*3600)."'";
-                }elseif($arr_value[$k] == 5){
-                    $cond1 .= " AND start_time >= '".date('Y-m-01 00:00:00')."'";
-                }elseif($arr_value[$k] == 6){
-                    $cond1 .= " AND start_time < '".date('Y-m-01 00:00:00')."' AND start_time >= '".date('Y-m-01 00:00:00',strtotime('-1 month'))."'";
-                }
-            }
-            if($key=='branch_id'){
-                $cond .= " AND u.branch_id IN (".str_replace("-",",", $arr_value[$k]).")";
-            }
-        }
-        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
-            $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
-        }
-        $list = u::query("SELECT CONCAT(u.sip_id,' - ',u.name,' - ',u.hrm_id) AS sip_name,
-                (SELECT name FROM cms_branches WHERE id=u.branch_id) AS branch_name,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1 AND `type`='inbound' AND $cond1) AS total_inbound,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1 AND `type`='outbound' AND $cond1) AS total_outbound,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1  AND  disposition = 'ANSWERED' AND $cond1) AS total_call_success,
-                (SELECT count(id) FROM voip24h_data WHERE user_id=u.id AND status=1 AND disposition != 'ANSWERED' AND $cond1) AS total_call_fail
-            FROM users AS u 
-            WHERE u.status=1 AND $cond AND sip_id IS NOT NULL
-            ORDER BY u.id DESC ");
-        $spreadsheet = new Spreadsheet();
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setCellValue('A1', 'Trung tâm');
-        $sheet->setCellValue('B1', 'Tên máy nhánh');
-        $sheet->setCellValue('C1', 'Tổng gọi vào');
-        $sheet->setCellValue('D1', 'Tổng gọi ra');
-        $sheet->setCellValue('E1', 'Tổng cuộc gọi thành công');
-        $sheet->setCellValue('F1', 'Tổng cuộc gọi thất bại');
-
-        $sheet->getColumnDimension("A")->setWidth(30);
-        $sheet->getColumnDimension("B")->setWidth(30);
-        $sheet->getColumnDimension("C")->setWidth(20);
-        $sheet->getColumnDimension("D")->setWidth(20);
-        $sheet->getColumnDimension("E")->setWidth(20);
-        $sheet->getColumnDimension("F")->setWidth(20);
-        for ($i = 0; $i < count($list) ; $i++) {
-            $x = $i + 2;
-            $sheet->setCellValue('A' . $x, $list[$i]->branch_name);
-            $sheet->setCellValue('B' . $x, $list[$i]->sip_name);
-            $sheet->setCellValue('C' . $x, $list[$i]->total_inbound) ;
-            $sheet->setCellValue('D' . $x, $list[$i]->total_outbound );
-            $sheet->setCellValue('E' . $x, $list[$i]->total_call_success);
-            $sheet->setCellValue('F' . $x, $list[$i]->total_call_fail);
-            
-            $sheet->getRowDimension($x)->setRowHeight(23);
-
-        }
-        $writer = new Xlsx($spreadsheet);
-        try {
-            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            header('Content-Disposition: attachment;filename="Báo cáo cuộc gọi.xlsx"');
-            header('Cache-Control: max-age=0');
-            $writer->save("php://output");
-        } catch (Exception $exception) {
-            throw $exception;
-        }
-    }
+    
     public function report04(Request $request , $key,$value) {
         set_time_limit(300);
         ini_set('memory_limit', '-1');
@@ -540,6 +433,150 @@ class ExportController extends Controller
         try {
             header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             header('Content-Disposition: attachment;filename="Báo cáo chi tiết cuộc gọi.xlsx"');
+            header('Cache-Control: max-age=0');
+            $writer->save("php://output");
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    public function report03(Request $request , $key,$value) {
+        set_time_limit(300);
+        ini_set('memory_limit', '-1');
+        $arr_key =explode(',',$key);
+        $arr_value =explode(',',$value);
+        $cond = "";
+        $cond1 = "";
+        $cond2 = "";
+
+        foreach($arr_key AS $k=>$key){
+            if($key=='start_date'){
+                $cond .= " AND p.last_assign_date >= '".date('Y-m-d 00:00:00',strtotime($arr_value[$k]))."'";
+                $cond1 .= " AND c.created_at >= '".date('Y-m-d 00:00:00',strtotime($arr_value[$k]))."'";
+            }
+            if($key=='to_date'){
+                $cond .= " AND p.last_assign_date <= '".date('Y-m-d 00:00:00',strtotime($arr_value[$k]))."'";
+                $cond1 .= " AND c.created_at <= '".date('Y-m-d 00:00:00',strtotime($arr_value[$k]))."'";
+            }
+            if($key=='source_id'){
+                $cond .= " AND  p.source_id IN (".str_replace("-",",", $arr_value[$k]).")" ;
+                $cond1 .= " AND  p.source_id IN (".str_replace("-",",", $arr_value[$k]).")" ;
+            }
+            if($key=='source_detail_id'){
+                $cond .= " AND  p.source_detail_id IN (".str_replace("-",",", $arr_value[$k]).")" ;
+                $cond1 .= " AND  p.source_detail_id IN (".str_replace("-",",", $arr_value[$k]).")" ;
+            }
+            if ($key=='branch_id') {
+                $cond2 .= " AND u.branch_id = ".$arr_value[$k];
+            }
+            if($key=='owner_id'){
+                $cond2 .= " AND  u.id IN (".str_replace("-",",", $arr_value[$k]).")" ;
+            }
+        }
+       
+        if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
+            $cond2 .= " AND u.id IN (".$request->user_info->users_manager.")";
+        }
+        $list = u::query("SELECT u.branch_name,u.name,u.hrm_id, u.id
+                FROM users AS u WHERE u.branch_id !=0 $cond2 AND u.status=1 ORDER BY u.branch_id ");
+            
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'Trung tâm');
+        $sheet->setCellValue('B1', 'Tele Sale');
+        $sheet->setCellValue('C1', 'Tổng số data đã chia chưa xử lý');
+        $sheet->setCellValue('D1', 'Tổng số data kết nối được');
+        $sheet->setCellValue('E1', 'Tổng số data không kết nối được');
+        $sheet->setCellValue('F1', '0. Blank');
+        $sheet->setCellValue('G1', '1. Thuê bao - Tắt máy - Sai số');
+        $sheet->setCellValue('H1', '2. Location');
+        $sheet->setCellValue('I1', '3. Máy bận - Không nghe máy');
+        $sheet->setCellValue('J1', '4. KH hẹn gọi lại sau');
+        $sheet->setCellValue('K1', '5. KH Từ chối nói chuyện');
+        $sheet->setCellValue('L1', '5.1. KH đã từng sử dụng dịch vụ');
+        $sheet->setCellValue('M1', '5.2. KH không quan tâm');
+        $sheet->setCellValue('N1', '5.3 KH thực sự không muốn nói chuyện');
+        $sheet->setCellValue('O1', '6. KH không phù hợp');
+        $sheet->setCellValue('P1', '6.1. Không có con');
+        $sheet->setCellValue('Q1', '6.2. Lý do khác');
+        $sheet->setCellValue('R1', '7. KH tiềm năng');
+        $sheet->setCellValue('S1', '7.1. KH đang cân nhắc');
+        $sheet->setCellValue('T1', '7.2. KH hẹn thời gian khác');
+        $sheet->setCellValue('U1', '7.3. KH ko muốn làm phiền');
+        $sheet->setCellValue('V1', '7.4. Confirm 1');
+
+        $sheet->getColumnDimension("A")->setWidth(30);
+        $sheet->getColumnDimension("B")->setWidth(30);
+        $sheet->getColumnDimension("C")->setWidth(20);
+        $sheet->getColumnDimension("D")->setWidth(20);
+        $sheet->getColumnDimension("E")->setWidth(20);
+        $sheet->getColumnDimension("F")->setWidth(20);
+        $sheet->getColumnDimension("G")->setWidth(20);
+        $sheet->getColumnDimension("H")->setWidth(20);
+        $sheet->getColumnDimension("I")->setWidth(20);
+        $sheet->getColumnDimension("J")->setWidth(20);
+        $sheet->getColumnDimension("K")->setWidth(20);
+        $sheet->getColumnDimension("L")->setWidth(20);
+        $sheet->getColumnDimension("M")->setWidth(20);
+        $sheet->getColumnDimension("N")->setWidth(20);
+        $sheet->getColumnDimension("O")->setWidth(20);
+        $sheet->getColumnDimension("P")->setWidth(20);
+        $sheet->getColumnDimension("Q")->setWidth(20);
+        $sheet->getColumnDimension("R")->setWidth(20);
+        $sheet->getColumnDimension("S")->setWidth(20);
+        $sheet->getColumnDimension("T")->setWidth(20);
+        $sheet->getColumnDimension("U")->setWidth(20);
+        $sheet->getColumnDimension("V")->setWidth(20);
+        for ($i = 0; $i < count($list) ; $i++) {
+            $data_report = u::first("SELECT (SELECT COUNT(p.id) FROM cms_parents AS p WHERE p.owner_id=". $list[$i]->id." AND p.status=0 AND (p.last_care_date ='' OR  p.last_care_date IS NULL) $cond ) AS total_new,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status IN (4,5,6,7) $cond) AS total_connect,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status IN (1,2,3) $cond) AS total_not_connect,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 0 $cond) AS detail_0,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 1 $cond) AS detail_1,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 2 $cond) AS detail_2,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 3 $cond) AS detail_3,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 4 $cond) AS detail_4,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 5 $cond) AS detail_5,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 6 $cond) AS detail_6,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 7 $cond) AS detail_7,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 5 AND c.call_status_sub = 51 $cond) AS detail_51,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 5 AND c.call_status_sub = 52 $cond) AS detail_52,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 5 AND c.call_status_sub = 53 $cond) AS detail_53,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 6 AND c.call_status_sub = 61 $cond) AS detail_61,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 6 AND c.call_status_sub = 62 $cond) AS detail_62,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 7 AND c.call_status_sub = 71 $cond) AS detail_71,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 7 AND c.call_status_sub = 72 $cond) AS detail_72,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 7 AND c.call_status_sub = 73 $cond) AS detail_73,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 7 AND c.call_status_sub = 74 $cond) AS detail_74");
+            $x = $i + 2;
+            $sheet->setCellValue('A' . $x, $list[$i]->branch_name);
+            $sheet->setCellValue('B' . $x, $list[$i]->name." - ".$list[$i]->hrm_id);
+            $sheet->setCellValue('C' . $x, $data_report->total_new) ;
+            $sheet->setCellValue('D' . $x, $data_report->total_not_connect );
+            $sheet->setCellValue('E' . $x, $data_report->total_connect);
+            $sheet->setCellValue('F' . $x, $data_report->detail_0);
+            $sheet->setCellValue('G' . $x, $data_report->detail_1);
+            $sheet->setCellValue('H' . $x, $data_report->detail_2);
+            $sheet->setCellValue('I' . $x, $data_report->detail_3);
+            $sheet->setCellValue('J' . $x, $data_report->detail_4);
+            $sheet->setCellValue('K' . $x, $data_report->detail_5);
+            $sheet->setCellValue('L' . $x, $data_report->detail_51);
+            $sheet->setCellValue('M' . $x, $data_report->detail_52);
+            $sheet->setCellValue('N' . $x, $data_report->detail_53);
+            $sheet->setCellValue('O' . $x, $data_report->detail_6);
+            $sheet->setCellValue('P' . $x, $data_report->detail_61);
+            $sheet->setCellValue('Q' . $x, $data_report->detail_62);
+            $sheet->setCellValue('R' . $x, $data_report->detail_7);
+            $sheet->setCellValue('S' . $x, $data_report->detail_71);
+            $sheet->setCellValue('T' . $x, $data_report->detail_72);
+            $sheet->setCellValue('U' . $x, $data_report->detail_73);
+            $sheet->setCellValue('V' . $x, $data_report->detail_74);
+            $sheet->getRowDimension($x)->setRowHeight(23);
+        }
+        $writer = new Xlsx($spreadsheet);
+        try {
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="Báo cáo cuộc gọi.xlsx"');
             header('Cache-Control: max-age=0');
             $writer->save("php://output");
         } catch (Exception $exception) {
