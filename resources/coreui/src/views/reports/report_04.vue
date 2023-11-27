@@ -5,39 +5,81 @@
         <div class="card">
           <loader :active="loading.processing" :text="loading.text" />
           <div class="card-header">
-            <strong> Báo cáo cuộc gọi</strong>
+            <strong> Báo cáo cuộc gọi chi tiết</strong>
           </div>
           <div class="card-body">
             <div class="row">
               <div class="form-group col-sm-4">
-                <label for="name">Ngày giờ bắt đầu tìm kiếm</label>
-                <input class="form-control" type="datetime-local" value="" id="from_date">
+                <label for="name">Từ khóa</label>
+                <input
+                  class="form-control"
+                  v-model="searchData.keyword"
+                  type="text"
+                  placeholder="Tên khách hàng, SĐT"
+                />
               </div>
-              <div class="form-group col-sm-4">
-                <label for="name">Ngày giờ kết thúc tìm kiếm</label>
-                <input class="form-control" type="datetime-local" value="" id="to_date">
-              </div>
-              <div class="form-group col-sm-12 search_date_type">
-                <input type="radio" id="type1" name="type_date" v-model="searchData.type_date" value="1" @change="search()">
-                <label for="type1">Hôm nay</label>
-                <input type="radio" id="type2" name="type_date" v-model="searchData.type_date" value="2"  @change="search()">
-                <label for="type2">Hôm qua</label>
-                <input type="radio" id="type3" name="type_date" v-model="searchData.type_date" value="3"  @change="search()">
-                <label for="type3">Tuần này</label>
-                <input type="radio" id="type4" name="type_date" v-model="searchData.type_date" value="4"  @change="search()">
-                <label for="type4">Tuần trước</label>
-                <input type="radio" id="type5" name="type_date" v-model="searchData.type_date" value="5"  @change="search()">
-                <label for="type5">Tháng này</label>
-                <input type="radio" id="type6" name="type_date" v-model="searchData.type_date"  value="6"  @change="search()">
-                <label for="type6">Tháng trước</label>
-              </div>  
-              <div class="form-group col-sm-4">
+               <div class="form-group col-sm-4">
                 <label for="name">Trung tâm</label>
+                <select class="form-control" v-model="searchData.branch_id" @change="loadUser()">
+                  <option value="0">Chọn trung tâm</option>
+                  <option :value="item.id" v-for="(item, index) in list_branches" :key="index">{{item.name}}</option>
+                </select>
+              </div>
+              <div class="form-group col-sm-4">
+                <label for="ccmonth">Người phụ trách</label>
                 <multiselect
-                  placeholder="Chọn trung tâm"
-                  select-label="Chọn trung tâm"
-                  v-model="searchData.branch_id"
-                  :options="list_branches"
+                  placeholder="Chọn người phụ trách"
+                  select-label="Chọn một người phụ trách"
+                  v-model="searchData.arr_owner"
+                  :options="users_manager"
+                  label="label_name"
+                  :close-on-select="false"
+                  :hide-selected="true"
+                  :multiple="true"
+                  :searchable="true"
+                  track-by="id"
+                >
+                  <span slot="noResult">Không tìm thấy dữ liệu</span>
+                </multiselect>  
+              </div>
+              <div class="form-group col-sm-4">
+                <label for="ccmonth">Ngày cập nhật</label>
+                  <date-picker
+                    style="width:100%;"
+                    v-model="searchData.dateRange"
+                    :clearable="true"
+                    :lang="datepickerOptions.lang"
+                    range
+                    format="YYYY-MM-DD"
+                    id="apax-date-range"
+                    placeholder="Chọn thời gian tìm kiếm từ ngày đến ngày"
+                  ></date-picker>
+              </div>
+             
+              <div class="form-group col-sm-4">
+                <label for="ccmonth">Nguồn</label>
+                 <multiselect
+                  placeholder="Chọn nguồn"
+                  select-label="Chọn nguồn"
+                  v-model="searchData.arr_source"
+                  :options="source_list"
+                  label="name"
+                  :close-on-select="false"
+                  :hide-selected="true"
+                  :multiple="true"
+                  :searchable="true"
+                  track-by="id"
+                >
+                  <span slot="noResult">Không tìm thấy dữ liệu</span>
+                </multiselect>   
+              </div>
+               <div class="form-group col-sm-4">
+                <label for="ccmonth">Nguồn chi tiết</label>
+                 <multiselect
+                  placeholder="Chọn nguồn chi tiết"
+                  select-label="Chọn nguồn chi tiết "
+                  v-model="searchData.arr_source_detail"
+                  :options="source_detail_list"
                   label="name"
                   :close-on-select="false"
                   :hide-selected="true"
@@ -47,40 +89,48 @@
                 >
                   <span slot="noResult">Không tìm thấy dữ liệu</span>
                 </multiselect>
-              </div>
-              <div class="form-group col-sm-4">
-                <label for="name">Từ khóa</label>
-                <input
-                  class="form-control"
-                  v-model="searchData.keyword"
-                  type="text"
-                  placeholder="Tên mã nhân viên, SDT"
-                />
-              </div>
-              <div class="form-group col-sm-4">
-                <label for="name">Trạng thái cuộc gọi</label>
-                <multiselect
-                  placeholder="Chọn trạng thái"
-                  select-label="Chọn trạng thái"
-                  v-model="searchData.type_status"
-                  :options="list_type_status"
-                  label="label"
-                  :close-on-select="false"
-                  :hide-selected="true"
-                  :multiple="true"
-                  :searchable="true"
-                  track-by="id"
-                >
-                  <span slot="noResult">Không tìm thấy dữ liệu</span>
-                </multiselect>
-              </div>
+               </div>
                <div class="form-group col-sm-4">
-                <label for="name">Loại cuộc gọi</label>
-                <select class="form-control"  v-model="searchData.type_call">
-                  <option value="">Chọn loại cuộc gọi</option>
-                  <option value="1">Gọi ra</option>
-                  <option value="2">Gọi vào </option>
+                <label for="name">Trạng thái cuộc gọi</label>
+                <select class="form-control"  v-model="searchData.call_status">
+                  <option value="">Chọn trạng thái cuộc gọi</option>
+                  <option value="1">Thuê bao - Tắt máy - Sai số</option>
+                  <option value="2">Location</option>
+                  <option value="3">Máy bận - Không nghe máy</option>
+                  <option value="4">KH hẹn gọi lại sau</option>
+                  <option value="5">KH Từ chối nói chuyện</option>
+                  <option value="6">KH không phù hợp</option>
+                  <option value="7">KH tiềm năng</option>
+                  <option value="9">Blacklist</option>
                 </select>
+              </div>
+              <div class="form-group col-sm-4">
+                <label for="name">Trạng thái cuộc gọi chi tiết</label>
+                <select class="form-control"  v-model="searchData.call_status_sub">
+                  <option value="">Chọn trạng thái cuộc gọi chi tiết</option>
+                  <option value="51" v-if="searchData.call_status==5">KH đã từng sử dụng dịch vụ</option>
+                  <option value="52" v-if="searchData.call_status==5">KH không quan tâm</option>
+                  <option value="53" v-if="searchData.call_status==5">KH thực sự không muốn nói chuyện</option>
+                  <option value="61" v-if="searchData.call_status==6">Không có con</option>
+                  <option value="62" v-if="searchData.call_status==6">Lý do khác</option>
+                  <option value="71" v-if="searchData.call_status==7">KH đang cân nhắc</option>
+                  <option value="72" v-if="searchData.call_status==7">KH hẹn thời gian khác</option>
+                  <option value="73" v-if="searchData.call_status==7">KH ko muốn làm phiền</option>
+                  <option value="74" v-if="searchData.call_status==7">Confirm 1</option>
+                </select>
+              </div>
+              <div class="form-group col-sm-4">
+                <label for="ccmonth">Ngày hẹn chăm sóc</label>
+                  <date-picker
+                    style="width:100%;"
+                    v-model="searchData.dateRangeCare"
+                    :clearable="true"
+                    :lang="datepickerOptions.lang"
+                    range
+                    format="YYYY-MM-DD"
+                    id="apax-date-range"
+                    placeholder="Chọn thời gian tìm kiếm từ ngày đến ngày"
+                  ></date-picker>
               </div>
               <div class="form-group col-sm-12">
                 <button class="btn btn-success" @click="exportExcel()">
@@ -98,42 +148,50 @@
                 </button>
               </div>
             </div>
-            <table class="table table-striped table-hover">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Ngày gọi</th>
-                  <th>Số gọi</th>
-                  <th>Số nhận</th>
-                  <th>Thời gian gọi</th>
-                  <th>Loại cuộc gọi</th>
-                  <th>Trạng thái cuộc gọi</th>
-                  <th>Trung tâm</th>
-                  <th>File cuộc gọi</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(item, index) in imports" :key="index">
-                  <td>
-                    {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
-                  </td>
-                  <td>{{ item.start_time }}</td> 
-                  <td>{{ item.phone_call }}</td>
-                  <td>{{ item.phone_rep }}</td>
-                  <td>{{ item.duration }}</td>
-                  <td>{{ item.phone_type}}</td>
-                  <td>{{ item.phone_status }}</td>
-                  <td>{{ item.branch_name}}</td>
-                  <td>
-                    <p v-if="item.link_record">
-                      <audio controls style="height: 40px; width: 256px; border: 1px solid #ccc;">
-                        <source :src="item.link_record" type="audio/x-wav">
-                      </audio>
-                    </p>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+            <div style="overflow: auto;">
+              <table class="table table-striped table-hover" style="width:1600px">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Tên khách hàng</th>
+                    <th>SĐT</th>
+                    <th>Trạng thái cuộc gọi</th>
+                    <th>Trạng thái cuộc gọi chi tiết</th>
+                    <th>Ngày hẹn chăm sóc</th>
+                    <th>Trung tâm</th>
+                    <th>Sale</th>
+                    <th>Ngày cập nhật</th>
+                    <th>Nguồn</th> 
+                    <th>Nguồn chi tiết</th> 
+                    <th>Ghi chú</th> 
+                    <th>Thao tác</th> 
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item, index) in imports" :key="index">
+                    <td>
+                      {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
+                    </td>
+                    <td>{{ item.name }}</td> 
+                    <td>{{ item.mobile_1 }}</td>
+                    <td>{{ item.call_status | callStatus}}</td>
+                    <td>{{ item.call_status_sub | callStatusSub}}</td>
+                    <td>{{ item.next_care_date}}</td>
+                    <td>{{ item.branch_name }}</td>
+                    <td>{{ item.sale_name}}</td>
+                    <td>{{ item.created_at}}</td>
+                    <td>{{ item.source_name}}</td>
+                    <td>{{ item.source_detail_name}}</td>
+                    <td>{{ item.note}}</td>
+                    <td><router-link
+                        class="btn btn-sm  btn-info"
+                        :to="`/parents/${item.parent_id}/detail`"
+                      >
+                        <i class="fa fa-phone"></i></router-link> </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
             <div class="text-center">
               <nav aria-label="Page navigation">
                 <paging
@@ -175,24 +233,46 @@ export default {
   name: "List-Parent",
   data() {
     return {
-      list_type_status:[
-        {id:1,label:'Nghe máy'},
-        {id:2,label:'Không nghe máy'},
-        {id:3,label:'Máy bận'},
-      ],
+      datepickerOptions: {
+        closed: true,
+        value: "",
+        minDate: "",
+        lang: {
+          days: ["CN", "T2", "T3", "T4", "T5", "T6", "T7"],
+          months: [
+            "Tháng 1",
+            "Tháng 2",
+            "Tháng 3",
+            "Tháng 4",
+            "Tháng 5",
+            "Tháng 6",
+            "Tháng 7",
+            "Tháng 8",
+            "Tháng 9",
+            "Tháng 10",
+            "Tháng 11",
+            "Tháng 12",
+          ],
+        },
+      },
       list_branches:[],
+      users_manager:[],
+      source_list:[],
+      source_detail_list:[],
       loading: {
         text: "Đang tải dữ liệu...",
         processing: false,
       },
       searchData: {
-        // from_date:"",
-        // to_date:"",
-        type_status: "",
-        branch_id:"",
-        type_date:1,
         keyword: "",
-        type_call:"",
+        branch_id:"",
+        arr_owner:"",
+        dateRange:"",
+        arr_source:"",
+        arr_source_detail:"",
+        call_status:"",
+        call_status_sub:"",
+        dateRangeCare:"",
         pagination: this.pagination
       },
       imports: [],
@@ -219,35 +299,77 @@ export default {
       .then(response => {
       this.list_branches = response.data
     })
+    u.g(`/api/sources`)
+      .then(response => {
+      this.source_list = response.data
+      this.source_detail_list = response.data
+    })
+     u.g(`/api/source_detail`)
+      .then(response => {
+      this.source_detail_list = response.data
+    })
     this.search(0);
   },
   methods: {
+    loadUser(){
+      this.arr_owner =[]
+      if(this.searchData.branch_id){
+        u.g(`/api/user/get-users-by-branch/${this.searchData.branch_id}`)
+          .then(response => {
+          this.users_manager = response.data
+        })
+      }else {
+        this.users_manager = []
+      }
+      
+    },
     reset() {
       location.reload();
     },
     search(a=1) {
-      const ids_branch_id = []
-      this.searchData.branch_id = u.is.obj(this.searchData.branch_id) ? [this.searchData.branch_id] : this.searchData.branch_id
-      if (this.searchData.branch_id.length) {
-        this.searchData.branch_id.map(item => {
-          ids_branch_id.push(item.id)
+      const startDate = this.searchData.dateRange!='' && this.searchData.dateRange!= undefined && this.searchData.dateRange[0] ?`${u.dateToString(this.searchData.dateRange[0])}`:''
+      const endDate = this.searchData.dateRange!='' && this.searchData.dateRange!= undefined && this.searchData.dateRange[1] ?`${u.dateToString(this.searchData.dateRange[1])}`:''
+      const startDateCare = this.searchData.dateRangeCare!='' && this.searchData.dateRangeCare!= undefined && this.searchData.dateRangeCare[0] ?`${u.dateToString(this.searchData.dateRangeCare[0])}`:''
+      const endDateCare = this.searchData.dateRangeCare!='' && this.searchData.dateRangeCare!= undefined && this.searchData.dateRangeCare[1] ?`${u.dateToString(this.searchData.dateRangeCare[1])}`:''
+      const ids_owner = []
+      this.searchData.arr_owner = u.is.obj(this.searchData.arr_owner) ? [this.searchData.arr_owner] : this.searchData.arr_owner
+      if (this.searchData.arr_owner.length) {
+        this.searchData.arr_owner.map(item => {
+          ids_owner.push(item.id)
         })
       }
-      const ids_type_status = []
-      this.searchData.type_status = u.is.obj(this.searchData.type_status) ? [this.searchData.type_status] : this.searchData.type_status
-      if (this.searchData.type_status.length) {
-        this.searchData.type_status.map(item => {
-          ids_type_status.push(item.id)
+      this.searchData.owner_id = ids_owner
+
+      const ids_source = []
+      this.searchData.arr_source = u.is.obj(this.searchData.arr_source) ? [this.searchData.arr_source] : this.searchData.arr_source
+      if (this.searchData.arr_source.length) {
+        this.searchData.arr_source.map(item => {
+          ids_source.push(item.id)
         })
       }
+      this.searchData.source_id = ids_source
+
+       const ids_source_detail = []
+      this.searchData.arr_source_detail = u.is.obj(this.searchData.arr_source_detail) ? [this.searchData.arr_source_detail] : this.searchData.arr_source_detail
+      if (this.searchData.arr_source_detail.length) {
+        this.searchData.arr_source_detail.map(item => {
+          ids_source_detail.push(item.id)
+        })
+      }
+      this.searchData.source_detail_id = ids_source_detail
+
       const data = {
-        from_date: a ? document.getElementById('from_date').value : "" ,
-        to_date:a ? document.getElementById('to_date').value : "",
-        branch_id:ids_branch_id,
-        type_date:this.searchData.type_date,
-        type_call:this.searchData.type_call,
-        type_status:ids_type_status,
         keyword: this.searchData.keyword,
+        branch_id:this.searchData.branch_id,
+        owner_id: this.searchData.owner_id,
+        source_id: this.searchData.source_id,
+        source_detail_id: this.searchData.source_detail_id,
+        call_status: this.searchData.call_status,
+        call_status_sub: this.searchData.call_status_sub,
+        start_date:startDate,
+        end_date:endDate,
+        start_date_care:startDateCare,
+        end_date_care:endDateCare,
         pagination:this.pagination,
       };
       const link = "/api/reports/04";
@@ -279,55 +401,137 @@ export default {
       this.search();
     },
     exportExcel() {
-      var ids_branch_id = ''
-      this.searchData.branch_id = u.is.obj(this.searchData.branch_id) ? [this.searchData.branch_id] : this.searchData.branch_id
-      if (this.searchData.branch_id.length) {
-        this.searchData.branch_id.map(item => {
-          ids_branch_id += ids_branch_id ? '-'+item.id : item.id
-        })
+      const startDate = this.searchData.dateRange!='' && this.searchData.dateRange!= undefined && this.searchData.dateRange[0] ?`${u.dateToString(this.searchData.dateRange[0])}`:''
+      const endDate = this.searchData.dateRange!='' && this.searchData.dateRange!= undefined && this.searchData.dateRange[1] ?`${u.dateToString(this.searchData.dateRange[1])}`:''
+      const startDateCare = this.searchData.dateRangeCare!='' && this.searchData.dateRangeCare!= undefined && this.searchData.dateRangeCare[0] ?`${u.dateToString(this.searchData.dateRangeCare[0])}`:''
+      const endDateCare = this.searchData.dateRangeCare!='' && this.searchData.dateRangeCare!= undefined && this.searchData.dateRangeCare[1] ?`${u.dateToString(this.searchData.dateRangeCare[1])}`:''
+      var ids_owner = "";
+      this.searchData.owner_id = u.is.obj(this.searchData.owner_id)
+        ? [this.searchData.owner_id]
+        : this.searchData.owner_id;
+      if (this.searchData.owner_id.length) {
+        this.searchData.owner_id.map((item) => {
+          ids_owner += ids_owner ? "-" + item.id : item.id;
+        });
       }
-      var ids_type_status = ''
-      this.searchData.type_status = u.is.obj(this.searchData.type_status) ? [this.searchData.type_status] : this.searchData.type_status
-      if (this.searchData.type_status.length) {
-        this.searchData.type_status.map(item => {
-         ids_type_status += ids_type_status ? '-'+item.id : item.id
-        })
+      var ids_source = "";
+      this.searchData.arr_source = u.is.obj(this.searchData.arr_source)
+        ? [this.searchData.arr_source]
+        : this.searchData.arr_source;
+      if (this.searchData.arr_source.length) {
+        this.searchData.arr_source.map((item) => {
+          ids_source += ids_source ? "-" + item.id : item.id;
+        });
+      }
+      var ids_source_detail = "";
+      this.searchData.arr_source_detail = u.is.obj(this.searchData.arr_source_detail)
+        ? [this.searchData.arr_source_detail]
+        : this.searchData.arr_source_detail;
+      if (this.searchData.arr_source_detail.length) {
+        this.searchData.arr_source_detail.map((item) => {
+          ids_source_detail += ids_source_detail ? "-" + item.id : item.id;
+        });
       }
       var url = `/api/export/report04/`;
       this.key ='';
       this.value = ''
-      if (this.searchData.keyword){
-        this.key += "keyword,"
-        this.value += this.searchData.keyword+","
+      if (this.searchData.keyword) {
+        this.key += "keyword,";
+        this.value += this.searchData.keyword + ",";
       }
-      if (ids_type_status){
-        this.key += "type_status,"
-        this.value += ids_type_status+","
+      if (this.searchData.branch_id) {
+        this.key += "branch_id,";
+        this.value += this.searchData.branch_id + ",";
       }
-       if (this.searchData.type_call){
-        this.key += "type_call,"
-        this.value += this.searchData.type_call+","
+      if (ids_owner) {
+        this.key += "ids_owner,";
+        this.value += ids_owner + ",";
       }
-      if (this.searchData.type_date){
-        this.key += "type_date,"
-        this.value += this.searchData.type_date+","
+       if (ids_source) {
+        this.key += "ids_source,";
+        this.value += ids_source + ",";
       }
-      if (ids_branch_id){
-        this.key += "branch_id,"
-        this.value += ids_branch_id+","
+       if (ids_source_detail) {
+        this.key += "ids_source_detail,";
+        this.value += ids_source_detail + ",";
       }
-      if(document.getElementById('from_date').value){
-        this.key += "from_date,"
-        this.value += document.getElementById('from_date').value+","
+      if (this.searchData.call_status) {
+        this.key += "call_status,";
+        this.value += this.searchData.call_status + ",";
       }
-      if(document.getElementById('to_date').value){
-        this.key += "to_date,"
-        this.value += document.getElementById('to_date').value+","
+      if (this.searchData.call_status_sub) {
+        this.key += "call_status_sub,";
+        this.value += this.searchData.call_status_sub + ",";
+      }
+      if (startDate) {
+        this.key += "start_date,";
+        this.value += startDate + ",";
+      }
+      if (endDate) {
+        this.key += "end_date,";
+        this.value += endDate + ",";
+      }
+      if (startDateCare) {
+        this.key += "start_date_care,";
+        this.value += startDateCare + ",";
+      }
+      if (endDateCare) {
+        this.key += "end_date_care,";
+        this.value += endDateCare + ",";
       }
       this.key = this.key? this.key.substring(0, this.key.length - 1):'_'
       this.value = this.value? this.value.substring(0, this.value.length - 1) : "_"
       url += this.key+"/"+this.value +`?token=${localStorage.getItem("api_token")}`
       window.open(url, '_blank');
+    },
+  },
+  filters: {
+    callStatus(item){
+      let resp = ''
+      if(item== 1){
+        resp = 'Thuê bao - Tắt máy - Sai số'
+      }else if(item==2){
+        resp = 'Location'
+      }else if(item==3){
+        resp = 'Máy bận - Không nghe máy'
+      }else if(item==4){
+        resp = 'KH hẹn gọi lại sau'
+      }else if(item==5){
+        resp = 'KH Từ chối nói chuyện'
+      }else if(item==6){
+        resp = 'KH không phù hợp'
+      }else if(item==7){
+        resp = 'KH tiềm năng'
+      }else if(item==9){
+        resp = 'Blacklist'
+      }else{
+        resp = ''
+      }
+
+      return resp
+    },
+    callStatusSub(item){
+      let resp = ''
+      if(item== 51){
+        resp = 'KH đã từng sử dụng dịch vụ'
+      }else if(item==52){
+        resp = 'KH thực sự không muốn nói chuyện'
+      }else if(item==61){
+        resp = 'Không có con'
+      }else if(item==62){
+        resp = 'Lý do khác'
+      }else if(item==71){
+        resp = 'KH đang cân nhắc'
+      }else if(item==72){
+        resp = 'KH hẹn thời gian khác'
+      }else if(item==73){
+        resp = 'KH ko muốn làm phiền'
+      }else if(item==94){
+        resp = 'Confirm 1'
+      }else{
+        resp = ''
+      }
+      return resp
     },
   },
 };

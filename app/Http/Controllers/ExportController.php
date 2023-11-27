@@ -312,102 +312,72 @@ class ExportController extends Controller
         $cond = "1";
         $arr_key =explode(',',$key);
         $arr_value =explode(',',$value);
-        $disabled_type_date = 0;
-        foreach($arr_key AS $k=>$key){
-            if($key=='from_date'||$key=='to_date'){
-                $disabled_type_date = 1;
-            }
-        }
         foreach($arr_key AS $k=>$key){
             if($key=='keyword'){
-                $keyword = $arr_value[$k];
-                $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%'OR v.phone LIKE '%$keyword%' OR v.phone LIKE '%$keyword%' )";;
+                $cond.= " AND (p.name LIKE '%".$arr_value[$k]."%' OR p.mobile_1 LIKE '%".$arr_value[$k]."%')";
             }
-            if($key=='type_status'){
-                $arr_type_status = explode('-',$arr_value[$k]);
-                $cond2 ="";
-                if(in_array(1,$arr_type_status)){
-                    $cond2 .= $cond2 ? " OR disposition = 'ANSWERED'" : "disposition = 'ANSWERED'";
-                }
-                if(in_array(2,$arr_type_status)){
-                    $cond2 .= $cond2 ? " OR disposition = 'NO ANSWER'" : "disposition = 'NO ANSWER'";
-                }
-                if(in_array(3,$arr_type_status)){
-                    $cond2 .= $cond2 ? " OR disposition = 'BUSY'" : "disposition = 'BUSY'";
-                }
-                if($cond2){
-                    $cond.=" AND ( $cond2 ) ";
-                }
+            if ($key=='branch_id') {
+                $cond.= " AND u.branch_id = ".$arr_value[$k];
             }
-            if($key=='from_date'){
-                $cond .= " AND start_time >= '".date('Y-m-d H:i:s',strtotime($arr_value[$k]))."'";
+            if($key=='owner_id'){
+                $cond.= " AND  u.id IN (".str_replace("-",",", $arr_value[$k]).")" ;
             }
-            if($key=='to_date'){
-                $cond .= " AND start_time <= '".date('Y-m-d H:i:s',strtotime($arr_value[$k]))."'";
+            if($key=='source_id'){
+                $cond .= " AND  p.source_id IN (".str_replace("-",",", $arr_value[$k]).")" ;
             }
-            if($key=='type_call'){
-                $cond.=$arr_value[$k] ==2 ? " AND v.type='inbound' " : "v.type='outbound'";
+            if($key=='source_detail_id'){
+                $cond .= " AND  p.source_detail_id IN (".str_replace("-",",", $arr_value[$k]).")" ;
             }
-            if($key=='type_date' && !$disabled_type_date){
-                if($arr_value[$k] == 1){
-                    $cond .= " AND start_time >= '".date('Y-m-d 00:00:00')."'";
-                }elseif($arr_value[$k] == 2){
-                    $cond .= " AND start_time < '".date('Y-m-d 00:00:00')."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime ( '-1 day' , time() ) )."'";
-                }elseif($arr_value[$k] == 3){
-                    $cond .= " AND start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday"))."'";
-                }elseif($arr_value[$k] == 4){
-                    $cond .= " AND start_time < '".date('Y-m-d 00:00:00',strtotime("last Monday"))."' AND start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday")-24*7*3600)."'";
-                }elseif($arr_value[$k] == 5){
-                    $cond .= " AND start_time >= '".date('Y-m-01 00:00:00')."'";
-                }elseif($arr_value[$k] == 6){
-                    $cond .= " AND start_time < '".date('Y-m-01 00:00:00')."' AND start_time >= '".date('Y-m-01 00:00:00',strtotime('-1 month'))."'";
-                }
+            if ($key=='call_status') {
+                $cond.=" AND c.call_status=".$arr_value[$k];
             }
-            if($key=='branch_id'){
-                $cond .= " AND u.branch_id IN (".str_replace("-",",", $arr_value[$k]).")";
+            if ($key=='call_status_sub') {
+                $cond.=" AND c.call_status_sub=".$arr_value[$k];
+            }
+            if($key=='start_date'){
+                $cond .= " AND c.created_at >= '".date('Y-m-d 00:00:00',strtotime($arr_value[$k]))."'";
+            }
+            if($key=='end_date'){
+                $cond .= " AND c.created_at <= '".date('Y-m-d 23:59:59',strtotime($arr_value[$k]))."'";
+            }
+            if($key=='start_date_care'){
+                $cond .= " AND c.next_care_date >= '".date('Y-m-d 00:00:00',strtotime($arr_value[$k]))."'";
+            }
+            if($key=='end_date_care'){
+                $cond .= " AND c.next_care_date <= '".date('Y-m-d 23:59:59',strtotime($arr_value[$k]))."'";
             }
         }
         
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
         }
-        $list = u::query("SELECT v.start_time,
-                    IF(v.type='inbound',v.phone, CONCAT(v.sip_id,' - ',u.name,' - ',u.hrm_id)) AS phone_call,
-                    IF(v.type='inbound',CONCAT(v.sip_id,' - ',u.name,' - ',u.hrm_id), v.phone) AS phone_rep,
-                    v.duration, IF(v.type='inbound','Gọi vào','Gọi ra') AS phone_type, v.disposition AS phone_status,
-                    (SELECT name FROM cms_branches WHERE id=v.branch_id) AS branch_name
-                FROM voip24h_data AS v
-                    LEFT JOIN users AS u ON u.id=v.user_id 
-                WHERE v.status=1 AND v.sip_id IS NOT NULL AND $cond 
-                ORDER BY v.id DESC ");
-        $arr_status = [
-            'NO ANSWER'=>'Không nghe máy',
-            'BUSY'=>'Máy bận',
-            'ANSWERED'=>'Nghe máy'
-        ];
-        foreach($list AS $k=>$row){
-            $list[$k]->duration = gmdate("H:i:s", $row->duration);
-            $list[$k]->phone_status = isset($arr_status[$list[$k]->phone_status]) ? $arr_status[$list[$k]->phone_status] : $list[$k]->phone_status;
-            if(!$request->user()->hasRole('admin') && $row->phone_type =='Gọi vào'){
-                $list[$k]->phone_call = substr($list[$k]->phone_call,0,4)."xxx".substr($list[$k]->phone_call,7);
-            }
-            if(!$request->user()->hasRole('admin') && $row->phone_type =='Gọi ra'){
-                $list[$k]->phone_rep = substr($list[$k]->phone_rep,0,4)."xxx".substr($list[$k]->phone_rep,7);
-            }
-        }
+        $list = u::query("SELECT p.id AS parent_id, p.name, p.mobile_1, c.call_status, c.call_status_sub, c.next_care_date,
+            u.branch_name, CONCAT(u.name, ' - ', u.hrm_id) AS sale_name, c.created_at,
+                s.name AS source_name, sd.name AS source_detail_name, c.note    
+            FROM cms_customer_care AS c
+                LEFT JOIN cms_parents AS p ON c.parent_id=p.id
+                LEFT JOIN users AS u ON u.id =c.creator_id 
+                LEFT JOIN cms_sources AS s ON s.id=p.source_id
+                LEFT JOIN cms_source_detail AS sd ON sd.id=p.source_detail_id 
+            WHERE c.status=1 AND c.method_id = 1 AND $cond 
+            ORDER BY c.id DESC ");
             
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
         $sheet->setCellValue('A1', 'STT');
-        $sheet->setCellValue('B1', 'Ngày gọi');
-        $sheet->setCellValue('C1', 'Số gọi');
-        $sheet->setCellValue('D1', 'Số nhận');
-        $sheet->setCellValue('E1', 'Thời gian gọi');
-        $sheet->setCellValue('F1', 'Loại cuộc gọi');
-        $sheet->setCellValue('G1', 'Trạng thái cuộc gọi');
-        $sheet->setCellValue('H1', 'Trung tâm');
+        $sheet->setCellValue('B1', 'Tên khách hàng');
+        $sheet->setCellValue('C1', 'SĐT');
+        $sheet->setCellValue('D1', 'Trạng thái cuộc gọi');
+        $sheet->setCellValue('E1', 'Trạng thái cuộc gọi chi tiết');
+        $sheet->setCellValue('F1', 'Ngày hẹn chăm sóc');
+        $sheet->setCellValue('G1', 'Trung tâm');
+        $sheet->setCellValue('H1', 'Sale');
+        $sheet->setCellValue('I1', 'Ngày cập nhật');
+        $sheet->setCellValue('J1', 'Nguồn');
+        $sheet->setCellValue('K1', 'Nguồn chi tiết');
+        $sheet->setCellValue('L1', 'Ghi chú');
 
-        $sheet->getColumnDimension("A")->setWidth(10);
+        $sheet->getColumnDimension("A")->setWidth(5);
         $sheet->getColumnDimension("B")->setWidth(20);
         $sheet->getColumnDimension("C")->setWidth(20);
         $sheet->getColumnDimension("D")->setWidth(20);
@@ -415,16 +385,24 @@ class ExportController extends Controller
         $sheet->getColumnDimension("F")->setWidth(20);
         $sheet->getColumnDimension("G")->setWidth(20);
         $sheet->getColumnDimension("H")->setWidth(20);
+        $sheet->getColumnDimension("I")->setWidth(20);
+        $sheet->getColumnDimension("J")->setWidth(20);
+        $sheet->getColumnDimension("K")->setWidth(20);
+        $sheet->getColumnDimension("L")->setWidth(20);
         for ($i = 0; $i < count($list) ; $i++) {
             $x = $i + 2;
             $sheet->setCellValue('A' . $x, $i+1);
-            $sheet->setCellValue('B' . $x, $list[$i]->start_time);
-            $sheet->setCellValue('C' . $x, $list[$i]->phone_call) ;
-            $sheet->setCellValue('D' . $x, $list[$i]->phone_rep );
-            $sheet->setCellValue('E' . $x, $list[$i]->duration);
-            $sheet->setCellValue('F' . $x, $list[$i]->phone_type);
-            $sheet->setCellValue('G' . $x, $list[$i]->phone_status);
-            $sheet->setCellValue('H' . $x, $list[$i]->branch_name);
+            $sheet->setCellValue('B' . $x, $list[$i]->name);
+            $sheet->setCellValue('C' . $x, $list[$i]->mobile_1) ;
+            $sheet->setCellValue('D' . $x, u::genTitleCallStatus($list[$i]->call_status) );
+            $sheet->setCellValue('E' . $x, u::genTitleCallStatusSub($list[$i]->call_status_sub));
+            $sheet->setCellValue('F' . $x, $list[$i]->next_care_date);
+            $sheet->setCellValue('G' . $x, $list[$i]->branch_name);
+            $sheet->setCellValue('H' . $x, $list[$i]->sale_name);
+            $sheet->setCellValue('I' . $x, $list[$i]->created_at);
+            $sheet->setCellValue('J' . $x, $list[$i]->source_name);
+            $sheet->setCellValue('K' . $x, $list[$i]->source_detail_name);
+            $sheet->setCellValue('L' . $x, $list[$i]->note);
             
             $sheet->getRowDimension($x)->setRowHeight(23);
 

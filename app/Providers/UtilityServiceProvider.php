@@ -440,4 +440,50 @@ class UtilityServiceProvider extends ServiceProvider
 		$resp = self::queryCRM($query, $print);
 		return $resp && is_array($resp) && count($resp) >= 1 ? $resp[0] : $resp;
 	}
+    public static function genTitleCallStatus($call_status){
+        if($call_status === 0){
+            return 'Blank';
+        } elseif($call_status == 1){
+            return 'Thuê bao - Tắt máy - Sai số';
+        } elseif($call_status == 2){
+            return 'Location';
+        } elseif($call_status == 3){
+            return 'Máy bận - Không nghe máy';
+        } elseif($call_status == 4){
+            return 'KH hẹn gọi lại sau';
+        } elseif($call_status == 5){
+            return 'KH Từ chối nói chuyện';
+        }elseif($call_status == 6){
+            return 'KH không phù hợp';
+        } elseif($call_status == 7){
+            return 'KH tiềm năng';
+        } elseif($call_status == 9){
+            return 'Blacklist';
+        } else{
+            return '';
+        } 
+    }
+    public static function genTitleCallStatusSub($call_status_sub){
+            if($call_status_sub == 51){
+                return 'KH đã từng sử dụng dịch vụ';
+            }elseif($call_status_sub == 52){
+                return 'KH không quan tâm';
+            }elseif($call_status_sub == 53){
+                return 'KH thực sự không muốn nói chuyện';
+            }elseif($call_status_sub == 61){
+                return 'Không có con';
+            }elseif($call_status_sub == 62){
+                return 'Lý do khác';
+            }elseif($call_status_sub == 71){
+                return 'KH đang cân nhắc';
+            }elseif($call_status_sub == 72){
+                return 'KH hẹn thời gian khác';
+            }elseif($call_status_sub == 73){
+                return 'KH ko muốn làm phiền';
+            }elseif($call_status_sub == 74){
+                return 'Confirm 1';
+            }else{
+                return '';
+            }
+    }
 }

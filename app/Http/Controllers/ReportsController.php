@@ -100,20 +100,6 @@ class ReportsController extends Controller
     }
     public function report04(Request $request)
     {
-        // call, talk_time
-        u::query("UPDATE voip24h_data AS v
-                LEFT JOIN cms_parents AS p ON p.mobile_1 = v.phone 
-                LEFT JOIN users AS u ON u.sip_id = v.sip_id 
-                SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
-            WHERE v.user_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
-        u::query("UPDATE voip24h_data AS v
-                LEFT JOIN cms_parents AS p ON p.mobile_2 = v.phone 
-                LEFT JOIN users AS u ON u.sip_id = v.sip_id 
-                SET v.parent_id =p.id ,v.user_id=u.id, v.branch_id=u.branch_id
-            WHERE v.user_id IS NULL AND v.created_at >'".date('Y-m-d 00:00:00')."'");
-        u::query("UPDATE voip24h_data AS v
-            LEFT JOIN cms_customer_care AS c ON c.data_id = v.id 
-            SET v.STATUS = c.STATUS WHERe v.status!=c.status");
         $keyword = isset($request->keyword) ? $request->keyword : '';
         
         $pagination = (object)$request->pagination;
@@ -122,76 +108,58 @@ class ReportsController extends Controller
         $offset = $page == 1 ? 0 : $limit * ($page-1);
         $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
         $cond = "1";
-        $cond2 = "";
         if($keyword!==''){
-            $cond .= " AND (u.name LIKE '%$keyword%' OR u.hrm_id LIKE '%$keyword%' OR v.phone LIKE '%$keyword%')";
-        }
-        if(in_array(1,$request->type_status)){
-            $cond2 .= $cond2 ? " OR v.disposition = 'ANSWERED'" : "v.disposition = 'ANSWERED'";
-        }
-        if(in_array(2,$request->type_status)){
-            $cond2 .= $cond2 ? " OR v.disposition = 'NO ANSWER'" : "v.disposition = 'NO ANSWER'";
-        }
-        if(in_array(3,$request->type_status)){
-            $cond2 .= $cond2 ? " OR v.disposition = 'BUSY'" : "v.disposition = 'BUSY'";
-        }
-        if($cond2){
-            $cond.=" AND ( $cond2 ) ";
+            $cond .= " AND (p.name LIKE '%$keyword%' OR p.mobile_1 LIKE '%$keyword%')";
         }
         if (!empty($request->branch_id)) {
-            $cond.= " AND u.branch_id IN (".implode(",",$request->branch_id).")";
+            $cond .= " AND  u.branch_id =".$request->branch_id ;
         }
-        if($request->type_call ){
-            $cond.=$request->type_call ==2 ? " AND v.type='inbound' " : " AND v.type='outbound'";
+        if (!empty($request->owner_id)) {
+            $cond .= " AND  u.id IN (".implode(",",$request->owner_id).")" ;
         }
-        if($request->from_date){
-            $request->type_date = 0;
-            $cond .= " AND v.start_time >= '".date('Y-m-d H:i:s',strtotime($request->from_date))."'";
+        if (!empty($request->source_id)) {
+            $cond .= " AND p.source_id IN (".implode(",",$request->source_id).")";
         }
-        if($request->to_date){
-            $request->type_date = 0;
-            $cond .= " AND v.start_time <= '".date('Y-m-d H:i:s',strtotime($request->to_date))."'";
+        if (!empty($request->source_detail_id)) {
+            $cond .= " AND p.source_detail_id IN (".implode(",",$request->source_detail_id).")";
         }
-        if($request->type_date == 1){
-            $cond .= " AND v.start_time >= '".date('Y-m-d 00:00:00')."'";
-        }elseif($request->type_date == 2){
-            $cond .= " AND v.start_time < '".date('Y-m-d 00:00:00')."' AND v.start_time >= '".date('Y-m-d 00:00:00',strtotime ( '-1 day' , time() ) )."'";
-        }elseif($request->type_date == 3){
-            $cond .= " AND v.start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday"))."'";
-        }elseif($request->type_date == 4){
-            $cond .= " AND v.start_time < '".date('Y-m-d 00:00:00',strtotime("last Monday"))."' AND v.start_time >= '".date('Y-m-d 00:00:00',strtotime("last Monday")-24*7*3600)."'";
-        }elseif($request->type_date == 5){
-            $cond .= " AND v.start_time >= '".date('Y-m-01 00:00:00')."'";
-        }elseif($request->type_date == 6){
-            $cond .= " AND v.start_time < '".date('Y-m-01 00:00:00')."' AND v.start_time >= '".date('Y-m-01 00:00:00',strtotime('-1 month'))."'";
+        if($request->call_status ){
+            $cond.=" AND c.call_status=".$request->call_status;
         }
-        // if($request->user()->id==21){
-        //     $cond .= " AND (u.id IN (".$request->user_info->users_manager.") AND u.id NOT IN (".$request->user_info->tmp_users_manager.")) ";
-        // }else
+        if($request->call_status_sub ){
+            $cond.=" AND c.call_status_sub=".$request->call_status_sub;
+        }
+        if($request->start_date){
+            $cond .= " AND c.created_at >= '".date('Y-m-d 00:00:00',strtotime($request->start_date))."'";
+        }
+        if($request->end_date){
+            $cond .= " AND c.created_at <= '".date('Y-m-d 23:59:59',strtotime($request->end_date))."'";
+        }
+        
+        if($request->start_date_care){
+            $cond .= " AND c.next_care_date >= '".date('Y-m-d 00:00:00',strtotime($request->start_date_care))."'";
+        }
+        if($request->end_date_care){
+            $cond .= " AND c.next_care_date <= '".date('Y-m-d 23:59:59',strtotime($request->end_date_care))."'";
+        }
+        
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
         }
-        $total = u::first("SELECT count(v.id) AS total FROM voip24h_data AS v
-                LEFT JOIN users AS u ON u.id=v.user_id  
-            WHERE v.status=1 AND v.sip_id IS NOT NULL AND $cond  ");
-        $list = u::query("SELECT v.start_time,
-                IF(v.type='inbound',v.phone, CONCAT(v.sip_id,' - ',u.name,' - ',u.hrm_id)) AS phone_call,
-                IF(v.type='inbound',CONCAT(v.sip_id,' - ',u.name,' - ',u.hrm_id), v.phone) AS phone_rep,
-                v.duration, IF(v.type='inbound','Gọi vào','Gọi ra') AS phone_type, v.disposition AS phone_status,
-                (SELECT name FROM cms_branches WHERE id=v.branch_id) AS branch_name, v.link_record
-            FROM voip24h_data AS v
-                LEFT JOIN users AS u ON u.id=v.user_id
-            WHERE v.status=1 AND v.sip_id IS NOT NULL AND $cond 
-            ORDER BY v.id DESC $limitation");
-        $arr_status = [
-            'NO ANSWER'=>'Không nghe máy',
-            'BUSY'=>'Máy bận',
-            'ANSWERED'=>'Nghe máy'
-        ];
-        foreach($list AS $k=>$row){
-            $list[$k]->duration = gmdate("H:i:s", $row->duration);
-            $list[$k]->phone_status = isset($arr_status[$list[$k]->phone_status]) ? $arr_status[$list[$k]->phone_status] : $list[$k]->phone_status;
-        }
+        $total = u::first("SELECT count(c.id) AS total FROM cms_customer_care AS c
+                LEFT JOIN cms_parents AS p ON c.parent_id=p.id 
+                LEFT JOIN users AS u ON u.id =c.creator_id  
+            WHERE c.status=1 AND c.method_id = 1 AND $cond  ");
+        $list = u::query("SELECT p.id AS parent_id, p.name, p.mobile_1, c.call_status, c.call_status_sub, c.next_care_date,
+            u.branch_name, CONCAT(u.name, ' - ', u.hrm_id) AS sale_name, c.created_at,
+                s.name AS source_name, sd.name AS source_detail_name, c.note    
+            FROM cms_customer_care AS c
+                LEFT JOIN cms_parents AS p ON c.parent_id=p.id
+                LEFT JOIN users AS u ON u.id =c.creator_id 
+                LEFT JOIN cms_sources AS s ON s.id=p.source_id
+                LEFT JOIN cms_source_detail AS sd ON sd.id=p.source_detail_id 
+            WHERE c.status=1 AND c.method_id = 1 AND $cond 
+            ORDER BY c.id DESC $limitation");
             
         $data = u::makingPagination($list, $total->total, $page, $limit);
         return response()->json($data);
