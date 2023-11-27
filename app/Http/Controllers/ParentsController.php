@@ -362,11 +362,15 @@ class ParentsController extends Controller
     public function makeToCall(Request $request,$parent_id){
         $parent_info = u::first("SELECT * FROM cms_parents WHERE id='$parent_id'");
         $phone = $request->phone ? $request->phone :$parent_info->mobile_1;
-        if($parent_info){
-            $voip = new VoipController();
-            $voip->makeToCall($phone,$request->user()->sip_id);
+        if($request->user()->sip_id){
+            if($parent_info){
+                $voip = new VoipController();
+                $voip->makeToCall($phone,$request->user()->sip_id);
+            }
+            return response()->json(['status'=>1]);
+        }else{
+            return response()->json(['status'=>0]);
         }
-        return "ok";
     }
     public function getInfoByPhone($phone){
         $parent_info = u::first("SELECT name,id,mobile_1 FROM cms_parents WHERE mobile_1='$phone'");

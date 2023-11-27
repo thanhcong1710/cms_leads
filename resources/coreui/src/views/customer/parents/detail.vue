@@ -108,7 +108,7 @@
                       <label for="nf-email">Trạng thái cuộc gọi <span class="text-danger"> (*)</span></label>
                       <select class="form-control" v-model="phone.select_note_status">
                         <option value="">Chọn trạng thái</option>
-                        <option value="0">Blank</option>
+                        <!-- <option value="0">Blank</option> -->
                         <option value="1">Thuê bao - Tắt máy - Sai số</option>
                         <option value="2">Location</option>
                         <option value="3">Máy bận - Không nghe máy</option>
@@ -926,18 +926,23 @@ export default {
       u.g(`/api/parents/make_to_call/${this.$route.params.id}?phone=${phone}`)
       .then((response) => {
         this.loading.processing = false;
-        this.phone.show = true
-        this.phone.status = 0
-        this.phone.select_note = ""
-        this.phone.show_input_note = false
-        this.phone.css_class= 'alert alert-success'
-        this.phone.title = "Đang thực hiện cuộc gọi đi đến SĐT - "+phone+" ..."
-        this.phone.care_id = ''
-        this.phone.note=''
-        this.phone.select_note_status='',
-        this.phone.select_note_status_sub='',
-        this.phone.next_care_date='',
-        this.phone.error_message=''
+        console.log(response.data.status)
+        if(response.data.status == 0){
+          alert('Vui lòng đăng nhập lại và nhập đúng đầu số điện thoại để gọi!');
+        }else{
+          this.phone.show = true
+          this.phone.status = 0
+          this.phone.select_note = ""
+          this.phone.show_input_note = false
+          this.phone.css_class= 'alert alert-success'
+          this.phone.title = "Đang thực hiện cuộc gọi đi đến SĐT - "+phone+" ..."
+          this.phone.care_id = ''
+          this.phone.note=''
+          this.phone.select_note_status='',
+          this.phone.select_note_status_sub='',
+          this.phone.next_care_date='',
+          this.phone.error_message=''
+        }
       })
       .catch((e) => {
       });
@@ -984,7 +989,7 @@ export default {
         mess += " - Chi tiết trạng thái cuộc gọi không được để trống<br/>";
         resp = false;
       }
-      if (['3','4','7'].indexOf(this.phone.select_note_status) > -1 && this.phone.select_note_status_sub!=73 && phone_next_care_date=='') {
+      if (['3','4','7'].indexOf(this.phone.select_note_status) > -1 && this.phone.select_note_status_sub!=73 && this.phone.select_note_status_sub!=74 && phone_next_care_date=='') {
         mess += " - Lịch chăm sóc tiếp không được để trống<br/>";
         resp = false;
       }
