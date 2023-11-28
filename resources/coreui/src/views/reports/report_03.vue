@@ -175,7 +175,7 @@
                     </tr>
                     <tr>
                       <td class="text-left" rowspan="2">6. KH không phù hợp</td>
-                      <td class="text-right" rowspan="2"></td>
+                      <td class="text-right" rowspan="2">{{data_report.detail_6}}</td>
                       <td class="text-left">6.1. Không có con</td>
                       <td class="text-right">{{data_report.detail_61}}</td>
                     </tr>
