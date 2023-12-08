@@ -5,35 +5,24 @@
         <div class="card">
           <loader :active="loading.processing" :text="loading.text" />
           <div class="card-header">
-            <strong> Báo cáo tuần Sale HUB - {{label_report}}</strong>
+            <strong> Báo cáo DATA theo thời gian</strong>
           </div>
           <div class="card-body">
             <div class="row">
               <div class="form-group col-sm-6">
-                <label for="name">Từ khóa</label>
-                <input
-                  class="form-control"
-                  v-model="searchData.keyword"
-                  type="text"
-                  placeholder="Tên nhân viên, mã nhân viên"
-                />
-              </div>
-              <div class="form-group col-sm-6">
-                <label for="ccmonth">Tuần</label>
-                  <vue-select
-                        label="label"
-                        placeholder="Chọn tuần"
-                        :options="list_week"
-                        v-model="week"
-                        :searchable="true"
-                        language="tv-VN"
-                        :onChange="selectWeek"
-                    ></vue-select>
+                <label for="ccmonth">Ngày tìm kiếm</label>
+                  <date-picker
+                    style="width:100%;"
+                    v-model="searchData.dateRange"
+                    :clearable="true"
+                    :lang="datepickerOptions.lang"
+                    range
+                    format="YYYY-MM-DD"
+                    id="apax-date-range"
+                    placeholder="Chọn thời gian tìm kiếm từ ngày đến ngày"
+                  ></date-picker>
               </div>
               <div class="form-group col-sm-12">
-                <router-link to="/reports/target-update" > <button class="btn btn-success">
-                  <i class="fas fa-plus"></i> Target
-                </button></router-link>
                 <button class="btn btn-success" @click="exportExcel()">
                   <i class="fas fa-file-excel"></i> Xuất báo cáo
                 </button>
@@ -91,25 +80,6 @@
                 </tr>
               </tbody>
             </table>
-            <div class="text-center">
-              <nav aria-label="Page navigation">
-                <paging
-                  :rootLink="pagination.url"
-                  :id="pagination.id"
-                  :listStyle="pagination.style"
-                  :customClass="pagination.class"
-                  :firstPage="pagination.spage"
-                  :previousPage="pagination.ppage"
-                  :nextPage="pagination.npage"
-                  :lastPage="pagination.lpage"
-                  :currentPage="pagination.cpage"
-                  :pagesItems="pagination.total"
-                  :pagesLimit="pagination.limit"
-                  :pageList="pagination.pages"
-                  :routing="changePage"
-                ></paging>
-              </nav>
-            </div>
           </div>
         </div>
       </div>
@@ -138,8 +108,7 @@ export default {
         processing: false,
       },
       searchData: {
-        keyword: "",
-        week_id:"",
+        dateRange: [new Date(), new Date()],
         pagination: this.pagination
       },
       imports: [],
@@ -162,10 +131,6 @@ export default {
     };
   },
   created() {
-    u.g(`/api/report_week`)
-      .then(response => {
-      this.list_week = response.data
-    })
     this.search();
   },
   methods: {
@@ -185,14 +150,7 @@ export default {
         .then((response) => {
           this.loading.processing = false;
           this.imports = response.data.list;
-          this.pagination.spage = response.data.paging.spage;
-          this.pagination.ppage = response.data.paging.ppage;
-          this.pagination.npage = response.data.paging.npage;
-          this.pagination.lpage = response.data.paging.lpage;
-          this.pagination.cpage = response.data.paging.cpage;
-          this.pagination.total = response.data.paging.total;
-          this.pagination.limit = response.data.paging.limit;
-          this.label_report=response.data.label_report
+          
         })
         .catch((e) => {
           u.processAuthen(e);
