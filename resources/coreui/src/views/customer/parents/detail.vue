@@ -12,7 +12,7 @@
                   </div>
                   <div style="float: left; padding: 10px;">
                     <h5 style="margin-bottom:0px">{{parent.name}} 
-                      <router-link  v-if="!disabled_action" style="padding: 2px 6px"
+                      <router-link  v-if="!disabled_edit" style="padding: 2px 6px"
                         class="btn btn-sm btn-outline-primary"
                         :to="`/parents/${parent.id}/edit`"
                       >
@@ -638,14 +638,15 @@ export default {
         phone:''
       },
       template_note:[],
-      disabled_action:false
+      disabled_action:false,
+      disabled_edit:false,
     };
   },
   created() {
     const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
-    // if(arr_role.indexOf("Supervisor")> -1){
-    //   this.disabled_action = true
-    // }
+    if(!arr_role.indexOf("admin")> -1){
+      this.disabled_edit = true
+    }
     // this.$socket.emit('userConnected', localStorage.getItem("user_id"));
     u.g(`/api/user/get-users-manager`)
       .then(response => {

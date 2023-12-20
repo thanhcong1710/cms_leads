@@ -181,13 +181,13 @@
                     <td>{{ item.last_care }}</td>
                     <td>{{ item.last_time_care }}</td>
                     <td>{{ item.status | getStatusName }}</td>
-                    <td  v-if="!disabled_action" class="sticky-col last-col">
-                      <router-link
+                    <td class="sticky-col last-col">
+                      <router-link  v-if="!disabled_action"
                         class="btn btn-sm btn-success"
                         :to="`/parents/${item.id}/edit`"
                       >
                         <i class="fa fa-edit"></i> </router-link>
-                      <button
+                      <button  v-if="!disabled_action"
                         class="btn btn-sm btn-danger"
                         type="button"
                         @click="deleteItem(item.id)"
@@ -441,9 +441,9 @@ export default {
   },
   created() {
     const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
-    // if(arr_role.indexOf("Supervisor")> -1){
-    //   this.disabled_action = true
-    // }
+    if(!arr_role.indexOf("admin")> -1){
+      this.disabled_action = true
+    }
     u.g(`/api/user/get-users-manager`)
       .then(response => {
       this.users_manager = response.data
