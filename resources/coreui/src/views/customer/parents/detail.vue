@@ -643,10 +643,10 @@ export default {
     };
   },
   created() {
-    const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
-    if(!(arr_role.indexOf("admin")> -1)){
-      this.disabled_edit = true
-    }
+    // const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
+    // if(!(arr_role.indexOf("admin")> -1)){
+    //   this.disabled_edit = true
+    // }
     // this.$socket.emit('userConnected', localStorage.getItem("user_id"));
     u.g(`/api/user/get-users-manager`)
       .then(response => {
