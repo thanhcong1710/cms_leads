@@ -644,7 +644,7 @@ export default {
   },
   created() {
     const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
-    if(!arr_role.indexOf("admin")> -1){
+    if(!(arr_role.indexOf("admin")> -1)){
       this.disabled_edit = true
     }
     // this.$socket.emit('userConnected', localStorage.getItem("user_id"));

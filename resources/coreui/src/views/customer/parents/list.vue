@@ -153,7 +153,7 @@
                     <th>Lịch sử chăm sóc</th>
                     <th>Thời gian chăm sóc gần nhất</th>
                     <th>Trạng thái</th>
-                    <th  v-if="!disabled_action" class="sticky-col last-col">Thao tác</th>
+                    <th class="sticky-col last-col">Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -441,7 +441,7 @@ export default {
   },
   created() {
     const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
-    if(!arr_role.indexOf("admin")> -1){
+    if(!(arr_role.indexOf("admin")> -1)){
       this.disabled_action = true
     }
     u.g(`/api/user/get-users-manager`)
