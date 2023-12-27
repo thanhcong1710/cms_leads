@@ -98,7 +98,7 @@ class SystemInfoController extends Controller
         }
         if(!$request->user()->hasRole('admin')){
             $edit = "IF(".$request->user()->branch_id." = s.branch_id,1,0) AS can_edit";
-            $cond .= " AND ( s.branch_id =".$request->user()->branch_id." OR s.branch_id IS NULL)";
+            $cond .= " AND ( s.branch_id =".$request->user()->branch_id." OR s.branch_id IS NULL OR s.branch_id=0)";
         }else{
             $edit = "1 AS can_edit";
         }
@@ -110,13 +110,13 @@ class SystemInfoController extends Controller
     }
     public function addSourceDetail(Request $request)
     {
-        $branch_id = !$request->user()->hasRole('admin') ? $request->user()->branch_id : NULL;
+        // $branch_id = !$request->user()->hasRole('admin') ? $request->user()->branch_id : NULL;
         $id = u::insertSimpleRow(array(
             'name'=>$request->name,
             'created_at' => date('Y-m-d H:i:s'),
             'creator_id' => Auth::user()->id,
             'status'=>$request->status,
-            'branch_id'=>$branch_id
+            'branch_id'=>$request->branch_id
         ), 'cms_source_detail');
         return response()->json($id);
     }
@@ -132,6 +132,7 @@ class SystemInfoController extends Controller
             'updated_at' => date('Y-m-d H:i:s'),
             'updator_id' => Auth::user()->id,
             'status'=>$request->status,
+            'branch_id'=>$request->branch_id
         ), array('id'=>$source_detail_id),'cms_source_detail');
         return response()->json($id);
     }

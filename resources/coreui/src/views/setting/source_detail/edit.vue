@@ -96,15 +96,22 @@ export default {
         },
         name: '',
         status:1,
+        branch_id:'',
+        branches:[],
     }
   },
   created() {
+    u.g(`/api/branches`)
+      .then(response => {
+      this.branches = response.data
+    })
     this.loading.processing = true;
     u.g(`/api/source_detail/show/${this.$route.params.id}`)
       .then(response => {
       this.loading.processing = false;
       this.name = response.data.name
       this.status = response.data.status
+      this.branch_id = response.data.branch_id
     })
   },
   methods: {
@@ -126,6 +133,7 @@ export default {
       u.p(`/api/source_detail/update/${this.$route.params.id}`,{
         name: this.name,
         status: this.status,
+        branch_id: this.branch_id,
       })
         .then((response) => {
           this.loading.processing = false;
