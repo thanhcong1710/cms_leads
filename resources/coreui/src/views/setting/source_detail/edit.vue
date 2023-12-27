@@ -13,6 +13,13 @@
                 <div class="col-sm-6">
                   <div class="row no-margin">
                     <div class="form-group col-sm-12">
+                      <label for="nf-email">Trung Tâm Áp dụng</label>
+                      <select class="form-control" v-model="branch_id">
+                        <option value="0">Chọn trung tâm</option>
+                        <option :value="item.id" v-for="(item, index) in branches" :key="index">{{item.name}}</option>
+                      </select>
+                    </div>
+                    <div class="form-group col-sm-12">
                       <label for="nf-email">Tên nguồn chi tiết <span class="text-danger"> (*)</span></label>
                       <input
                         class="form-control"
