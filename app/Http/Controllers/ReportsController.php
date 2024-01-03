@@ -179,8 +179,8 @@ class ReportsController extends Controller
             $cond1 .= " AND c.created_at >= '".date('Y-m-d 00:00:00',strtotime($request->start_date))."'";
         }
         if($request->end_date){
-            $cond .= " AND p.last_assign_date <= '".date('Y-m-d 00:00:00',strtotime($request->end_date))."'";
-            $cond1 .= " AND c.created_at <= '".date('Y-m-d 00:00:00',strtotime($request->end_date))."'";
+            $cond .= " AND p.last_assign_date <= '".date('Y-m-d 23:59:59',strtotime($request->end_date))."'";
+            $cond1 .= " AND c.created_at <= '".date('Y-m-d 23:59:59',strtotime($request->end_date))."'";
         }
         if (!empty($request->owner_id)) {
             $cond .= " AND  u.id IN (".implode(",",$request->owner_id).")" ;
