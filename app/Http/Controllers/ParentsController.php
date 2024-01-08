@@ -319,7 +319,7 @@ class ParentsController extends Controller
                         $thoi_gian_con = 16 - floor((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
                         $text.="<br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }
-                    if($duplicate_info->status < 80 && $duplicate_info->status!=73){
+                    if($duplicate_info->status > 80 || $duplicate_info->status==73){
                         $text="<br> Khách hàng thuộc các trường hợp không được phép ghi đè - ".u::getStatus($duplicate_info->status);
                     }
                     $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name .".$text;
