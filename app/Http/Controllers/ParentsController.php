@@ -520,7 +520,7 @@ class ParentsController extends Controller
                 p.care_date=(SELECT IF(care_date IS NULL, p.care_date,care_date) FROM cms_customer_care WHERE parent_id=p.id AND `status`=1 ORDER BY id DESC LIMIT 1)
             WHERE p.id=$parent_id ");
         u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id,p.is_lock = 1
-            WHERE p.id=$parent_id AND p.status NOT IN( 90, 81, 82, 83, 73)");
+            WHERE p.id=$parent_id ");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE last_care_date IS NULL  AND id=$parent_id
                 AND last_assign_date IS NOT NULL 
