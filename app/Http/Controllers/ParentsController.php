@@ -66,9 +66,9 @@ class ParentsController extends Controller
         if ($start_date !== '') {
             $cond .= " AND p.next_care_date > '$start_date 00:00:00'";
         }
-        if (date('d') >= '11') {
-            $cond .= " AND p.status = -1";
-        }
+        // if (date('d') >= '11') {
+        //     $cond .= " AND p.status = -1";
+        // }
         //type_search=1
         $cond_1 = " AND p.care_date IS NULL AND p.status <80 ";
         //type_search=2
