@@ -7,6 +7,7 @@ use App\Providers\UtilityServiceProvider as u;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Providers\CurlServiceProvider as curl;
+use Illuminate\Support\Facades\Log;
 
 class VoipController extends Controller
 {
@@ -176,5 +177,10 @@ class VoipController extends Controller
         $sip= (int)$sip;
         $sip_info= u::first("SELECT * FROM config_ext_phone WHERE ext_start<= $sip AND ext_end>= $sip LIMIT 1");
         return $sip_info ? $sip_info->ext_phone : 0;
+    }
+
+    public function oncallWebhook(Request $request){
+        Log::info("message",['data'=>$request->input()]);
+        return response()->json("ok");
     }
 }

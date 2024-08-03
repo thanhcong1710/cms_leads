@@ -156,3 +156,4 @@ Route::group(['middleware' => 'api'], function ($router) {
     });
 });
 Route::post('/camera/ipn', 'CameraAIController@ipn');
+Route::post('webhook/oncall', 'VoipController@oncallWebhook');
