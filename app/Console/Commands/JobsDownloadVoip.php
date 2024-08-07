@@ -41,26 +41,27 @@ class JobsDownloadVoip extends Command
      */
     public function handle(Request $request)
     {
-        $last_time = date('Y-m-d H:i:s',time()-3600);
-        $list_call = u::query("SELECT * FROM voip24h_data WHERE process_data = 0 AND created_at>'$last_time' ORDER BY id DESC");
+        $last_time = date('Y-m-d H:i:s',time()- 60*60);
+        $list_call = u::query("SELECT id, data_id FROM cms_customer_care WHERE get_data_call =0 AND data_id IS NOT NULL AND created_at>'$last_time' ORDER BY id DESC");
         foreach($list_call AS $row){
             $voipControll = new VoipController();
-            $response = $voipControll->getDataCallId($row->callid);
-            $data = json_decode($response);
-            if(isset($data->result->data[0]->download) &&$data->result->data[0]->download){
+            $response = $voipControll->getDataRecordCallId($row->data_id);
+            if(isset($response->items[0]->file_id) && $response->items[0]->file_id){
                 $dir = __DIR__.'/../../../public/static/voip/'. date('Y_m').'/';
                 $dir_file = 'static/voip/'. date('Y_m').'/';
                 if(!file_exists($dir)){
                     mkdir($dir);
                 }
-                $file_name = $row->callid.".wav";
-                $file_name_mp3 = $row->callid.".mp3";
-                file_put_contents($dir.$file_name, fopen($data->result->data[0]->download, 'r'));
+                $file_name = $row->data_id.".wav";
+                $file_name_mp3 = $row->data_id.".mp3";
+                $file_id = $response->items[0]->file_id;
+                $url_download = "https://rsv01.oncall.vn:8887/api/files/$file_id/data";
+                file_put_contents($dir.$file_name, fopen($url_download, 'r'));
 
                 shell_exec('ffmpeg -i ' . $dir.$file_name . ' ' . $dir.$file_name_mp3 . ''); 
-                u::updateSimpleRow(array('meta_data'=>$response,'process_data'=>1,'link_record'=>$dir_file.$file_name_mp3),array('callid'=>$row->callid),'voip24h_data');
+                u::updateSimpleRow(array('get_data_call'=>1,'attached_file'=>$dir_file.$file_name_mp3),array('id'=>$row->id),'cms_customer_care');
             }else{
-                u::updateSimpleRow(array('process_data'=>1),array('callid'=>$row->callid),'voip24h_data');
+                u::updateSimpleRow(array('get_data_call'=>1),array('id'=>$row->id),'cms_customer_care');
             }
         }
         u::query("INSERT INTO log_jobs (`action`, created_at) VALUES ('jobsDownloadVoip','".date('Y-m-d H:i:s')."')");

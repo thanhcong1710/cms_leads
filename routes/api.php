@@ -33,6 +33,7 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::get('/import/process_import_checkin', 'ImportsController@processImportCheckin');
     Route::get('/parent/process_parent_lock', 'ParentsController@processParentLock');
     Route::get('/parent/delete_file_attached', 'ParentCareController@deleteFileAttached');
+    Route::get('call/test', 'VoipController@makeToCall');
 
     Route::group(['middleware' => 'admin'], function ($router) {
         Route::resource('users', 'UsersController')->except( ['create', 'store'] );

@@ -365,14 +365,15 @@ class ParentsController extends Controller
     public function makeToCall(Request $request,$parent_id){
         $parent_info = u::first("SELECT * FROM cms_parents WHERE id='$parent_id'");
         $phone = $request->phone ? $request->phone :$parent_info->mobile_1;
-        if($request->user()->sip_id){
-            if($parent_info){
-                $voip = new VoipController();
-                $voip->makeToCall($phone,$request->user()->sip_id);
-            }
-            return response()->json(['status'=>1]);
+        // if($request->user()->sip_id && $parent_info){
+        if($parent_info){
+            $sip_id = $request->user()->sip_id;
+            $sip_id = 1067;
+            $voip = new VoipController();
+            $result = $voip->makeToCall($phone, $sip_id);
+            return response()->json($result);
         }else{
-            return response()->json(['status'=>0]);
+            return response()->json(['status'=>0, 'message'=>'Vui lòng đăng nhập lại và nhập đúng đầu số điện thoại để gọi!']);
         }
     }
     public function getInfoByPhone($phone){

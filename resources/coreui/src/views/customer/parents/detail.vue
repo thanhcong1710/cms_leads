@@ -927,9 +927,8 @@ export default {
       u.g(`/api/parents/make_to_call/${this.$route.params.id}?phone=${phone}`)
       .then((response) => {
         this.loading.processing = false;
-        console.log(response.data.status)
         if(response.data.status == 0){
-          alert('Vui lòng đăng nhập lại và nhập đúng đầu số điện thoại để gọi!');
+          alert(response.data.message);
         }else{
           this.phone.show = true
           this.phone.status = 0
@@ -937,12 +936,12 @@ export default {
           this.phone.show_input_note = false
           this.phone.css_class= 'alert alert-success'
           this.phone.title = "Đang thực hiện cuộc gọi đi đến SĐT - "+phone+" ..."
-          this.phone.care_id = ''
           this.phone.note=''
           this.phone.select_note_status='',
           this.phone.select_note_status_sub='',
           this.phone.next_care_date='',
           this.phone.error_message=''
+          this.phone.care_id = response.data.call_id
         }
       })
       .catch((e) => {
@@ -1008,7 +1007,8 @@ export default {
           care_date:"",
           next_care_date:phone_next_care_date,
           call_status_sub:this.phone.select_note_status_sub,
-          call_status:this.phone.select_note_status
+          call_status:this.phone.select_note_status,
+          data_id : this.phone.care_id,
         };
         this.loading.processing = true;
       u.p(`/api/care/add`,data)

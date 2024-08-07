@@ -53,7 +53,8 @@ class CurlServiceProvider extends ServiceProvider
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_POSTFIELDS => json_encode($params),
-            CURLOPT_HTTPHEADER => $http_header
+            CURLOPT_HTTPHEADER => $http_header,
+            CURLOPT_SSL_VERIFYPEER => false
         ];
 
         if($proxy){
@@ -66,7 +67,6 @@ class CurlServiceProvider extends ServiceProvider
         $response = curl_exec($curl);
         $err = curl_error($curl);
         curl_close($curl);
-
         if ($err) {
             return false;
         } else {

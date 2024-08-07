@@ -16,171 +16,80 @@ class VoipController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    protected $baseUriCall;
+    protected $baseUriSocket;
     public function __construct()
     {
-        // $this->baseUri = "103.226.250.52";
-        // $this->voip24 = "http://dial.voip24h.vn/dial";
-        // $this->voip24_key = "cb7320a02d1bf15651002cac0fe56523e13d7298";
-        // $this->voip24_secret = "0e43c1bc6caeb10fc22a3ca43cc29b99";
-        if(env('APP_ENV', 'staging')=='production'){
-            $this->voip24 = "https://voice.diginext.com.vn/api";
-            $this->voip24_key = "d5fa5d0b5b0d793a4c9dc80c4c23e5a1347a177704c03b450bf431606a8c1ec0";
-            $this->ma_dn = "dn00196";
-            $this->dauso = "842488886505";
-        }else{
-            $this->voip24 = "https://voice.diginext.com.vn/api";
-            $this->voip24_key = "d5fa5d0b5b0d793a4c9dc80c4c23e5a1347a177704c03b450bf431606a8c1ec0";
-            $this->ma_dn = "test2dn00000";
-            $this->dauso = "842488886505";
-        }
+        $this->baseUriSocket = "103.226.250.52";
+        $this->baseUriCall = "https://rsv01.oncall.vn:8887";
     }
-    public function webhook(Request $request)
-    {
-        $data = json_decode(file_get_contents('php://input'), true);
-        u::insertSimpleRow( array(
-            'type'=>'webhook',
-            'response'=>json_encode($data, true),
-            'callid'=>$data['callid'],
-            'state'=>$data['state'],
-            'created_at'=>date('Y-m-d H:i:s'),
-        ),'voip24h_respose');
-        $obj = (object)$data;
-        if($obj->state == 'Cdr'){
-            $cdr = (object)$obj->cdr;
-            if($obj->type =="inbound"){
-                $phone = $cdr->source;
-                $disposition = $cdr->disposition;
-            }else{
-                $phone = $obj->phone;
-                if($cdr->disposition=='ANSWERED'){
-                    $check_info = u::first("SELECT count(id) AS total FROM voip24h_respose WHERE callid= '$obj->callid' AND state='Up'");
-                    $disposition = $check_info->total>0 ? 'ANSWERED' :'NO ANSWER';
-                }else{
-                    $disposition = $cdr->disposition;
-                }
-            }
-            
-            $data_id = u::insertSimpleRow( array(
-                'callid'=>$obj->callid,
-                'phone'=>$phone,
-                'type'=>$obj->type,
-                'sip_id'=>$obj->extend,
-                'start_time'=>$cdr->starttime ? $cdr->starttime : NULL,
-                'answer_time'=>$cdr->answertime ? $cdr->answertime : NULL,
-                'end_time'=>$cdr->endtime ? $cdr->endtime : NULL,
-                'duration'=>$cdr->duration,
-                'disposition'=>$disposition,
-                'created_at'=>date('Y-m-d H:i:s'),
-            ),'voip24h_data');
-            $parent_info = u::first("SELECT id FROM cms_parents WHERE (mobile_1='$phone' OR mobile_2='$phone')");
-            $user_info = u::first("SELECT id,branch_id FROM users WHERE sip_id='".(int)$obj->extend."'");
-            if($data_id && $parent_info && $user_info){
-                $care_id = u::insertSimpleRow( array(
-                    'parent_id'=>$parent_info->id,
-                    'note'=>'',
-                    'created_at'=>date('Y-m-d H:i:s'),
-                    'creator_id'=>$user_info->id,
-                    'method_id'=>1,
-                    'care_date'=>$cdr->starttime ? $cdr->starttime : NULL,
-                    'data_id'=>$data_id,
-                    'data_state'=>$disposition,
-                    'phone'=>$phone,
-                    'branch_id'=>$user_info->branch_id,
-                    'status'=>0,
-                ),'cms_customer_care');
-                ParentsController::processParentLockById($parent_info->id);
-                $this->socketIo($user_info->id,'call_end',array('user_id'=>$user_info->id,'care_id'=>$care_id,'parent_id'=>$parent_info->id));
-            }
-        }elseif($obj->state == 'Ring' && $obj->type=="inbound"){
-            $user_info = u::first("SELECT id FROM users WHERE sip_id='".(int)$obj->extend."'");
-            $parent_info = u::first("SELECT id FROM cms_parents WHERE mobile_1='$obj->phone'");
-            if($user_info && $parent_info){ 
-                $this->socketIo($user_info->id,'inbound',array('user_id'=>$user_info->id,'phone'=>$obj->phone));
-            }
-        }
-        
-        return response()->json("ok");
-    }
-    public function makeToCall($phone,$sip=0)
-    {
-        // $method = "GET";
-        // $http_data = array(
-        //     'voip' => $this->voip24_key,
-        //     'secret' => $this->voip24_secret,
-        //     'sip' => $sip ? $sip : '651',
-        //     'phone' =>$phone
-        // );
-        // $url = sprintf('%s?%s',$this->voip24, http_build_query($http_data));
-        // $res = curl::curl($url, $method);
-        // u::logRequest($url,$method,[],[],$res,'log_request_outbound');
-        // return "ok";
+    private function getToken(){
         $header=[
             "Content-Type: application/json",
-            "Secret-Key: ".$this->voip24_key
         ];
         $method = "POST";
         $params = array(
-            'ma_dn' => $this->ma_dn,
-            'dauso' => $this->getDauSoByShip($sip),
-            'mayle' => $sip ? $sip : '0',
-            'sokhachhang' =>$phone
+            'username' => 'HNCX01058',
+            'password' => 'Eh5Gee3Cb3B1',
+            'domain' => 'hncx01058.oncall',
         );
-        $url = $url = sprintf('%s/click-to-call',$this->voip24);
+        $url = sprintf('%s/api/tokens',$this->baseUriCall);
         $res = curl::curl($url, $method, $header, $params);
-        u::logRequest($url,$method,$header,$params,$res,'log_request_outbound');
-        return "ok";
+        $res =json_decode($res);
+        return data_get($res, 'access_token');
     }
-    public function socketIo($user_id,$event,$data){
-
-        $arr=[
-            'user_id'=>$user_id,
-            'event'=>$event,
-            'data'=>$data
+    public function makeToCall($phone,$sip=0)
+    {
+        $token = self::getToken();
+        $header=[
+            "Authorization: Bearer ".$token
         ];
-        
-        $socketio = new SocketIO();
-        if ($socketio->send($this->baseUri, 3000 , 'pushData', json_encode($arr))){
-            u::insertSimpleRow( array(
-                'user_id'=>$user_id,
-                'event'=>$event,
-                'created_at'=>date('Y-m-d H:i:s'),
-                'data'=>json_encode($data)
-            ),'log_socket');
-            echo 'we sent the message and disconnected: '.json_encode($data);
-        } else {
-            echo 'Sorry, we have a mistake :\'(';
+        $method = "GET";
+        $params = array(
+            'extension_number' => $sip,
+            'password' => $this->getPassByShip($sip),
+            'domain' => 'hncx01058.oncall',
+            'caller' => $sip,
+            'callee' => $phone,
+            'send_sdp' =>true,
+        );
+        $url = $url = sprintf('%s/api/sessions/directly?%s',$this->baseUriCall, http_build_query($params));
+        $res = curl::curl($url, $method, $header, []);
+        u::logRequest($url,$method,$header,$params,$res,'log_request_outbound');
+        $res =json_decode($res);
+        if(data_get($res, 'id')){
+            return [
+                'status'=>1,
+                'call_id'=> data_get($res, 'id')
+            ];
+        } else{
+            return [
+                'status'=>0,
+                'message'=> 'Thực hiện cuộc gọi thất bại, vui lòng thử lại'
+            ];
         }
     }
-    public function getDataCallId($callid){
-        $method = "GET";
-        $http_data = array(
-            'voip' => $this->voip24_key,
-            'secret' => $this->voip24_secret,
-            'callid' => $callid,
-        );
-        $url = sprintf('%s?%s',$this->voip24."/searching", http_build_query($http_data));
-        $res = curl::curl($url, $method);
-        u::logRequest($url,$method,[],[],$res,'log_request_outbound');
-        return $res;
-    }
-    public function testSocket(Request $request){
-        $arr=[
-            'user_id'=>$request->user_id ? $request->user_id : 38,
-            'event'=>$request->event ? $request->event :'call_end',
-            'data'=> array(
-                'user_id'=>$request->user_id ? $request->user_id : 38,
-                'phone'=>'0967973295')
-        ];
-        $this->socketIo($arr['user_id'],$arr['event'],$arr['data']);
-    }
-    public static function getDauSoByShip($sip){
+    private function getPassByShip($sip){
         $sip= (int)$sip;
-        $sip_info= u::first("SELECT * FROM config_ext_phone WHERE ext_start<= $sip AND ext_end>= $sip LIMIT 1");
-        return $sip_info ? $sip_info->ext_phone : 0;
+        $sip_info= u::first("SELECT * FROM oncall_extension_has_pass WHERE ext = $sip");
+        return $sip_info ? $sip_info->password : '';
     }
-
+    
     public function oncallWebhook(Request $request){
         Log::info("message",['data'=>$request->input()]);
         return response()->json("ok");
+    }
+
+    public function getDataRecordCallId($data_id){
+        $token = self::getToken();
+        $header=[
+            "Authorization: Bearer ".$token
+        ];
+        $method = "GET";
+        $url = $url = sprintf('%s/api/recordings/%s',$this->baseUriCall, $data_id);
+        $res = curl::curl($url, $method, $header, []);
+        $res =json_decode($res);
+        // u::logRequest($url,$method,$header,[],$res,'log_request_outbound');
+        return $res;
     }
 }
