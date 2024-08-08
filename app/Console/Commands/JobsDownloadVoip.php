@@ -56,7 +56,14 @@ class JobsDownloadVoip extends Command
                 $file_name_mp3 = $row->data_id.".mp3";
                 $file_id = $response->items[0]->file_id;
                 $url_download = "https://rsv01.oncall.vn:8887/api/files/$file_id/data";
-                file_put_contents($dir.$file_name, fopen($url_download, 'r'));
+
+                $arrContextOptions=array(
+                    "ssl"=>array(
+                        "verify_peer"=>false,
+                        "verify_peer_name"=>false,
+                    ),
+                );  
+                file_put_contents($dir.$file_name, file_get_contents("$url_download", false, stream_context_create($arrContextOptions)));
 
                 shell_exec('ffmpeg -i ' . $dir.$file_name . ' ' . $dir.$file_name_mp3 . ''); 
                 u::updateSimpleRow(array('get_data_call'=>1,'attached_file'=>$dir_file.$file_name_mp3),array('id'=>$row->id),'cms_customer_care');
