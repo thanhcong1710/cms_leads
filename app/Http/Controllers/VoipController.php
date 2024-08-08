@@ -89,7 +89,7 @@ class VoipController extends Controller
         $url = $url = sprintf('%s/api/recordings/%s',$this->baseUriCall, $data_id);
         $res = curl::curl($url, $method, $header, []);
         $res =json_decode($res);
-        // u::logRequest($url,$method,$header,[],$res,'log_request_outbound');
+        u::logRequest($url,$method,$header,[],$res,'log_request_outbound');
         return $res;
     }
 }
