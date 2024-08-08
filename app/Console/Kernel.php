@@ -28,7 +28,7 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('jobsDownloadVoip:command')->cron('*/15 * * * *');
+        $schedule->command('jobsDownloadVoip:command')->cron('*/15 * * * *');
         $schedule->command('jobsProcessReport:command')->everySixHours();
         // $schedule->command('jobsProcessImportCheckin:command')->cron('*/3 * * * *');
         $schedule->command('jobsProcessLockParent:command')->cron('0 0 * * *');
