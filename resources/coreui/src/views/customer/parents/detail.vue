@@ -185,14 +185,14 @@
                             <td width="10%">{{ item.method_name}}{{item.type_call?" - "+item.type_call:''}}</td>
                             <td width="10%">{{ item.call_status_label }} </td>
                             <td width="25%">
-                              <p v-if="item.link_record">
-                                <audio controls style="height: 40px; width: 256px; border: 1px solid #ccc;">
-                                  <source :src="item.link_record" type="audio/x-wav">
-                                </audio>
-                              </p>
                               <p v-html="item.note"></p>
-                              <p v-if="item.attached_file">
+                              <p v-if="item.attached_file && !item.data_id">
                                 <a :href="item.attached_file" target="blank">File đính kèm</a>
+                              </p>
+                              <p v-if="item.attached_file && item.data_id">
+                                <audio controls style="height: 40px; width: 256px; border: 1px solid #ccc;">
+                                  <source :src="item.attached_file" type="audio/x-wav">
+                                </audio>
                               </p>
                             </td>
                           </tr>
