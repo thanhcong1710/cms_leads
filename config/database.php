@@ -69,7 +69,7 @@ return [
             'port' => '63306',
             'database' =>  env('APP_ENV', 'staging') == 'production' ? 'cms_product' : 'cms_staging',
             'username' => 'cms_product',
-            'password' => 'CrM.cMsEdU.vN@098&^%_product',
+            'password' => 'cms_product@2024!',
             'unix_socket' => env('DB_SOCKET', ''),
             'charset' => 'utf8',
             'collation' => 'utf8_unicode_ci',
