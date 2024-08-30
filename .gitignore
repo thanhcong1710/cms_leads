@@ -31,3 +31,5 @@ package-lock.*
 .project
 .buildpath
 public/*
+/node_modules*
+/vendor/*
