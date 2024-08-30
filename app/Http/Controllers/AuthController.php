@@ -11,7 +11,6 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Providers\CurlServiceProvider as curl;
 class AuthController extends Controller
 
-
 { 
     /**
      * @return void
