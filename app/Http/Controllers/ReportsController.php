@@ -200,7 +200,7 @@ class ReportsController extends Controller
             $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
             $cond1 .= " AND u.id IN (".$request->user_info->users_manager.")";
         }
-        $data = u::first("SELECT (SELECT COUNT(p.id) FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id WHERE p.status=0 AND (p.last_care_date ='' OR  p.last_care_date IS NULL) $cond ) AS total_new,
+        $data = u::first("SELECT (SELECT COUNT(p.id) FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id WHERE p.status=0 AND ( p.last_care_date IS NULL) $cond ) AS total_new,
                 (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status IN (4,5,6,7) $cond1) AS total_connect,
                 (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status IN (1,2,3) $cond1) AS total_not_connect,
                 (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 0 $cond1) AS detail_0,

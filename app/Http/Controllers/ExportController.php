@@ -506,7 +506,7 @@ class ExportController extends Controller
         $sheet->getColumnDimension("U")->setWidth(20);
         $sheet->getColumnDimension("V")->setWidth(20);
         for ($i = 0; $i < count($list) ; $i++) {
-            $data_report = u::first("SELECT (SELECT COUNT(p.id) FROM cms_parents AS p WHERE p.owner_id=". $list[$i]->id." AND p.status=0 AND (p.last_care_date ='' OR  p.last_care_date IS NULL) $cond ) AS total_new,
+            $data_report = u::first("SELECT (SELECT COUNT(p.id) FROM cms_parents AS p WHERE p.owner_id=". $list[$i]->id." AND p.status=0 AND ( p.last_care_date IS NULL) $cond ) AS total_new,
                 (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status IN (4,5,6,7) $cond) AS total_connect,
                 (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status IN (1,2,3) $cond) AS total_not_connect,
                 (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id WHERE c.creator_id = ". $list[$i]->id." AND c.call_status = 0 $cond) AS detail_0,
