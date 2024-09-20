@@ -30,7 +30,7 @@ class VoipController extends Controller
         $method = "POST";
         $params = array(
             'username' => 'HNCX01058',
-            'password' => 'oncal@124',
+            'password' => 'Oncall@124',
             'domain' => 'hncx01058.oncall',
         );
         $url = sprintf('%s/api/tokens',$this->baseUriCall);
