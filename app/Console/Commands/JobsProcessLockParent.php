@@ -47,8 +47,8 @@ class JobsProcessLockParent extends Command
         $import->processGetStatus();
         
         //delete file attach cms_customer_care
-        $care = new ParentCareController();
-        $care->deleteFileAttached();
+        // $care = new ParentCareController();
+        // $care->deleteFileAttached();
         u::query("INSERT INTO log_jobs (`action`, created_at) VALUES ('jobsProcessLockParent','".date('Y-m-d H:i:s')."')");
         return "ok";
     }
