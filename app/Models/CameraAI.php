@@ -26,7 +26,7 @@ class CameraAI
                 $params = [
                     'token'=>$this->token,
                     'name'=>$student_info->name,
-                    'url'=> env('APP_URL', 'https://lead.cmsedu.vn').$student_info->avatar_url,
+                    'url'=> env('APP_URL', 'https://lead.congnghegiaoduc.com').$student_info->avatar_url,
                     'aliasID'=>$student_info->student_id,
                     'placeID'=>$student_info->placeID,
                     'title'=>$student_info->student_id,
@@ -52,7 +52,7 @@ class CameraAI
                 $header = ['Content-Type' => 'application/x-www-form-urlencoded'];
                 $params = [
                     'token'=>$this->token,
-                    'url'=> env('APP_URL', 'https://lead.cmsedu.vn').$student_info->avatar_url,
+                    'url'=> env('APP_URL', 'https://lead.congnghegiaoduc.com').$student_info->avatar_url,
                     'aliasID'=>$student_info->student_id,
                     'placeID'=>$student_info->placeID
                 ];

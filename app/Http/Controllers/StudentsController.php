@@ -118,9 +118,9 @@ class StudentsController extends Controller
             'sibling_id' => $student_info->sibling_id ? $student_info->sibling_id : 0,
         );
         if(env('APP_ENV', 'staging')=='production'){
-            $url = sprintf('%s/api/leads-create-checkin', 'https://crm.cmsedu.vn/');
+            $url = sprintf('%s/api/leads-create-checkin', 'https://crm.congnghegiaoduc.com/');
         }else{
-            $url = sprintf('%s/api/leads-create-checkin', 'https://staging.cmsedu.vn/');
+            $url = sprintf('%s/api/leads-create-checkin', 'https://staging.congnghegiaoduc.com/');
         }
         $res = curl::curl($url, $method,[],$data);
         u::logRequest($url,$method,[],$data,$res,'log_request_outbound');
@@ -144,9 +144,9 @@ class StudentsController extends Controller
             'updator_hrm' => Auth::user()->hrm_id
         );
         if(env('APP_ENV', 'staging')=='production'){
-            $url = sprintf('%s/api/leads-update-student-info', 'https://crm.cmsedu.vn/');
+            $url = sprintf('%s/api/leads-update-student-info', 'https://crm.congnghegiaoduc.com/');
         }else{
-            $url = sprintf('%s/api/leads-update-student-info', 'https://staging.cmsedu.vn/');
+            $url = sprintf('%s/api/leads-update-student-info', 'https://staging.congnghegiaoduc.com/');
         }
         $res = curl::curl($url, $method,[],$data);
         u::logRequest($url,$method,[],$data,$res,'log_request_outbound');
@@ -192,9 +192,9 @@ class StudentsController extends Controller
             );
 
             if(env('APP_ENV', 'staging')=='production'){
-                $url = sprintf('%s/api/leads-update-parent-info', 'https://crm.cmsedu.vn/');
+                $url = sprintf('%s/api/leads-update-parent-info', 'https://crm.congnghegiaoduc.com/');
             }else{
-                $url = sprintf('%s/api/leads-update-parent-info', 'https://staging.cmsedu.vn/');
+                $url = sprintf('%s/api/leads-update-parent-info', 'https://staging.congnghegiaoduc.com/');
             }
             $res = curl::curl($url, $method,[],$data);
             u::logRequest($url,$method,[],$data,$res,'log_request_outbound');
@@ -218,9 +218,9 @@ class StudentsController extends Controller
             'type_product'=>$type_product
         );
         if(env('APP_ENV', 'staging')=='production'){
-            $url = sprintf('%s/api/leads-update-checkin', 'https://crm.cmsedu.vn/');
+            $url = sprintf('%s/api/leads-update-checkin', 'https://crm.congnghegiaoduc.com/');
         }else{
-            $url = sprintf('%s/api/leads-update-checkin', 'https://staging.cmsedu.vn/');
+            $url = sprintf('%s/api/leads-update-checkin', 'https://staging.congnghegiaoduc.com/');
         }
         $res = curl::curl($url, $method,[],$data);
         u::logRequest($url,$method,[],$data,$res,'log_request_outbound');
