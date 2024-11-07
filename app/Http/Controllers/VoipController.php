@@ -16,51 +16,49 @@ class VoipController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    protected $apiKey;
     protected $baseUriCall;
     protected $baseUriSocket;
     public function __construct()
     {
-        $this->baseUriSocket = "103.226.250.52";
-        $this->baseUriCall = "https://rsv01.oncall.vn:8887";
-    }
-    private function getToken(){
-        $header=[
-            "Content-Type: application/json",
-        ];
-        $method = "POST";
-        $params = array(
-            'username' => 'HNCX01058',
-            'password' => 'oncall@124',
-            'domain' => 'hncx01058.oncall',
-        );
-        $url = sprintf('%s/api/tokens',$this->baseUriCall);
-        $res = curl::curl($url, $method, $header, $params);
-        $res =json_decode($res);
-        return data_get($res, 'access_token');
+        $this->apiKey = "f2966f069e0c637f438a1e87b8b6a928";
+        // $this->baseUriSocket = "103.226.250.52";
+        $this->baseUriCall = "https://crm.pavietnam.vn";
     }
     public function makeToCall($phone,$sip=0)
     {
-        $token = self::getToken();
-        $header=[
-            "Authorization: Bearer ".$token
+
+        $header=[];
+        $method = "POST";
+        $url = sprintf('%s/api/callNow.php',$this->baseUriCall);
+        $data_request = [
+            'api_key' => $this->apiKey,
+            'extension' => $sip,
+            'phone'   => $phone,
         ];
-        $method = "GET";
-        $params = array(
-            'extension_number' => $sip,
-            'password' => $this->getPassByShip($sip),
-            'domain' => 'hncx01058.oncall',
-            'caller' => $sip,
-            'callee' => $phone,
-            'send_sdp' =>true,
-        );
-        $url = $url = sprintf('%s/api/sessions/directly?%s',$this->baseUriCall, http_build_query($params));
-        $res = curl::curl($url, $method, $header, []);
-        u::logRequest($url,$method,$header,$params,$res,'log_request_outbound');
-        $res =json_decode($res);
-        if(data_get($res, 'id')){
+    
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://crm.pavietnam.vn/api/callNow.php');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data_request));
+        $result = curl_exec($ch);
+        u::logRequest($url,$method,$header,$data_request,$result,'log_request_outbound');
+
+        $res =json_decode($result);
+        if(data_get($res, 'code') == 1000){
+            $id = u::insertSimpleRow(array(
+                'phone' => $phone,
+                'sip_id' => $sip,
+                'created_at' => date('Y-m-d H:i:s')
+            ), 'pa_cdr_data');
             return [
                 'status'=>1,
-                'call_id'=> data_get($res, 'id')
+                'call_id'=> $id,
             ];
         } else{
             return [
@@ -68,28 +66,79 @@ class VoipController extends Controller
                 'message'=> 'Thực hiện cuộc gọi thất bại, vui lòng thử lại'
             ];
         }
+        
     }
-    private function getPassByShip($sip){
-        $sip= (int)$sip;
-        $sip_info= u::first("SELECT * FROM oncall_extension_has_pass WHERE ext = $sip");
-        return $sip_info ? $sip_info->password : '';
-    }
-    
-    public function oncallWebhook(Request $request){
-        Log::info("message",['data'=>$request->input()]);
-        return response()->json("ok");
-    }
-
-    public function getDataRecordCallId($data_id){
-        $token = self::getToken();
-        $header=[
-            "Authorization: Bearer ".$token
+    public function getCDRReport($from_date)
+    {
+        $data_request = [
+            'api_key' => $this->apiKey,
+            'to_date' => '',
+            'duration_max' => '',
+            'from_date' => $from_date,
+            'limit'   => '',
+            'destination' => '',
+            'duration_min' => '',
+            'source'  => '',
+            'status'  => '',
+            'page'    => '',
+            'from'    => '',
         ];
-        $method = "GET";
-        $url = $url = sprintf('%s/api/recordings/%s',$this->baseUriCall, $data_id);
-        $res = curl::curl($url, $method, $header, []);
-        $res =json_decode($res);
-        u::logRequest($url,$method,$header,[],$res,'log_request_outbound');
+    
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://crm.pavietnam.vn/api/getCDRReport.php');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data_request));
+        $result = curl_exec($ch);
+        u::logRequest('https://crm.pavietnam.vn/api/getCDRReport.php','POST',[],$data_request,$result,'log_request_outbound');
+        $res =json_decode($result);
         return $res;
     }
+    public function playRecording()
+    {
+        $data_request = [
+            'api_key' => $this->apiKey,
+            'recording_file' => "/var/spool/asterisk/monitor/2024/11/04/out-0389941902-1410-20241104-164343-1730713420.22483.wav",
+        ];
+    
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://crm.pavietnam.vn/api/playRecording.php');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data_request));
+        $result = curl_exec($ch);
+        // u::logRequest('https://crm.pavietnam.vn/api/playRecording.php','POST',[],$data_request,$result,'log_request_outbound');
+        $res =json_decode($result);
+        return $res;
+    }
+    private function takeNote($data, $phone){
+        $data_request = [
+            'api_key' => $this->apiKey,
+            'phone'   => $phone,
+            'content' => $data,
+        ];
+    
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, 'https://crm.pavietnam.vn/api/note-call/takeNote.php');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data_request));
+        $result = curl_exec($ch);
+        u::logRequest('https://crm.pavietnam.vn/api/note-call/takeNote.php','POSST',[],$data_request,$result,'log_request_outbound');
+    
+        echo $result;
+        return true;
+    } 
 }
