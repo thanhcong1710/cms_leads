@@ -184,7 +184,11 @@ class VoipController extends Controller
 
         $response = curl_exec($curl);
 
+        $err = curl_error($curl);
         curl_close($curl);
+        if ($err) {
+            var_dump($response,$err);die();
+        } 
         var_dump($response);die();
 
 
