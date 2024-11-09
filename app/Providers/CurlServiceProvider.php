@@ -65,6 +65,8 @@ class CurlServiceProvider extends ServiceProvider
         }
 
         curl_setopt_array($curl, $options);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 0);
+        curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, 0);
 
         $response = curl_exec($curl);
         $err = curl_error($curl);
