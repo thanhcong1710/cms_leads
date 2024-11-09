@@ -7,6 +7,8 @@
  */
 
 namespace App\Providers;
+
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
 class CurlServiceProvider extends ServiceProvider
@@ -68,6 +70,7 @@ class CurlServiceProvider extends ServiceProvider
         $err = curl_error($curl);
         curl_close($curl);
         if ($err) {
+            Log::info('curl error', ['err'=>$err]);
             return false;
         } else {
             return $response;
