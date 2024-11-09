@@ -25,7 +25,7 @@ Route::group(['middleware' => 'api'], function ($router) {
     Route::post('single-sign-on', 'AuthController@singleSignOn');
     Route::get('switch-system', 'AuthController@switchSystem');
     Route::get('webhook/voip24h', 'VoipController@webhook');
-    Route::get('socket_io/test', 'VoipController@testSocket');
+    Route::get('socket_io/test', 'VoipController@test');
     Route::get('tools/download_record', 'ToolsController@downloadReCord');
     Route::get('tools/gen_week', 'ToolsController@genWeek');
     Route::get('/export/import/{import_id}', 'ExportController@import');
