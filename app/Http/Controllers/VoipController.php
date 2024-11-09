@@ -145,7 +145,7 @@ class VoipController extends Controller
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://crm.logiclab.vn/api/leads-create-checkin',
+        CURLOPT_URL => 'https://cms.logiclab.vn/api/leads-create-checkin',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
