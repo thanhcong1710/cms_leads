@@ -56,7 +56,7 @@ class CurlServiceProvider extends ServiceProvider
             CURLOPT_CUSTOMREQUEST => $method,
             CURLOPT_POSTFIELDS => json_encode($params),
             CURLOPT_HTTPHEADER => $http_header,
-            CURLOPT_SSL_VERIFYPEER => false
+            // CURLOPT_SSL_VERIFYPEER => false
         ];
 
         if($proxy){
