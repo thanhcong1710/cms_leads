@@ -92,4 +92,55 @@ class VoipController extends Controller
         u::logRequest($url,$method,$header,[],$res,'log_request_outbound');
         return $res;
     }
+
+    public function  testSocket (){
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => 'https://crm.logiclab.vn/api/leads-create-checkin',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'POST',
+        CURLOPT_POSTFIELDS =>'{
+            "student_name": "Nh\\u1eadt Huy",
+            "student_gender": "M",
+            "student_note": null,
+            "student_date_of_birth": "2020-09-25",
+            "gud_name": "Di\\u1ec7u Linh",
+            "gud_email": null,
+            "gud_mobile_1": "0399739128",
+            "gud_mobile_2": null,
+            "gud_gender": "F",
+            "gud_birthday": null,
+            "gud_job": null,
+            "source": 24,
+            "source_detail": null,
+            "address": null,
+            "province_id": null,
+            "district_id": null,
+            "branch_id": 1,
+            "checkin_at": "2024-11-09 00:00",
+            "type_product": "1",
+            "ec_hrm": "CM0114",
+            "creator_hrm": "C00001",
+            "sibling_id": 0
+        }',
+        CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/json'
+        ),
+        ));
+
+        $response = curl_exec($curl);
+
+        $err = curl_error($curl);
+        curl_close($curl);
+        if ($err) {
+            var_dump($response,$err);die();
+        } 
+        var_dump($response);die();
+    }
 }
