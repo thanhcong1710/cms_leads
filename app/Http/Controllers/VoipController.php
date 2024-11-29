@@ -98,49 +98,7 @@ class VoipController extends Controller
         $res =json_decode($result);
         return $res;
     }
-    public function playRecording()
-    {
-        $data_request = [
-            'api_key' => $this->apiKey,
-            'recording_file' => "/var/spool/asterisk/monitor/2024/11/04/out-0389941902-1410-20241104-164343-1730713420.22483.wav",
-        ];
-    
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://crm.pavietnam.vn/api/playRecording.php');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data_request));
-        $result = curl_exec($ch);
-        // u::logRequest('https://crm.pavietnam.vn/api/playRecording.php','POST',[],$data_request,$result,'log_request_outbound');
-        $res =json_decode($result);
-        return $res;
-    }
-    private function takeNote($data, $phone){
-        $data_request = [
-            'api_key' => $this->apiKey,
-            'phone'   => $phone,
-            'content' => $data,
-        ];
-    
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, 'https://crm.pavietnam.vn/api/note-call/takeNote.php');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
-        curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        curl_setopt($ch, CURLOPT_POST, true);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data_request));
-        $result = curl_exec($ch);
-        u::logRequest('https://crm.pavietnam.vn/api/note-call/takeNote.php','POSST',[],$data_request,$result,'log_request_outbound');
-    
-        echo $result;
-        return true;
-    } 
+
     public function test(){
         $curl = curl_init();
 

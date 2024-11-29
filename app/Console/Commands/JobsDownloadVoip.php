@@ -44,31 +44,35 @@ class JobsDownloadVoip extends Command
         $last_time = date('Y-m-d H:i:s',time()- 60*60);
         $list_call = u::query("SELECT id, data_id FROM cms_customer_care WHERE get_data_call =0 AND data_id IS NOT NULL AND created_at>'$last_time' ORDER BY id DESC");
         foreach($list_call AS $row){
-            $voipControll = new VoipController();
-            $response = $voipControll->getDataRecordCallId($row->data_id);
-            if(isset($response->items[0]->file_id) && $response->items[0]->file_id){
+            $pa_cdr_data = u::first("SELECT * FROM pa_cdr_data WHERE id=".(int)$row->data_id);
+            if($pa_cdr_data){
+                $data_request = [
+                    'api_key' => 'f2966f069e0c637f438a1e87b8b6a928',
+                    'recording_file' => data_get($pa_cdr_data, 'pa_recordingfile'),
+                ];
+            
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, 'https://crm.pavietnam.vn/api/playRecording.php');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data_request);
+                $result = curl_exec($ch);
+        
                 $dir = __DIR__.'/../../../public/static/voip/'. date('Y_m').'/';
                 $dir_file = 'static/voip/'. date('Y_m').'/';
                 if(!file_exists($dir)){
                     mkdir($dir);
                 }
-                $file_name = $row->data_id.".wav";
-                $file_name_mp3 = $row->data_id.".mp3";
-                $file_id = $response->items[0]->file_id;
-                $url_download = "https://rsv01.oncall.vn:8887/api/files/$file_id/data";
+                $file_name_mp3 = 'pa_cdr_'.$row->data_id.".mp3";
 
-                $arrContextOptions=array(
-                    "ssl"=>array(
-                        "verify_peer"=>false,
-                        "verify_peer_name"=>false,
-                    ),
-                );  
-                file_put_contents($dir.$file_name, file_get_contents("$url_download", false, stream_context_create($arrContextOptions)));
-
-                shell_exec('ffmpeg -i ' . $dir.$file_name . ' ' . $dir.$file_name_mp3 . ''); 
-                u::updateSimpleRow(array('get_data_call'=>1,'attached_file'=>$dir_file.$file_name_mp3),array('id'=>$row->id),'cms_customer_care');
-            }else{
-                u::updateSimpleRow(array('get_data_call'=>1),array('id'=>$row->id),'cms_customer_care');
+                $result = file_put_contents($dir.$file_name_mp3,$result);
+                if($result){
+                    u::updateSimpleRow(array('get_data_call'=>1,'attached_file'=>$dir_file.$file_name_mp3),array('id'=>$row->id),'cms_customer_care');
+                }
             }
         }
         u::query("INSERT INTO log_jobs (`action`, created_at) VALUES ('jobsDownloadVoip','".date('Y-m-d H:i:s')."')");
