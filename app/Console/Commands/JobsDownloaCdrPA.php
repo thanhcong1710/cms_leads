@@ -81,7 +81,7 @@ class JobsDownloadCdrPA extends Command
         $list_call = u::query("SELECT id, data_id FROM cms_customer_care WHERE get_data_call =0 AND data_id IS NOT NULL AND created_at>'$last_time' ORDER BY id DESC LIMIT 50");
         foreach($list_call AS $row){
             $pa_cdr_data = u::first("SELECT * FROM pa_cdr_data WHERE id=".(int)$row->data_id);
-            if($pa_cdr_data){
+            if($pa_cdr_data && data_get($pa_cdr_data, 'pa_recordingfile')){
                 $curl = curl_init();
                 curl_setopt_array($curl, array(
                     CURLOPT_URL => 'https://crm.pavietnam.vn/api/playRecording.php?api_key=f2966f069e0c637f438a1e87b8b6a928&recording_file='.data_get($pa_cdr_data, 'pa_recordingfile'),
