@@ -77,63 +77,40 @@ class JobsDownloadCdrPA extends Command
             }
         }
 
-        // $last_time = date('Y-m-d H:i:s',time()- 60*60);
-        // $list_call = u::query("SELECT id, data_id FROM cms_customer_care WHERE get_data_call =0 AND data_id=2 AND created_at>'$last_time' ORDER BY id DESC");
-        // foreach($list_call AS $row){
-        //     $call_info = u::first("SELECT pa_recordingfile FROM pa_cdr_data WHERE id=".(int)data_get($row,'data_id'));
-        //     $pa_recordingfile = data_get($call_info, 'pa_recordingfile');
+        $last_time = date('Y-m-d H:i:s',time()- 24*60*60);
+        $list_call = u::query("SELECT id, data_id FROM cms_customer_care WHERE get_data_call =0 AND data_id IS NOT NULL AND created_at>'$last_time' ORDER BY id DESC LIMIT 50");
+        foreach($list_call AS $row){
+            $pa_cdr_data = u::first("SELECT * FROM pa_cdr_data WHERE id=".(int)$row->data_id);
+            if($pa_cdr_data){
+                $data_request = [
+                    'api_key' => 'f2966f069e0c637f438a1e87b8b6a928',
+                    'recording_file' => data_get($pa_cdr_data, 'pa_recordingfile'),
+                ];
+            
+                $ch = curl_init();
+                curl_setopt($ch, CURLOPT_URL, 'https://crm.pavietnam.vn/api/playRecording.php');
+                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
+                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+                curl_setopt($ch, CURLOPT_POST, true);
+                curl_setopt($ch, CURLOPT_POSTFIELDS, $data_request);
+                $result = curl_exec($ch);
+        
+                $dir = __DIR__.'/../../../public/static/voip/'. date('Y_m').'/';
+                $dir_file = 'static/voip/'. date('Y_m').'/';
+                if(!file_exists($dir)){
+                    mkdir($dir);
+                }
+                $file_name_mp3 = 'pa_cdr_'.$row->data_id.".wav";
 
-        //     if($pa_recordingfile){
-        //         $arr_record_file = explode('/', $pa_recordingfile);
-        //         $file_name = $arr_record_file[count($arr_record_file)-1];
-        //         $dir = __DIR__.'/../../../public/static/voip/'. date('Y_m').'/';
-        //         $dir_file = 'static/voip/'. date('Y_m').'/';
-        //         if(!file_exists($dir)){
-        //             mkdir($dir);
-        //         }
-        //         try {
-        //             $url = "https://crm.pavietnam.vn/cloud-phone/play-audio?file=symlink/monitor/".date('Y/m/d')."/".'out-0389941902-1410-20241106-142308-1730877784.25070.wav';   // Replace with your file URL
-        //             $savePath = $dir.$file_name;
-        //             $url ="https://erp.congnghegiaoduc.com/images/logo.png";
-        //             $savePath = $dir.'logo.png';
-        //                 // Specify the path to save the file
-
-        //              file_put_contents($savePath, file_get_contents($url));
-        //             // Initialize a cURL session
-        //             // $ch = curl_init($url);
-        //             // $fp = fopen($savePath, 'wb');
-        //             // if (!$fp) {
-        //             //     die("Không thể mở file để ghi. Vui lòng kiểm tra quyền và đường dẫn.");
-        //             // }
-        //             // $ch = curl_init($url);
-        //             // curl_setopt($ch, CURLOPT_FILE, $fp);
-        //             // curl_setopt($ch, CURLOPT_HEADER, 0);
-        //             // curl_setopt($ch, CURLOPT_FAILONERROR, true);
-        //             // curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true); // Theo dõi chuyển hướng
-        //             // curl_setopt($ch, CURLOPT_USERAGENT, "Mozilla/5.0 (compatible; cURL)");
-
-        //             // // Thực thi cURL và kiểm tra lỗi
-        //             // if (!curl_exec($ch)) {
-        //             //     echo "Lỗi khi tải tệp: " . curl_error($ch) . " (HTTP code: " . curl_getinfo($ch, CURLINFO_HTTP_CODE) . ")";
-        //             // } else {
-        //             //     echo "Tải tệp thành công!";
-        //             // }
-
-        //             // Đóng cURL và tệp
-        //             // curl_close($ch);
-        //             // fclose($fp);
-
-
-        //             // Execute the cURL session
-        //             // if (curl_exec($ch)) {
-        //             //     u::updateSimpleRow(array('get_data_call'=>1,'attached_file'=>$dir_file.$file_name),array('id'=>$row->id),'cms_customer_care');
-        //             // } 
-        //         } catch (\Throwable $th) {
-        //             //throw $th;
-        //         }  
-                
-        //     }
-        // }
+                $result = file_put_contents($dir.$file_name_mp3,$result);
+                if($result){
+                    u::updateSimpleRow(array('get_data_call'=>1,'attached_file'=>$dir_file.$file_name_mp3),array('id'=>$row->id),'cms_customer_care');
+                }
+            }
+        }
         u::query("INSERT INTO log_jobs (`action`, created_at) VALUES ('jobsDownloadCdrPA','".date('Y-m-d H:i:s')."')");
         return "ok";
     }
