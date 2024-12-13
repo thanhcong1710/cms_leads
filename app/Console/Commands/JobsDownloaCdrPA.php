@@ -82,21 +82,21 @@ class JobsDownloadCdrPA extends Command
         foreach($list_call AS $row){
             $pa_cdr_data = u::first("SELECT * FROM pa_cdr_data WHERE id=".(int)$row->data_id);
             if($pa_cdr_data){
-                $data_request = [
-                    'api_key' => 'f2966f069e0c637f438a1e87b8b6a928',
-                    'recording_file' => data_get($pa_cdr_data, 'pa_recordingfile'),
-                ];
-            
-                $ch = curl_init();
-                curl_setopt($ch, CURLOPT_URL, 'https://crm.pavietnam.vn/api/playRecording.php');
-                curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-                curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 0);
-                curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-                curl_setopt($ch, CURLOPT_POST, true);
-                curl_setopt($ch, CURLOPT_POSTFIELDS, $data_request);
-                $result = curl_exec($ch);
+                $curl = curl_init();
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'https://crm.pavietnam.vn/api/playRecording.php?api_key=f2966f069e0c637f438a1e87b8b6a928&recording_file='.data_get($pa_cdr_data, 'pa_recordingfile'),
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_HTTPHEADER => array(
+                      'Cookie: PHPSESSID=jghvaladgkg8iee0a61degp607'
+                    ),
+                  ));
+                $result = curl_exec($curl);
         
                 $dir = __DIR__.'/../../../public/static/voip/'. date('Y_m').'/';
                 $dir_file = 'static/voip/'. date('Y_m').'/';
