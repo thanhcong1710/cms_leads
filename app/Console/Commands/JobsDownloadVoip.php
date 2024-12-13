@@ -43,6 +43,7 @@ class JobsDownloadVoip extends Command
     {
         $last_time = date('Y-m-d H:i:s',time()- 60*60);
         $list_call = u::query("SELECT id, data_id FROM cms_customer_care WHERE get_data_call =0 AND data_id IS NOT NULL AND created_at>'$last_time' ORDER BY id DESC");
+        var_dump($list_call);die();
         foreach($list_call AS $row){
             $pa_cdr_data = u::first("SELECT * FROM pa_cdr_data WHERE id=".(int)$row->data_id);
             if($pa_cdr_data){
