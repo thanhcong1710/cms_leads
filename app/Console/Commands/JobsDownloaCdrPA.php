@@ -41,44 +41,44 @@ class JobsDownloadCdrPA extends Command
      */
     public function handle(Request $request)
     {
-        // $voipControll = new VoipController();
-        // $date = Date('Y-m-d');
-        // $data_cdr = $voipControll->getCDRReport($date);
-        // if(data_get($data_cdr,'code') == 1000){
-        //     $list_cdr = data_get($data_cdr, 'data');
-        //     if ($list_cdr){
-        //         $list_cdr = json_decode($list_cdr);
-        //         rsort($list_cdr);
-        //     }
-        //     foreach ($list_cdr AS $cdr){
-        //         $sip_id = data_get($cdr, 'cnum');
-        //         $phone = data_get($cdr, 'dst');
-        //         $pa_uniqueid = data_get($cdr, 'uniqueid');
-        //         $pa_disposition = data_get($cdr, 'disposition');
-        //         $pa_duration = data_get($cdr, 'duration');
-        //         $pa_billsec = data_get($cdr, 'billsec');
-        //         $pa_recordingfile = data_get($cdr, 'recordingfile');
-        //         $pa_calldate = data_get($cdr, 'calldate');
-        //         $check_exit = u::first("SELECT id FROM pa_cdr_data WHERE pa_uniqueid='$pa_uniqueid' LIMIT 1");
-        //         $end_check = date('Y-m-d H:i:s', strtotime($pa_calldate)+30);
-        //         if (!$check_exit) {
-        //             $data_crm = u::first("SELECT id FROM pa_cdr_data WHERE sip_id ='$sip_id' AND phone='$phone' AND created_at < '$end_check' AND created_at > '$pa_calldate' AND status=0");
-        //             if($data_crm) {
-        //                 u::updateSimpleRow(array(
-        //                     'pa_uniqueid' => $pa_uniqueid,
-        //                     'pa_disposition' => $pa_disposition,
-        //                     'pa_duration' => $pa_duration,
-        //                     'pa_billsec' => $pa_billsec,
-        //                     'pa_recordingfile' => $pa_recordingfile,
-        //                     'status' => 1,
-        //                 ), array('id'=>data_get($data_crm, 'id')), 'pa_cdr_data');
-        //             }
-        //         }
-        //     }
-        // }
+        $voipControll = new VoipController();
+        $date = Date('Y-m-d');
+        $data_cdr = $voipControll->getCDRReport($date);
+        if(data_get($data_cdr,'code') == 1000){
+            $list_cdr = data_get($data_cdr, 'data');
+            if ($list_cdr){
+                $list_cdr = json_decode($list_cdr);
+                rsort($list_cdr);
+            }
+            foreach ($list_cdr AS $cdr){
+                $sip_id = data_get($cdr, 'cnum');
+                $phone = data_get($cdr, 'dst');
+                $pa_uniqueid = data_get($cdr, 'uniqueid');
+                $pa_disposition = data_get($cdr, 'disposition');
+                $pa_duration = data_get($cdr, 'duration');
+                $pa_billsec = data_get($cdr, 'billsec');
+                $pa_recordingfile = data_get($cdr, 'recordingfile');
+                $pa_calldate = data_get($cdr, 'calldate');
+                $check_exit = u::first("SELECT id FROM pa_cdr_data WHERE pa_uniqueid='$pa_uniqueid' LIMIT 1");
+                $end_check = date('Y-m-d H:i:s', strtotime($pa_calldate)+30);
+                if (!$check_exit) {
+                    $data_crm = u::first("SELECT id FROM pa_cdr_data WHERE sip_id ='$sip_id' AND phone='$phone' AND created_at < '$end_check' AND created_at > '$pa_calldate' AND status=0");
+                    if($data_crm) {
+                        u::updateSimpleRow(array(
+                            'pa_uniqueid' => $pa_uniqueid,
+                            'pa_disposition' => $pa_disposition,
+                            'pa_duration' => $pa_duration,
+                            'pa_billsec' => $pa_billsec,
+                            'pa_recordingfile' => $pa_recordingfile,
+                            'status' => 1,
+                        ), array('id'=>data_get($data_crm, 'id')), 'pa_cdr_data');
+                    }
+                }
+            }
+        }
 
         $last_time = date('Y-m-d H:i:s',time()- 24*60*60);
-        $list_call = u::query("SELECT id, data_id FROM cms_customer_care WHERE data_id=4736 AND created_at>'$last_time' ORDER BY id DESC LIMIT 50");
+        $list_call = u::query("SELECT id, data_id FROM cms_customer_care WHERE data_id IS NOT NULL AND get_data_call=0 AND created_at>'$last_time' ORDER BY id DESC LIMIT 50");
         foreach($list_call AS $row){
             $pa_cdr_data = u::first("SELECT * FROM pa_cdr_data WHERE id=".(int)$row->data_id);
             if($pa_cdr_data && data_get($pa_cdr_data, 'pa_recordingfile')){
