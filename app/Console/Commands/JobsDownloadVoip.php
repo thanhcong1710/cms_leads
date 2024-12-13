@@ -67,7 +67,7 @@ class JobsDownloadVoip extends Command
                 if(!file_exists($dir)){
                     mkdir($dir);
                 }
-                $file_name_mp3 = 'pa_cdr_'.$row->data_id.".mp3";
+                $file_name_mp3 = 'pa_cdr_'.$row->data_id.".wav";
 
                 $result = file_put_contents($dir.$file_name_mp3,$result);
                 if($result){
