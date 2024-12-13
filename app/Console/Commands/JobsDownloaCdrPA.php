@@ -7,6 +7,7 @@ use App\Models\Sms;
 use Illuminate\Console\Command;
 use App\Providers\UtilityServiceProvider as u;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class JobsDownloadCdrPA extends Command
 {
@@ -106,6 +107,7 @@ class JobsDownloadCdrPA extends Command
                 $file_name_mp3 = 'pa_cdr_'.$row->data_id.".wav";
 
                 $result = file_put_contents($dir.$file_name_mp3,$result);
+                Log::info("message",['id'=>$row->data_id,'result'=>$result]);
                 if($result){
                     u::updateSimpleRow(array('get_data_call'=>1,'attached_file'=>$dir_file.$file_name_mp3),array('id'=>$row->id),'cms_customer_care');
                 }
