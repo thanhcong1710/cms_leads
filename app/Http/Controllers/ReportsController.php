@@ -201,9 +201,8 @@ class ReportsController extends Controller
             $cond1 .= " AND u.id IN (".$request->user_info->users_manager.")";
         }
         $data = u::first("SELECT (SELECT COUNT(p.id) FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id WHERE p.status=0 AND ( p.last_care_date IS NULL) $cond ) AS total_new,
-                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status IN (4,5,6,7) $cond1) AS total_not_connect,
-                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status IN (1,2,3) $cond1) AS total_connect,
-                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 0 $cond1) AS detail_0,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status IN (5,6,7,8,9,10,11) $cond1) AS total_connect,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status IN (1,2,3,4) $cond1) AS total_not_connect,
                 (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 1 $cond1) AS detail_1,
                 (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 2 $cond1) AS detail_2,
                 (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 3 $cond1) AS detail_3,
@@ -211,15 +210,10 @@ class ReportsController extends Controller
                 (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 5 $cond1) AS detail_5,
                 (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 6 $cond1) AS detail_6,
                 (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 7 $cond1) AS detail_7,
-                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 5 AND c.call_status_sub = 51 $cond1) AS detail_51,
-                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 5 AND c.call_status_sub = 52 $cond1) AS detail_52,
-                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 5 AND c.call_status_sub = 53 $cond1) AS detail_53,
-                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 6 AND c.call_status_sub = 61 $cond1) AS detail_61,
-                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 6 AND c.call_status_sub = 62 $cond1) AS detail_62,
-                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 7 AND c.call_status_sub = 71 $cond1) AS detail_71,
-                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 7 AND c.call_status_sub = 72 $cond1) AS detail_72,
-                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 7 AND c.call_status_sub = 73 $cond1) AS detail_73,
-                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 7 AND c.call_status_sub = 74 $cond1) AS detail_74
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 8 $cond1) AS detail_8,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 9 $cond1) AS detail_9,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 10 $cond1) AS detail_10,
+                (SELECT COUNT(c.id) FROM cms_customer_care AS c LEFT JOIN cms_parents AS p ON p.id=c.parent_id LEFT JOIN users AS u ON u.id=c.creator_id WHERE c.call_status = 11 $cond1) AS detail_11
                 ");
             
         return response()->json($data);

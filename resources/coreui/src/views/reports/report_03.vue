@@ -112,11 +112,11 @@
                     </tr>
                     <tr>
                       <td  class="text-left">Tổng số data kết nối được</td>
-                      <td class="text-right">{{data_report.total_not_connect}}</td>
+                      <td class="text-right">{{data_report.total_connect}}</td>
                     </tr>
                     <tr>
                       <td  class="text-left">Tổng số data không kết nối được</td>
-                      <td class="text-right">{{data_report.total_connect}}</td>
+                      <td class="text-right">{{data_report.total_not_connect}}</td>
                     </tr>
                   </tbody>
                 </table>
@@ -125,81 +125,53 @@
                 <table class="table table-hover">
                   <tbody>
                     <tr  style="background-color: rgba(0, 0, 21, 0.05)">
-                      <td colspan="4">
+                      <td colspan="2">
                         Thông tin chi tiết
                       </td>
                     </tr>
                     <tr>
-                      <td class="text-left">0. Blank</td>
-                      <td class="text-right">{{data_report.detail_0}}</td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td class="text-left">1. Thuê bao - Tắt máy - Sai số</td>
+                      <td class="text-left">1. Blank</td>
                       <td class="text-right">{{data_report.detail_1}}</td>
-                      <td></td>
-                      <td></td>
                     </tr>
                     <tr>
-                      <td class="text-left">2. Location</td>
+                      <td class="text-left">2. Thuê bao - Tắt máy - Sai số</td>
                       <td class="text-right">{{data_report.detail_2}}</td>
-                      <td></td>
-                      <td></td>
                     </tr>
                     <tr>
-                      <td class="text-left">3. Máy bận - Không nghe máy</td>
+                      <td class="text-left">3. Location</td>
                       <td class="text-right">{{data_report.detail_3}}</td>
-                      <td></td>
-                      <td></td>
                     </tr>
                     <tr>
-                      <td class="text-left">4. KH hẹn gọi lại sau</td>
+                      <td class="text-left">4. Máy bận - Không nghe máy</td>
                       <td class="text-right">{{data_report.detail_4}}</td>
-                      <td></td>
-                      <td></td>
                     </tr>
                     <tr>
-                      <td class="text-left" rowspan="3">5. KH Từ chối nói chuyện</td>
-                      <td class="text-right" rowspan="3">{{data_report.detail_5}}</td>
-                      <td class="text-left">5.1. KH đã từng sử dụng dịch vụ</td>
-                      <td class="text-right">{{data_report.detail_51}}</td>
+                      <td class="text-left">5. KH hẹn gọi lại sau</td>
+                      <td class="text-right">{{data_report.detail_5}}</td>
                     </tr>
                     <tr>
-                      <td class="text-left">5.2. KH không quan tâm</td>
-                      <td class="text-right">{{data_report.detail_52}}</td>
+                      <td class="text-left">6. KH không có nhu cầu</td>
+                      <td class="text-right">{{data_report.detail_6}}</td>
                     </tr>
                     <tr>
-                      <td class="text-left">5.3 KH thực sự không muốn nói chuyện</td>
-                      <td class="text-right">{{data_report.detail_53}}</td>
+                      <td class="text-left">7. Không có con/Không có con trong độ tuổi CMS</td>
+                      <td class="text-right">{{data_report.detail_7}}</td>
                     </tr>
                     <tr>
-                      <td class="text-left" rowspan="2">6. KH không phù hợp</td>
-                      <td class="text-right" rowspan="2">{{data_report.detail_6}}</td>
-                      <td class="text-left">6.1. Không có con</td>
-                      <td class="text-right">{{data_report.detail_61}}</td>
+                      <td class="text-left">8. Lý do khác</td>
+                      <td class="text-right">{{data_report.detail_8}}</td>
                     </tr>
                     <tr>
-                      <td class="text-left">6.2. Lý do khác</td>
-                      <td class="text-right">{{data_report.detail_62}}</td>
+                      <td class="text-left">9. KH quan tâm cần follow update</td>
+                      <td class="text-right">{{data_report.detail_9}}</td>
                     </tr>
                     <tr>
-                      <td class="text-left" rowspan="4">7. KH tiềm năng </td>
-                      <td class="text-right" rowspan="4">{{data_report.detail_7}}</td>
-                      <td class="text-left">7.1. KH đang cân nhắc</td>
-                      <td class="text-right">{{data_report.detail_71}}</td>
+                      <td class="text-left">10.KH đồng ý đặt lịch check in</td>
+                      <td class="text-right">{{data_report.detail_10}}</td>
                     </tr>
                     <tr>
-                      <td class="text-left">7.2. KH hẹn thời gian khác</td>
-                      <td class="text-right">{{data_report.detail_72}}</td>
-                    </tr>
-                    <tr>
-                      <td class="text-left">7.3. KH ko muốn làm phiền</td>
-                      <td class="text-right">{{data_report.detail_73}}</td>
-                    </tr>
-                    <tr>
-                      <td class="text-left">7.4. Confirm 1</td>
-                      <td class="text-right">{{data_report.detail_74}}</td>
+                      <td class="text-left">11. Danh sách đen</td>
+                      <td class="text-right">{{data_report.detail_11}}</td>
                     </tr>
                   </tbody>
                 </table>

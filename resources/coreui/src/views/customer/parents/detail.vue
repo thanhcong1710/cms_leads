@@ -37,20 +37,17 @@
                 <p>Trạng thái</p>
                 <p> 
                   <select class="form-control" @change="showModalChangeStatus" v-model="tmp_status" :disabled="disabled_action" >
-                    <option value="0" v-if="tmp_status<70">0. KH mới</option>
-                    <option value="10" v-if="tmp_status<70">1. KH không liên lạc được</option>
-                    <option value="20" v-if="tmp_status<70">2. KH ở vùng CMS không có cơ sở</option>
-                    <option value="30" v-if="tmp_status<70">3. KH không nghe máy</option>
-                    <option value="40" v-if="tmp_status<70">4. KH hẹn gọi lại sau</option>
-                    <option value="50" v-if="tmp_status<70">5. KH không quan tâm</option>
-                    <option value="60" v-if="tmp_status<70">6. KH không tiềm năng</option>
-                    <option value="71">7.1. KH quan tâm, cần follow up date</option>
-                    <option value="72">7.2. KH tiềm năng nhưng không muốn làm phiền</option>
-                    <option value="73">7.3. KH đồng ý đặt lịch Checkin</option>
-                    <option value="81">8.1. KH đã đến checkin</option>
-                    <option value="82">8.2. KH đã mua gói phí</option>
-                    <option value="83">8.3. KH đến hạn tái tục</option>
-                    <option value="90">9. Danh sách đen</option>
+                    <option value="1">1. KH mới</option>
+                    <option value="2">2. KH không liên lạc được</option>
+                    <option value="3">3. KH ở vùng CMS không có cơ sở</option>
+                    <option value="4">4. KH hẹn gọi lại sau</option>
+                    <option value="5">5. KH không quan tâm</option>
+                    <option value="6">6. KH quan tâm, cần follow up date</option>
+                    <option value="7">7. KH đồng ý đặt lịch Checkin</option>
+                    <option value="8">8. KH đã đến checkin</option>
+                    <option value="9">9. KH đã mua gói phí</option>
+                    <option value="10">10. KH đến hạn tái tục</option>
+                    <option value="11">11. Danh sách đen</option>
                   </select>
                 </p>  
               </div>
@@ -108,35 +105,21 @@
                       <label for="nf-email">Trạng thái cuộc gọi <span class="text-danger"> (*)</span></label>
                       <select class="form-control" v-model="phone.select_note_status">
                         <option value="">Chọn trạng thái</option>
-                        <!-- <option value="0">Blank</option> -->
-                        <option value="1">Thuê bao - Tắt máy - Sai số</option>
-                        <option value="2">Location</option>
-                        <option value="3">Máy bận - Không nghe máy</option>
-                        <option value="4">KH hẹn gọi lại sau</option>
-                        <option value="5">KH Từ chối nói chuyện</option>
+                        <option value="1">Blank</option>
+                        <option value="2">Thuê bao - Tắt máy - Sai số</option>
+                        <option value="3">Location</option>
+                        <option value="4">Máy bận - Không nghe máy</option>
+                        <option value="5">KH hẹn gọi lại sau</option>
                         <option value="6">KH không phù hợp</option>
-                        <option value="7">KH tiềm năng</option>
-                        <option value="9">Blacklist</option>
+                        <option value="7">Không có con/Không có con trong độ tuổi CMS</option>
+                        <option value="8">Lý do khác</option>
+                        <option value="9">KH quan tâm cần follow update</option>
+                        <option value="10">KH đồng ý đặt lịch checkin</option>
+                        <option value="11">Danh sách đen</option>
                       </select>
                       <br>
-                      <div v-if="['5','6','7'].indexOf(phone.select_note_status) > -1">
-                        <label >Chi tiết trạng thái cuộc gọi <span class="text-danger"> (*)</span></label>
-                        <select class="form-control" v-model="phone.select_note_status_sub">
-                          <option value="">Chọn chi tiết trạng thái</option>
-                          <option value="51" v-if="phone.select_note_status==5">KH đã từng sử dụng dịch vụ</option>
-                          <option value="52" v-if="phone.select_note_status==5">KH không quan tâm</option>
-                          <option value="53" v-if="phone.select_note_status==5">KH thực sự không muốn nói chuyện</option>
-                          <option value="61" v-if="phone.select_note_status==6">Không có con</option>
-                          <option value="62" v-if="phone.select_note_status==6">Lý do khác</option>
-                          <option value="71" v-if="phone.select_note_status==7">KH đang cân nhắc</option>
-                          <option value="72" v-if="phone.select_note_status==7">KH hẹn thời gian khác</option>
-                          <option value="73" v-if="phone.select_note_status==7">KH ko muốn làm phiền</option>
-                          <option value="74" v-if="phone.select_note_status==7">Confirm 1</option>
-                        </select>
-                        <br>
-                      </div>
-                      <div v-if="['3','4', '7'].indexOf(phone.select_note_status) > -1">
-                        <label>Lịch chăm sóc tiếp <span class="text-danger"> (*)</span></label>
+                      <div>
+                        <label>Lịch chăm sóc tiếp</label>
                         <input class="form-control" type="datetime-local" id="phone_next_care_date">
                         <br>
                       </div>
@@ -979,18 +962,10 @@ export default {
     updateNotePhone(){
       let mess = "";
       let resp = true;
-      let phone_next_care_date = ['3','4','7'].indexOf(this.phone.select_note_status) > -1 ?document.getElementById('phone_next_care_date').value : ''
+      let phone_next_care_date = document.getElementById('phone_next_care_date').value
       this.phone.error_message = "";
       if (this.phone.select_note_status == "") {
         mess += " - Trạng thái cuộc gọi không được để trống<br/>";
-        resp = false;
-      }
-      if (['5','6','7'].indexOf(this.phone.select_note_status) > -1 && this.phone.select_note_status_sub =='') {
-        mess += " - Chi tiết trạng thái cuộc gọi không được để trống<br/>";
-        resp = false;
-      }
-      if (['3','4','7'].indexOf(this.phone.select_note_status) > -1 && this.phone.select_note_status_sub!=73 && this.phone.select_note_status_sub!=74 && phone_next_care_date=='') {
-        mess += " - Lịch chăm sóc tiếp không được để trống<br/>";
         resp = false;
       }
       if (this.phone.note == "") {

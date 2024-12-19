@@ -94,29 +94,17 @@
                 <label for="name">Trạng thái cuộc gọi</label>
                 <select class="form-control"  v-model="searchData.call_status">
                   <option value="">Chọn trạng thái cuộc gọi</option>
-                  <option value="1">Thuê bao - Tắt máy - Sai số</option>
-                  <option value="2">Location</option>
-                  <option value="3">Máy bận - Không nghe máy</option>
-                  <option value="4">KH hẹn gọi lại sau</option>
-                  <option value="5">KH Từ chối nói chuyện</option>
+                  <option value="1">Blank</option>
+                  <option value="2">Thuê bao - Tắt máy - Sai số</option>
+                  <option value="3">Location</option>
+                  <option value="4">Máy bận - Không nghe máy</option>
+                  <option value="5">KH hẹn gọi lại sau</option>
                   <option value="6">KH không phù hợp</option>
-                  <option value="7">KH tiềm năng</option>
-                  <option value="9">Blacklist</option>
-                </select>
-              </div>
-              <div class="form-group col-sm-4">
-                <label for="name">Trạng thái cuộc gọi chi tiết</label>
-                <select class="form-control"  v-model="searchData.call_status_sub">
-                  <option value="">Chọn trạng thái cuộc gọi chi tiết</option>
-                  <option value="51" v-if="searchData.call_status==5">KH đã từng sử dụng dịch vụ</option>
-                  <option value="52" v-if="searchData.call_status==5">KH không quan tâm</option>
-                  <option value="53" v-if="searchData.call_status==5">KH thực sự không muốn nói chuyện</option>
-                  <option value="61" v-if="searchData.call_status==6">Không có con</option>
-                  <option value="62" v-if="searchData.call_status==6">Lý do khác</option>
-                  <option value="71" v-if="searchData.call_status==7">KH đang cân nhắc</option>
-                  <option value="72" v-if="searchData.call_status==7">KH hẹn thời gian khác</option>
-                  <option value="73" v-if="searchData.call_status==7">KH ko muốn làm phiền</option>
-                  <option value="74" v-if="searchData.call_status==7">Confirm 1</option>
+                  <option value="7">Không có con/Không có con trong độ tuổi CMS</option>
+                  <option value="8">Lý do khác</option>
+                  <option value="9">KH quan tâm cần follow update</option>
+                  <option value="10">KH đồng ý đặt lịch checkin</option>
+                  <option value="11">Danh sách đen</option>
                 </select>
               </div>
               <div class="form-group col-sm-4">
@@ -156,7 +144,6 @@
                     <th>Tên khách hàng</th>
                     <th>SĐT</th>
                     <th>Trạng thái cuộc gọi</th>
-                    <th>Trạng thái cuộc gọi chi tiết</th>
                     <th>Ngày hẹn chăm sóc</th>
                     <th>Trung tâm</th>
                     <th>Sale</th>
@@ -175,7 +162,6 @@
                     <td>{{ item.name }}</td> 
                     <td>{{ item.mobile_1 }}</td>
                     <td>{{ item.call_status | callStatus}}</td>
-                    <td>{{ item.call_status_sub | callStatusSub}}</td>
                     <td>{{ item.next_care_date}}</td>
                     <td>{{ item.branch_name }}</td>
                     <td>{{ item.sale_name}}</td>
@@ -258,7 +244,6 @@ export default {
       list_branches:[],
       users_manager:[],
       source_list:[],
-      source_detail_list:[],
       loading: {
         text: "Đang tải dữ liệu...",
         processing: false,
@@ -269,7 +254,6 @@ export default {
         arr_owner:"",
         dateRange:"",
         arr_source:"",
-        arr_source_detail:"",
         call_status:"",
         call_status_sub:"",
         dateRangeCare:"",
@@ -349,15 +333,6 @@ export default {
       }
       this.searchData.source_id = ids_source
 
-       const ids_source_detail = []
-      this.searchData.arr_source_detail = u.is.obj(this.searchData.arr_source_detail) ? [this.searchData.arr_source_detail] : this.searchData.arr_source_detail
-      if (this.searchData.arr_source_detail.length) {
-        this.searchData.arr_source_detail.map(item => {
-          ids_source_detail.push(item.id)
-        })
-      }
-      this.searchData.source_detail_id = ids_source_detail
-
       const data = {
         keyword: this.searchData.keyword,
         branch_id:this.searchData.branch_id,
@@ -423,15 +398,7 @@ export default {
           ids_source += ids_source ? "-" + item.id : item.id;
         });
       }
-      var ids_source_detail = "";
-      this.searchData.arr_source_detail = u.is.obj(this.searchData.arr_source_detail)
-        ? [this.searchData.arr_source_detail]
-        : this.searchData.arr_source_detail;
-      if (this.searchData.arr_source_detail.length) {
-        this.searchData.arr_source_detail.map((item) => {
-          ids_source_detail += ids_source_detail ? "-" + item.id : item.id;
-        });
-      }
+      
       var url = `/api/export/report04/`;
       this.key ='';
       this.value = ''
@@ -450,10 +417,6 @@ export default {
        if (ids_source) {
         this.key += "ids_source,";
         this.value += ids_source + ",";
-      }
-       if (ids_source_detail) {
-        this.key += "ids_source_detail,";
-        this.value += ids_source_detail + ",";
       }
       if (this.searchData.call_status) {
         this.key += "call_status,";
@@ -489,48 +452,31 @@ export default {
     callStatus(item){
       let resp = ''
       if(item== 1){
-        resp = 'Thuê bao - Tắt máy - Sai số'
+        resp = 'Blank'
       }else if(item==2){
-        resp = 'Location'
+        resp = 'Thuê bao - Tắt máy - Sai số'
       }else if(item==3){
-        resp = 'Máy bận - Không nghe máy'
+        resp = 'Location'
       }else if(item==4){
-        resp = 'KH hẹn gọi lại sau'
+        resp = 'Máy bận - Không nghe máy'
       }else if(item==5){
-        resp = 'KH Từ chối nói chuyện'
+        resp = 'KH hẹn gọi lại sau'
       }else if(item==6){
-        resp = 'KH không phù hợp'
+        resp = 'KH không có nhu cầu'
       }else if(item==7){
-        resp = 'KH tiềm năng'
+        resp = 'Không có con/Không có con trong độ tuổi CMS'
+      }else if(item==8){
+        resp = 'Lý do khác'
       }else if(item==9){
-        resp = 'Blacklist'
+        resp = 'KH quan tâm cần follow update'
+      }else if(item==10){
+        resp = 'KH đồng ý đặt lịch checkin'
+      }else if(item==11){
+        resp = 'Danh sách đen'
       }else{
         resp = ''
       }
 
-      return resp
-    },
-    callStatusSub(item){
-      let resp = ''
-      if(item== 51){
-        resp = 'KH đã từng sử dụng dịch vụ'
-      }else if(item==52){
-        resp = 'KH thực sự không muốn nói chuyện'
-      }else if(item==61){
-        resp = 'Không có con'
-      }else if(item==62){
-        resp = 'Lý do khác'
-      }else if(item==71){
-        resp = 'KH đang cân nhắc'
-      }else if(item==72){
-        resp = 'KH hẹn thời gian khác'
-      }else if(item==73){
-        resp = 'KH ko muốn làm phiền'
-      }else if(item==94){
-        resp = 'Confirm 1'
-      }else{
-        resp = ''
-      }
       return resp
     },
   },

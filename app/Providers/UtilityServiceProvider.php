@@ -324,87 +324,64 @@ class UtilityServiceProvider extends ServiceProvider
         } 
     }
     public static function getTitleCallStatus($call_status, $call_status_sub){
-        if($call_status === 0){
+        if($call_status === 1){
             return 'Blank';
-        } elseif($call_status == 1){
-            return 'Thuê bao - Tắt máy - Sai số';
         } elseif($call_status == 2){
-            return 'Location';
+            return 'Thuê bao - Tắt máy - Sai số';
         } elseif($call_status == 3){
-            return 'Máy bận - Không nghe máy';
+            return 'Location';
         } elseif($call_status == 4){
-            return 'KH hẹn gọi lại sau';
+            return 'Máy bận - Không nghe máy';
         } elseif($call_status == 5){
-            if($call_status_sub == 51){
-                return 'KH đã từng sử dụng dịch vụ';
-            }elseif($call_status_sub == 52){
-                return 'KH không quan tâm';
-            }elseif($call_status_sub == 53){
-                return 'KH thực sự không muốn nói chuyện';
-            }
-        }elseif($call_status == 6){
-            if($call_status_sub == 61){
-                return 'Không có con';
-            }elseif($call_status_sub == 62){
-                return 'Lý do khác';
-            }
+            return 'KH hẹn gọi lại sau';
+        } elseif($call_status == 6){
+            return 'KH không có nhu cầu';
         } elseif($call_status == 7){
-            if($call_status_sub == 71){
-                return 'KH đang cân nhắc';
-            }elseif($call_status_sub == 72){
-                return 'KH hẹn thời gian khác';
-            }elseif($call_status_sub == 73){
-                return 'KH ko muốn làm phiền';
-            }elseif($call_status_sub == 74){
-                return 'Confirm 1';
-            }
-        } elseif($call_status == 9){
-            return 'Blacklist';
+            return 'Không có con/Không có con trong độ tuổi CMS';
+        }elseif($call_status == 8){
+            return 'Lý do khác';
+        }elseif($call_status == 9){
+            return 'KH quan tâm cần follow update';
+        } elseif($call_status == 10){
+            return 'KH đồng ý đặt lịch checkin';
+        } elseif($call_status == 11){
+            return 'Danh sách đen';
         }  
     }
     public static function getStatus($status){
         $tmp ="";
         switch ($status) {
-            case 0:
+            case 1:
                 $tmp = 'KH mới';
                 break;
-            case 10:
+            case 2:
                 $tmp = 'KH không liên lạc được';
                 break;
-            case 20:
+            case 3:
                 $tmp = 'KH ở vùng CMS không có cơ sở';
                 break;
-            case 30:
-                $tmp = 'KH không nghe máy';
-                break;
-            case 40:
+            case 4:
                 $tmp = 'KH hẹn gọi lại sau';
                 break;
-            case 50:
+            case 5:
                 $tmp = 'KH không quan tâm';
                 break;
-            case 60:
-                $tmp = 'KH không tiềm năng';
-                break;
-            case 71:
+            case 6:
                 $tmp = 'KH quan tâm, cần follow up date';
                 break;
-            case 72:
-                $tmp = 'KH tiềm năng nhưng không muốn làm phiền';
-                break;
-            case 73:
+            case 7:
                 $tmp = 'KH đồng ý đặt lịch Checkin';
                 break;
-            case 81:
-                $tmp = 'KH đến hạn tái tục';
+            case 8:
+                $tmp = 'KH đã đến checkin';
                 break;
-            case 82:
+            case 9:
                 $tmp = 'KH đã mua gói phí';
                 break;
-            case 83:
+            case 10:
                 $tmp = 'KH đến hạn tái tục';
                 break;
-            case 90:
+            case 11:
                 $tmp = 'Danh sách đen';
                 break;
             default:
@@ -441,25 +418,29 @@ class UtilityServiceProvider extends ServiceProvider
 		return $resp && is_array($resp) && count($resp) >= 1 ? $resp[0] : $resp;
 	}
     public static function genTitleCallStatus($call_status){
-        if($call_status === 0){
+        if($call_status === 1){
             return 'Blank';
-        } elseif($call_status == 1){
-            return 'Thuê bao - Tắt máy - Sai số';
         } elseif($call_status == 2){
-            return 'Location';
+            return 'Thuê bao - Tắt máy - Sai số';
         } elseif($call_status == 3){
-            return 'Máy bận - Không nghe máy';
+            return 'Location';
         } elseif($call_status == 4){
-            return 'KH hẹn gọi lại sau';
+            return 'Máy bận - Không nghe máy';
         } elseif($call_status == 5){
-            return 'KH Từ chối nói chuyện';
-        }elseif($call_status == 6){
-            return 'KH không phù hợp';
+            return 'KH hẹn gọi lại sau';
+        } elseif($call_status == 6){
+            return 'KH không có nhu cầu';
         } elseif($call_status == 7){
-            return 'KH tiềm năng';
-        } elseif($call_status == 9){
-            return 'Blacklist';
-        } else{
+            return 'Không có con/Không có con trong độ tuổi CMS';
+        }elseif($call_status == 8){
+            return 'Lý do khác';
+        }elseif($call_status == 9){
+            return 'KH quan tâm cần follow update';
+        } elseif($call_status == 10){
+            return 'KH đồng ý đặt lịch checkin';
+        } elseif($call_status == 11){
+            return 'Danh sách đen';
+        }  else{
             return '';
         } 
     }

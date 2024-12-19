@@ -248,41 +248,38 @@ export default {
       let resp = ''
       switch (Number(value)) {
           case 1:
-              resp = 'KH mới'
-              break
+              resp = 'KH mới';
+              break;
           case 2:
-              resp = 'KH tiềm năng'
-              break
+              resp = 'KH không liên lạc được';
+              break;
           case 3:
-              resp = 'KH tiềm năng cần follow up'
-              break
+              resp = 'KH ở vùng CMS không có cơ sở';
+              break;
           case 4:
-              resp = 'KH bận gọi lại sau'
-              break
+              resp = 'KH hẹn gọi lại sau';
+              break;
           case 5:
-              resp = 'KH không nghe máy'
-              break
+              resp = 'KH không quan tâm';
+              break;
           case 6:
-              resp = 'KH đồng ý đặt lịch checkin'
-              break
+              resp = 'KH quan tâm, cần follow up date';
+              break;
           case 7:
-              resp = 'KH đã đến checkin'
-              break
+              resp = 'KH đồng ý đặt lịch Checkin';
+              break;
           case 8:
-              resp = 'KH đã mua gói phí'
-              break
+              resp = 'KH đã đến checkin';
+              break;
           case 9:
-              resp = 'KH không có nhu cầu'
-              break
+              resp = 'KH đã mua gói phí';
+              break;
           case 10:
-              resp = 'KH không tiềm năng'
-              break
+              resp = 'KH đến hạn tái tục';
+              break;
           case 11:
-              resp = 'KH đến hạn tái tục'
-              break
-          case 12:
-              resp = 'Danh sách đen'
-              break 
+              resp = 'Danh sách đen';
+              break;
           default:
               resp = 'KH mới'
               break
