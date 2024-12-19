@@ -270,18 +270,6 @@ class ParentsController extends Controller
                 $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name";
                 $result->dup_parent_id = $duplicate_info->parent_id;
             }
-            // $parent_info = u::first("SELECT mobile_1,mobile_2 FROM cms_parents WHERE id=$parent_id");
-            // if($parent_info->mobile_1!=$phone && $parent_info->mobile_2!=$phone){
-            //     $connection = DB::connection('mysql_crm');
-            //     $lead_info = $connection->select(DB::raw("SELECT u.full_name AS ec_name,u.hrm_id AS ec_hrm_id,(SELECT name FROM branches WHERE id=t.branch_id) AS branch_name
-            //         FROM students AS s LEFT JOIN term_student_user AS t ON t.student_id =s.id LEFT JOIN users AS u ON u.id=t.ec_id 
-            //             WHERE s.gud_mobile1='{$phone}' OR  s.gud_mobile2='{$phone}'"));
-            //     if(isset($lead_info[0])){
-            //         $lead_info = $lead_info[0];
-            //         $result->status = 0;
-            //         $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $lead_info->ec_name - $lead_info->ec_hrm_id $lead_info->branch_name";
-            //     }
-            // }
         }else{
             $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name,p.status,u.branch_id,p.id AS parent_id,p.owner_id,
                     (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND status=1 AND creator_id=p.owner_id ORDER BY care_date DESC LIMIT 1) AS care_date,
@@ -295,48 +283,14 @@ class ParentsController extends Controller
                 }else{
                     $result->status = 0;
                     $result->dup_parent_id = $duplicate_info->parent_id;
-                    $text = "";
-                    if(in_array($duplicate_info->branch_id,[5,9]) &&1==2){
-                        $tmp_created_at = date('Y-m-d H:i:s',time()-4800);
-                        $arr_content = array(
-                            '0'=>'Khách hàng bận gọi lại sau',
-                            '1'=>'Mai gls',
-                            '2'=>'Đi công tác cuối tuần gọi lại',
-                            '3'=>'Đi du lịch công ty sang tuần đặt lịch',
-                            '4'=>'Đag họp nhé',
-                            '5'=>'Bận rồi',
-                            '6'=>'Đang ăn cơm em ơi',
-                            '7'=>'Đang trên đường không tiện nghe máy',
-                            '8'=>'Nhà c đang đi có việc nên em gọi sau nhé',
-                            '9'=>'Ồn lắm chưa nghe được',
-                            '10'=>'Đang đi chợ');
-                        $tmp_note = $arr_content[rand(0,10)];
-                        u::query("INSERT INTO cms_customer_care (parent_id,note,created_at,creator_id,method_id,care_date,status,branch_id) VALUES (
-                            '$duplicate_info->parent_id','$tmp_note','$tmp_created_at','$duplicate_info->owner_id','1','$tmp_created_at',1,'$duplicate_info->branch_id')");
-                        $thoi_gian_con = 60;
-                        $text.="<br> Thời gian chăm sóc gần nhất: ".$tmp_created_at." <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
-                    }elseif($duplicate_info->total_care>0 && (61 - floor((time() - strtotime($duplicate_info->care_date))/(3600*24)))>0){
-                        $thoi_gian_con = 61 - floor((time() - strtotime($duplicate_info->care_date))/(3600*24));
-                        $text.="<br> Thời gian chăm sóc gần nhất: $duplicate_info->care_date <br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
-                    }else{
-                        $thoi_gian_con = 16 - floor((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
-                        $text.="<br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
-                    }
-                    if($duplicate_info->status > 80 || $duplicate_info->status==73){
+                    $text="<br> Thời gian chăm sóc gần nhất: $duplicate_info->care_date";
+                    
+                    if($duplicate_info->status ==9 || $duplicate_info->status==10){
                         $text="<br> Khách hàng thuộc các trường hợp không được phép ghi đè - ".u::getStatus($duplicate_info->status);
                     }
                     $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name .".$text;
                 }
             }
-            // $connection = DB::connection('mysql_crm');
-            // $lead_info = $connection->select(DB::raw("SELECT u.full_name AS ec_name,u.hrm_id AS ec_hrm_id,(SELECT name FROM branches WHERE id=t.branch_id) AS branch_name
-            //     FROM students AS s LEFT JOIN term_student_user AS t ON t.student_id =s.id LEFT JOIN users AS u ON u.id=t.ec_id 
-            //         WHERE s.gud_mobile1='{$phone}' OR  s.gud_mobile2='{$phone}'"));
-            // if(isset($lead_info[0])){
-            //     $lead_info = $lead_info[0];
-            //     $result->status = 0;
-            //     $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $lead_info->ec_name - $lead_info->ec_hrm_id $lead_info->branch_name";
-            // }
         }
         return response()->json($result);
     }
@@ -500,19 +454,16 @@ class ParentsController extends Controller
         u::query("UPDATE cms_parents SET is_lock = 1");
         u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id");
         u::query("UPDATE cms_parents AS p SET p.care_date=(SELECT  IF(care_date IS NULL, p.care_date,care_date) FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1)");
-        u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1) WHERE  p.status NOT IN( 90, 81, 82, 83, 73)");
-        u::query("UPDATE cms_parents SET is_lock = 0 
-            WHERE last_care_date IS NULL 
-                AND last_assign_date IS NOT NULL 
-                AND is_lock=1 AND status NOT IN( 90, 81, 82, 83, 73)
-                AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
+        u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1)");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE
                 last_care_date IS NOT NULL 
-                AND last_assign_date IS NOT NULL 
-                AND is_lock=1 AND status NOT IN( 90, 81, 82, 83, 73)
-                AND DATEDIFF( CURRENT_DATE, last_care_date )> 60
-                AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
+                AND is_lock=1 AND status NOT IN( 9,10)
+                AND ( 
+                    (DATEDIFF( CURRENT_DATE, last_care_date )> 15 AND status IN (1,2,5))
+                    OR  (DATEDIFF( CURRENT_DATE, last_care_date )> 30 AND status IN (3,4,6,7,11))
+                    OR  (DATEDIFF( CURRENT_DATE, last_care_date )> 60 AND status IN (8))
+                ) ");
         return "ok";
     }
 
@@ -524,17 +475,14 @@ class ParentsController extends Controller
         u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id,p.is_lock = 1
             WHERE p.id=$parent_id ");
         u::query("UPDATE cms_parents SET is_lock = 0 
-            WHERE last_care_date IS NULL  AND id=$parent_id
-                AND last_assign_date IS NOT NULL 
-                AND is_lock=1 AND status NOT IN( 90, 81, 82, 83, 73)
-                AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
-        u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE
                 last_care_date IS NOT NULL  AND id=$parent_id
-                AND last_assign_date IS NOT NULL 
-                AND is_lock=1 AND status NOT IN( 90, 81, 82, 83, 73)
-                AND DATEDIFF( CURRENT_DATE, last_care_date )> 60
-                AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15");
+                AND is_lock=1 AND status NOT IN( 9,10)
+                AND ( 
+                    (DATEDIFF( CURRENT_DATE, last_care_date )> 15 AND status IN (1,2,5))
+                    OR  (DATEDIFF( CURRENT_DATE, last_care_date )> 30 AND status IN (3,4,6,7,11))
+                    OR  (DATEDIFF( CURRENT_DATE, last_care_date )> 60 AND status IN (8))
+                ) ");
         return true;
     }
     
@@ -569,22 +517,22 @@ class ParentsController extends Controller
         u::query(" UPDATE cms_parents AS p
             LEFT JOIN tmp_cms_parents AS t ON t.gud_mobile2 = p.mobile_1 AND t.gud_mobile2!='' AND t.gud_mobile2 IS NOT NULL
         SET p.`status` = IF(
-            t.contract_active > 0, 82,
-                IF(t.contract_total>0, 83,
-                    IF(t.checked>0,81, p.`status`)
+            t.contract_active > 0, 9,
+                IF(t.contract_total>0, 10,
+                    IF(t.checked>0,8, p.`status`)
                 )
          )
-        WHERE t.id IS NOT NULL AND p.status!=90 ");
+        WHERE t.id IS NOT NULL ");
 
         u::query(" UPDATE cms_parents AS p
             LEFT JOIN tmp_cms_parents AS t ON t.gud_mobile1 = p.mobile_1 AND t.gud_mobile1!='' AND t.gud_mobile1 IS NOT NULL
         SET p.`status` = IF(
-            t.contract_active > 0, 82,
-                IF(t.contract_total>0, 83,
-                    IF(t.checked>0,81, p.`status`)
+            t.contract_active > 0, 9,
+                IF(t.contract_total>0, 10,
+                    IF(t.checked>0,8, p.`status`)
                 )
         )
-        WHERE t.id IS NOT NULL AND p.status!=90 ");
+        WHERE t.id IS NOT NULL  ");
     }
 
     public static function addItemsTmpCmsParents($list) {
