@@ -57,25 +57,12 @@ class ParentCareController extends Controller
             'message' => "Thành công",
             'data'=>$id
         ];
-        if(data_get($dataRequest, 'call_status')){
-            $parent_info = u::first("SELECT * FROM cms_parents WHERE id=$request->parent_id");
-            $parent_status = u::genStatusByCallStatus(data_get($dataRequest, 'call_status'), data_get($dataRequest, 'call_status_sub' ));
-            if(($parent_info->status < 70 && $parent_info->status!=$parent_status) || $parent_status > $parent_info->status){
-                if( data_get($dataRequest, 'next_care_date' )){
-                    $data=u::updateSimpleRow(array(
-                        'updated_at' => date('Y-m-d H:i:s'),
-                        'updator_id' => $request->user()->id,
-                        'next_care_date'=>date('Y-m-d H:i:s',strtotime($request->next_care_date)),
-                        'status' => $parent_status
-                    ), array('id' => $request->parent_id), 'cms_parents');
-                }else{
-                    $data=u::updateSimpleRow(array(
-                        'updated_at' => date('Y-m-d H:i:s'),
-                        'updator_id' => $request->user()->id,
-                        'status' => $parent_status
-                    ), array('id' => $request->parent_id), 'cms_parents');
-                }
-            }
+        if( data_get($dataRequest, 'next_care_date' )){
+            $data=u::updateSimpleRow(array(
+                'updated_at' => date('Y-m-d H:i:s'),
+                'updator_id' => $request->user()->id,
+                'next_care_date'=>date('Y-m-d H:i:s',strtotime($request->next_care_date)),
+            ), array('id' => $request->parent_id), 'cms_parents');
         }
        
         ParentsController::processParentLockById($request->parent_id);
