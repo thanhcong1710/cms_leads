@@ -272,7 +272,7 @@ class ParentsController extends Controller
             }
         }else{
             $duplicate_info = u::first("SELECT p.is_lock,u.name,u.hrm_id, u.branch_name,p.status,u.branch_id,p.id AS parent_id,p.owner_id,
-                    (SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND status=1 AND creator_id=p.owner_id ORDER BY care_date DESC LIMIT 1) AS care_date,
+                    p.last_care_date,
                     (SELECT count(id) FROM cms_customer_care WHERE parent_id=p.id AND status=1  AND creator_id=p.owner_id) AS total_care, p.last_assign_date
                 FROM cms_parents AS p LEFT JOIN users AS u ON u.id=p.owner_id  WHERE (p.mobile_1='$phone' OR p.mobile_2='$phone') ");
             if($duplicate_info){
@@ -283,10 +283,32 @@ class ParentsController extends Controller
                 }else{
                     $result->status = 0;
                     $result->dup_parent_id = $duplicate_info->parent_id;
-                    $text="<br> Thời gian chăm sóc gần nhất: $duplicate_info->care_date";
+                    $text="";
                     
                     if($duplicate_info->status ==9 || $duplicate_info->status==10){
                         $text="<br> Khách hàng thuộc các trường hợp không được phép ghi đè - ".u::getStatus($duplicate_info->status);
+                    } else {
+                        if (in_array($duplicate_info->status,[1,2,5])){
+                            if($duplicate_info->last_care_date){
+                                $thoi_gian_con = 15 - floor((time() - strtotime($duplicate_info->last_care_date))/(3600*24));
+                            }else{
+                                $thoi_gian_con = 15 - floor((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
+                            }
+                        }elseif (in_array($duplicate_info->status,[3,4,6,7,11])){
+                            if($duplicate_info->last_care_date){
+                                $thoi_gian_con = 30 - floor((time() - strtotime($duplicate_info->last_care_date))/(3600*24));
+                            }else{
+                                $thoi_gian_con = 30 - floor((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
+                            }
+                        }elseif (in_array($duplicate_info->status,[3,4,6,7,11])){
+                            if($duplicate_info->last_care_date){
+                                $thoi_gian_con = 60 - floor((time() - strtotime($duplicate_info->last_care_date))/(3600*24));
+                            }else{
+                                $thoi_gian_con = 60 - floor((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
+                            }
+                        }
+                        
+                        $text="<br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }
                     $result->message = "Khách hàng có SĐT: $phone đang thuộc quyền quản lý của nhân viên $duplicate_info->name - $duplicate_info->hrm_id $duplicate_info->branch_name .".$text;
                 }
