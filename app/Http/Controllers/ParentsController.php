@@ -459,7 +459,7 @@ class ParentsController extends Controller
             WHERE
                 (last_care_date IS NULL AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15) OR
                 (
-                    last_care_date IS NOT NULL AND 
+                    last_care_date IS NOT NULL  
                     AND is_lock=1 AND status NOT IN( 9,10)
                     AND ( 
                         (DATEDIFF( CURRENT_DATE, last_care_date )> 15 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15 AND status IN (1,2,5))
