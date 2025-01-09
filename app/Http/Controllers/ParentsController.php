@@ -288,7 +288,7 @@ class ParentsController extends Controller
                     if($duplicate_info->status ==9 || $duplicate_info->status==10){
                         $text="<br> Khách hàng thuộc các trường hợp không được phép ghi đè - ".u::getStatus($duplicate_info->status);
                     } else {
-                        if (in_array($duplicate_info->status,[1,2,5])){
+                        if (in_array($duplicate_info->status,[0,1,2,5])){
                             if($duplicate_info->last_care_date){
                                 $thoi_gian_con = 15 - floor((time() - strtotime($duplicate_info->last_care_date))/(3600*24));
                             }else{
