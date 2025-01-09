@@ -300,7 +300,7 @@ class ParentsController extends Controller
                             }else{
                                 $thoi_gian_con = 30 - floor((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
                             }
-                        }elseif (in_array($duplicate_info->status,[3,4,6,7,11])){
+                        }else {
                             if($duplicate_info->last_care_date){
                                 $thoi_gian_con = 60 - floor((time() - strtotime($duplicate_info->last_care_date))/(3600*24));
                             }else{
