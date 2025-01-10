@@ -325,16 +325,16 @@ export default {
       this.parent.source_detail = this.html.source_detail.list.filter(item => item.id == this.parent.source_detail_id)[0]
       this.parent.province = this.html.province.list.filter(item => item.id == this.parent.province_id)[0]
       this.tmp_district_id = this.parent.district_id
-      if(this.parent.source_id==26 || this.parent.source_id==32){
-        const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
-        if(arr_role.indexOf("admin")> -1){
-           this.edit_source=false
-        }else{
-          this.edit_source=true
-        }
-      }else{
-        this.edit_source=false
-      }
+      // if(this.parent.source_id==26 || this.parent.source_id==32){
+      //   const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
+      //   if(arr_role.indexOf("admin")> -1){
+      //      this.edit_source=false
+      //   }else{
+      //     this.edit_source=true
+      //   }
+      // }else{
+      //   this.edit_source=false
+      // }
     })
   },
   methods: {
