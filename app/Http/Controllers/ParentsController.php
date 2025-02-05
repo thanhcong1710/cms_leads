@@ -70,7 +70,7 @@ class ParentsController extends Controller
         //     $cond .= " AND p.status = -1";
         // }
         //type_search=1
-        $cond_1 = " AND p.care_date IS NULL AND p.status <80 ";
+        $cond_1 = " AND p.care_date IS NULL AND p.status NOT IN (8,9,10,12) ";
         //type_search=2
         $cond_2 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') = '".date('Y-m-d')."'";
         $cond_3 = " AND next_care_date < '".date('Y-m-d')."' 
