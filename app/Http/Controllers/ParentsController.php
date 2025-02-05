@@ -479,7 +479,7 @@ class ParentsController extends Controller
         u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1)");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE
-                (last_care_date IS NULL AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15) OR
+                (last_care_date IS NULL AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15 AND status NOT IN( 9,10)) OR
                 (
                     last_care_date IS NOT NULL  
                     AND is_lock=1 AND status NOT IN( 9,10)
@@ -502,7 +502,7 @@ class ParentsController extends Controller
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE
                 id=$parent_id AND (
-                (last_care_date IS NULL AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15) OR
+                (last_care_date IS NULL AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15 AND status NOT IN( 9,10)) OR
                     (last_care_date IS NOT NULL  
                         AND is_lock=1 AND status NOT IN( 9,10)
                         AND ( 
