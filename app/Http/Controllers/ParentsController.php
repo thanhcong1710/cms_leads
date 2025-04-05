@@ -27,6 +27,7 @@ class ParentsController extends Controller
         $end_date = isset($request->end_date) ? $request->end_date : '';
         $start_date = isset($request->start_date) ? $request->start_date : '';
         $type_seach = isset($request->type_seach) ? $request->type_seach : 0;
+        $student_year = isset($request->student_year) ? $request->student_year : 0;
 
         $pagination = (object)$request->pagination;
         $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
@@ -65,6 +66,9 @@ class ParentsController extends Controller
         }
         if ($start_date !== '') {
             $cond .= " AND p.next_care_date > '$start_date 00:00:00'";
+        }
+        if ($student_year){
+            $cond .= " AND (SELECT count(id) FROM cms_students WHERE parent_id=p.id AND DATE_FORMAT( birthday,'%Y')=$student_year)>0";
         }
         // if (date('d') >= '11') {
         //     $cond .= " AND p.status = -1";

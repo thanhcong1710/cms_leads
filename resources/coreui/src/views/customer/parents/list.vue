@@ -99,6 +99,10 @@
                     placeholder="Chọn thời gian tìm kiếm từ ngày đến ngày"
                   ></date-picker>
               </div>
+              <div class="form-group col-sm-3">
+                <label for="ccmonth">Năm sinh của học sinh</label>
+                <input type="number"  v-model="searchData.studentYear" class="form-control" placeholder="YYYY" min="1999" max="2030">
+              </div>
               <div class="form-group col-sm-12">
                 <router-link v-if="!disabled_action" class="btn btn-success" :to="'/parents/add'">
                   <i class="fa fa-plus"></i> Thêm mới
@@ -366,6 +370,7 @@ export default {
         pagination: this.pagination,
         dateRange: "",
         type_seach: 1,
+        studentYear:"",
       },
       users_manager:[],
       parents: [],
@@ -525,7 +530,8 @@ export default {
         start_date:startDate,
         end_date:endDate,
         pagination:this.pagination,
-        type_seach:this.searchData.type_seach
+        type_seach:this.searchData.type_seach,
+        student_year: this.searchData.studentYear
       };
       localStorage.setItem("parents_searchData", JSON.stringify(this.searchData));
       const link = "/api/parents/list";
