@@ -98,12 +98,11 @@ class VoipController extends Controller
         $res =json_decode($result);
         return $res;
     }
-
-    public function test(){
+    public function  testSocket (){
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://cms.logiclab.vn/api/leads-create-checkin',
+        CURLOPT_URL => 'https://crm.logiclab.vn/api/leads-create-checkin',
         CURLOPT_RETURNTRANSFER => true,
         CURLOPT_ENCODING => '',
         CURLOPT_MAXREDIRS => 10,
@@ -148,7 +147,5 @@ class VoipController extends Controller
             var_dump($response,$err);die();
         } 
         var_dump($response);die();
-
-
     }
 }
