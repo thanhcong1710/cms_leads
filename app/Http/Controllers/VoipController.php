@@ -151,4 +151,5 @@ class VoipController extends Controller
 
 
     }
+    // Document VitalPBX https://documenter.getpostman.com/view/5481262/S17rvTgc?version=latest#feb244c3-1d4d-4e89-bbc1-0c54f6df2561
 }
