@@ -124,7 +124,7 @@ class VoipController extends Controller
         u::logRequest($url,$method,$header,$data_request,$res,'log_request_outbound');
         $res = json_decode($res);
 
-        if(data_get($res, 'code') == 1000){
+        if(data_get($res, 'status') == 'success'){
             $id = u::insertSimpleRow(array(
                 'phone' => $phone,
                 'sip_id' => $sip,
