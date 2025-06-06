@@ -18,7 +18,7 @@
                   placeholder="Tên khách hàng, số điện thoại"
                 />
               </div>
-              <div class="form-group col-sm-3">
+              <!-- <div class="form-group col-sm-3">
                 <label for="ccmonth">Trung tâm</label>
                  <multiselect
                   placeholder="Chọn trung tâm"
@@ -34,7 +34,7 @@
                 >
                   <span slot="noResult">Không tìm thấy dữ liệu</span>
                 </multiselect>   
-              </div>
+              </div> -->
               <div class="form-group col-sm-3">
                 <label for="ccmonth">Trạng thái</label>
                 <multiselect
@@ -466,10 +466,10 @@ export default {
     // if(!(arr_role.indexOf("admin")> -1)){
     //   this.disabled_action = true
     // }
-    u.g(`/api/branches`)
-      .then(response => {
-      this.branch_list = response.data
-    })
+    // u.g(`/api/branches`)
+    //   .then(response => {
+    //   this.branch_list = response.data
+    // })
     u.g(`/api/user/get-users-manager`)
       .then(response => {
       this.users_manager = response.data
@@ -518,14 +518,14 @@ export default {
       }
       this.searchData.status = ids
 
-      const ids_branch = []
-      this.searchData.arr_branch = u.is.obj(this.searchData.arr_branch) ? [this.searchData.arr_branch] : this.searchData.arr_branch
-      if (this.searchData.arr_branch.length) {
-        this.searchData.arr_branch.map(item => {
-          ids_branch.push(item.id)
-        })
-      }
-      this.searchData.branch_id = ids_branch
+      // const ids_branch = []
+      // this.searchData.arr_branch = u.is.obj(this.searchData.arr_branch) ? [this.searchData.arr_branch] : this.searchData.arr_branch
+      // if (this.searchData.arr_branch.length) {
+      //   this.searchData.arr_branch.map(item => {
+      //     ids_branch.push(item.id)
+      //   })
+      // }
+      // this.searchData.branch_id = ids_branch
 
       const ids_owner = []
       this.searchData.arr_owner = u.is.obj(this.searchData.arr_owner) ? [this.searchData.arr_owner] : this.searchData.arr_owner
@@ -557,7 +557,7 @@ export default {
       const data = {
         keyword: this.searchData.keyword,
         status: this.searchData.status,
-        branch_id: this.searchData.branch_id,
+        // branch_id: this.searchData.branch_id,
         owner_id: this.searchData.owner_id,
         source_id: this.searchData.source_id,
         source_detail_id: this.searchData.source_detail_id,
