@@ -22,6 +22,7 @@ class ParentsController extends Controller
         $status = isset($request->status) ? $request->status : [];
         $keyword = isset($request->keyword) ? $request->keyword : '';
         $owner_id = isset($request->owner_id) ? $request->owner_id :  [];
+        $branch_id = isset($request->branch_id) ? $request->branch_id :  [];
         $source_id = isset($request->source_id) ? $request->source_id : [];
         $source_detail_id = isset($request->source_detail_id) ? $request->source_detail_id : [];
         $end_date = isset($request->end_date) ? $request->end_date : '';
@@ -56,6 +57,9 @@ class ParentsController extends Controller
         }
         if (!empty($source_detail_id)) {
             $cond .= " AND p.source_detail_id IN (".implode(",",$source_detail_id).")";
+        }
+        if (!empty($branch_id)) {
+            $cond .= " AND p.tmp_branch_id IN (".implode(",",$branch_id).")";
         }
         
         if ($keyword !== '') {
@@ -478,7 +482,7 @@ class ParentsController extends Controller
     }
     public function processParentLock(){
         u::query("UPDATE cms_parents SET is_lock = 1");
-        u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id");
+        u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id WHERE AND u.branch_id!=0 AND u.branch_id!= null");
         u::query("UPDATE cms_parents AS p SET p.care_date=(SELECT  IF(care_date IS NULL, p.care_date,care_date) FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1)");
         u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1)");
         u::query("UPDATE cms_parents SET is_lock = 0 
@@ -502,7 +506,7 @@ class ParentsController extends Controller
                 p.care_date=(SELECT IF(care_date IS NULL, p.care_date,care_date) FROM cms_customer_care WHERE parent_id=p.id AND `status`=1 ORDER BY id DESC LIMIT 1)
             WHERE p.id=$parent_id ");
         u::query("UPDATE cms_parents AS p LEFT JOIN users AS u ON u.id = p.owner_id SET p.tmp_branch_id = u.branch_id,p.is_lock = 1
-            WHERE p.id=$parent_id ");
+            WHERE p.id=$parent_id  AND u.branch_id!=0 AND u.branch_id!= null");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE
                 id=$parent_id AND (
