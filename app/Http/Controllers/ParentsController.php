@@ -22,7 +22,7 @@ class ParentsController extends Controller
         $status = isset($request->status) ? $request->status : [];
         $keyword = isset($request->keyword) ? $request->keyword : '';
         $owner_id = isset($request->owner_id) ? $request->owner_id :  [];
-        $branch_id = isset($request->branch_id) ? $request->branch_id :  [];
+        $branch_id = isset($request->branchId) ? $request->branchId :  0;
         $source_id = isset($request->source_id) ? $request->source_id : [];
         $source_detail_id = isset($request->source_detail_id) ? $request->source_detail_id : [];
         $end_date = isset($request->end_date) ? $request->end_date : '';
@@ -58,8 +58,8 @@ class ParentsController extends Controller
         if (!empty($source_detail_id)) {
             $cond .= " AND p.source_detail_id IN (".implode(",",$source_detail_id).")";
         }
-        if (!empty($branch_id)) {
-            $cond .= " AND p.tmp_branch_id IN (".implode(",",$branch_id).")";
+        if (!empty($branch_id) && $branch_id) {
+            $cond .= " AND p.tmp_branch_id = $branch_id ";
         }
         
         if ($keyword !== '') {
