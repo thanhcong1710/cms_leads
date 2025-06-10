@@ -189,6 +189,19 @@ class ParentsController extends Controller
             'last_assign_date'=>$request->owner_id != $pre_parent_info->owner_id ? date('Y-m-d H:i:s') : $pre_parent_info->last_assign_date,
         ), array('id' => $request->parent_id), 'cms_parents');
         LogParents::logAssign($request->parent_id,$pre_parent_info->owner_id,$request->owner_id,Auth::user()->id);
+        $students = u::query('SELECT crm_id FROM cms_students WHERE parent_id='.$request->parent_id);
+        if(!empty($students)){
+            $owner_info = u::first("SELECT hrm_id FROM users WHERE id=".$request->owner_id);
+            if( $owner_info){
+                $crm_ec_id = u::firstCRM("SELECT id FROM users WHERE hrm_id = ".data_get($owner_info, 'hrm_id'));
+                foreach($students AS $student){
+                    if(data_get($student, 'crm_id')){
+                        u::queryCRM("UPDATE term_student_user SET ec_id= ".data_get($crm_ec_id, 'id')." WHERE student_id =".data_get($student, 'crm_id'));
+                    }
+                }
+            }
+        }
+
         return response()->json($data);
     }
     public function assignList(Request $request)
@@ -201,6 +214,19 @@ class ParentsController extends Controller
             $last_assign_date = $owner_id != $row->owner_id ? date('Y-m-d H:i:s') : $row->last_assign_date;
             u::query("UPDATE cms_parents SET owner_id= $owner_id,last_assign_date='$last_assign_date' WHERE id =$row->parent_id");
             LogParents::logAssign($row->parent_id,$row->owner_id,$owner_id,Auth::user()->id);
+
+            $students = u::query('SELECT crm_id FROM cms_students WHERE parent_id='.$row->parent_id);
+            if(!empty($students)){
+                $owner_info = u::first("SELECT hrm_id FROM users WHERE id=".$owner_id);
+                if( $owner_info){
+                    $crm_ec_id = u::firstCRM("SELECT id FROM users WHERE hrm_id = ".data_get($owner_info, 'hrm_id'));
+                    foreach($students AS $student){
+                        if(data_get($student, 'crm_id')){
+                            u::queryCRM("UPDATE term_student_user SET ec_id= ".data_get($crm_ec_id, 'id')." WHERE student_id =".data_get($student, 'crm_id'));
+                        }
+                    }
+                }
+            }
         }
         return response()->json("ok");
     }
