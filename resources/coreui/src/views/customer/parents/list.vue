@@ -107,7 +107,7 @@
                   ></date-picker>
               </div>
               <div class="form-group col-sm-3">
-                <label for="ccmonth">Chưa trong sóc trong khoảng</label>
+                <label for="ccmonth">Chưa chăm sóc trong khoảng</label>
                   <date-picker
                     style="width:100%;"
                     v-model="searchData.dateRangeCare"
