@@ -6,7 +6,7 @@
           <CCard class="mx-4 mb-0">
             <CCardBody class="p-4">
               <CForm @submit.prevent="login" method="POST">
-                <img style="max-width: 186px;" src="static/logo.png"/>
+                <img style="max-width: 186px;" src="/static/logo.png"/>
                 <h1>Login</h1>
                 <p class="text-muted">Sign In to your account</p>
                 <CInput

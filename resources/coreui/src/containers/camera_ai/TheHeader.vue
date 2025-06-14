@@ -11,7 +11,7 @@
       @click="$store.commit('toggleSidebarDesktop')"
     />
     <CHeaderBrand class="mx-auto d-lg-none" to="/camera-ai">
-      <img style="max-width: 186px;" src="static/logo.png"/>
+      <img style="max-width: 186px;" src="/static/logo.png"/>
     </CHeaderBrand>
 
     <CMenu/>
