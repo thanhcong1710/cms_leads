@@ -331,7 +331,6 @@ export default {
         }else{
            this.edit_source=true
          }
-       }
     })
   },
   methods: {
