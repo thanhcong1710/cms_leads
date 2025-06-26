@@ -49,7 +49,7 @@ class LogParents extends Model
             '10'=>'KH đến hạn tái tục',
             '11'=>'Danh sách đen'
         );
-        $content = "Thay đổi trạng thái: từ `".$arr_status[$pre_status]."` thành `".$arr_status[$status]."`";
+        $content = "Thay đổi trạng thái: từ `".($arr_status[$pre_status] ?? '')."` thành `".($arr_status[$status] ?? '')."`";
         u::insertSimpleRow(array(
             'parent_id'=>$parent_id,
             'content'=>$content,
