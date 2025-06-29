@@ -326,7 +326,7 @@ export default {
       this.parent.province = this.html.province.list.filter(item => item.id == this.parent.province_id)[0]
       this.tmp_district_id = this.parent.district_id
        const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
-      if(arr_role.indexOf("admin")> -1){
+      if(arr_role.indexOf("admin")> -1 || this.parent.source_id == 0){
            this.edit_source=false
         }else{
            this.edit_source=true
