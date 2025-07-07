@@ -581,8 +581,8 @@ class ExportController extends Controller
         }
         
         $list = u::query("SELECT p.phone, p.assign_date,
-                CONCAT(u1.full_name,' - ', u1.hrm_id ) AS pre_owner_name,
-                CONCAT(u2.full_name,' - ', u2.hrm_id ) AS  p.owner_name
+                CONCAT(u1.name,' - ', u1.hrm_id ) AS pre_owner_name,
+                CONCAT(u2.name,' - ', u2.hrm_id ) AS  owner_name
             FROM cms_parent_assign AS p 
                 LEFT JOIN users AS u1 ON u1.id= p.pre_owner_id
                 LEFT JOIN users AS u2 ON u2.id= p.owner_id
