@@ -64,7 +64,6 @@
                     </td>
                     <td>{{ item.pre_owner_name }}</td> 
                     <td>{{ item.owner_name }}</td>
-                    <td>{{ item.call_status | callStatus}}</td>
                     <td>{{ item.total}}</td>
                   </tr>
                 </tbody>
@@ -236,53 +235,12 @@ export default {
     exportExcel() {
       const startDate = this.searchData.dateRange!='' && this.searchData.dateRange!= undefined && this.searchData.dateRange[0] ?`${u.dateToString(this.searchData.dateRange[0])}`:''
       const endDate = this.searchData.dateRange!='' && this.searchData.dateRange!= undefined && this.searchData.dateRange[1] ?`${u.dateToString(this.searchData.dateRange[1])}`:''
-      const startDateCare = this.searchData.dateRangeCare!='' && this.searchData.dateRangeCare!= undefined && this.searchData.dateRangeCare[0] ?`${u.dateToString(this.searchData.dateRangeCare[0])}`:''
-      const endDateCare = this.searchData.dateRangeCare!='' && this.searchData.dateRangeCare!= undefined && this.searchData.dateRangeCare[1] ?`${u.dateToString(this.searchData.dateRangeCare[1])}`:''
-      var ids_owner = "";
-      this.searchData.owner_id = u.is.obj(this.searchData.owner_id)
-        ? [this.searchData.owner_id]
-        : this.searchData.owner_id;
-      if (this.searchData.owner_id.length) {
-        this.searchData.owner_id.map((item) => {
-          ids_owner += ids_owner ? "-" + item.id : item.id;
-        });
-      }
-      var ids_source = "";
-      this.searchData.arr_source = u.is.obj(this.searchData.arr_source)
-        ? [this.searchData.arr_source]
-        : this.searchData.arr_source;
-      if (this.searchData.arr_source.length) {
-        this.searchData.arr_source.map((item) => {
-          ids_source += ids_source ? "-" + item.id : item.id;
-        });
-      }
-      
       var url = `/api/export/report05/`;
       this.key ='';
       this.value = ''
       if (this.searchData.keyword) {
         this.key += "keyword,";
         this.value += this.searchData.keyword + ",";
-      }
-      if (this.searchData.branch_id) {
-        this.key += "branch_id,";
-        this.value += this.searchData.branch_id + ",";
-      }
-      if (ids_owner) {
-        this.key += "ids_owner,";
-        this.value += ids_owner + ",";
-      }
-       if (ids_source) {
-        this.key += "ids_source,";
-        this.value += ids_source + ",";
-      }
-      if (this.searchData.call_status) {
-        this.key += "call_status,";
-        this.value += this.searchData.call_status + ",";
-      }
-      if (this.searchData.call_status_sub) {
-        this.key += "call_status_sub,";
-        this.value += this.searchData.call_status_sub + ",";
       }
       if (startDate) {
         this.key += "start_date,";
@@ -292,14 +250,6 @@ export default {
         this.key += "end_date,";
         this.value += endDate + ",";
       }
-      if (startDateCare) {
-        this.key += "start_date_care,";
-        this.value += startDateCare + ",";
-      }
-      if (endDateCare) {
-        this.key += "end_date_care,";
-        this.value += endDateCare + ",";
-      }
       this.key = this.key? this.key.substring(0, this.key.length - 1):'_'
       this.value = this.value? this.value.substring(0, this.value.length - 1) : "_"
       url += this.key+"/"+this.value +`?token=${localStorage.getItem("api_token")}`
@@ -307,36 +257,6 @@ export default {
     },
   },
   filters: {
-    callStatus(item){
-      let resp = ''
-      if(item== 1){
-        resp = 'Blank'
-      }else if(item==2){
-        resp = 'Thuê bao - Tắt máy - Sai số'
-      }else if(item==3){
-        resp = 'Location'
-      }else if(item==4){
-        resp = 'Máy bận - Không nghe máy'
-      }else if(item==5){
-        resp = 'KH hẹn gọi lại sau'
-      }else if(item==6){
-        resp = 'KH không có nhu cầu'
-      }else if(item==7){
-        resp = 'Không có con/Không có con trong độ tuổi CMS'
-      }else if(item==8){
-        resp = 'Lý do khác'
-      }else if(item==9){
-        resp = 'KH quan tâm cần follow update'
-      }else if(item==10){
-        resp = 'KH đồng ý đặt lịch checkin'
-      }else if(item==11){
-        resp = 'Danh sách đen'
-      }else{
-        resp = ''
-      }
-
-      return resp
-    },
   },
 };
 </script>

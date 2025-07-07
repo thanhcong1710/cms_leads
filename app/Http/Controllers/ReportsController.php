@@ -246,7 +246,7 @@ class ReportsController extends Controller
             FROM cms_parent_assign AS p WHERE $cond GROUP BY p.pre_owner_id,p.owner_id 
             ORDER BY p.pre_owner_id DESC $limitation");
             
-        $data = u::makingPagination($list, $total->total, $page, $limit);
+        $data = u::makingPagination($list, $total->total?? 0, $page, $limit);
         return response()->json($data);
     }
 }
