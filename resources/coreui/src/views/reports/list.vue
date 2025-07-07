@@ -10,7 +10,8 @@
             <!-- <p class="h6"><router-link to="/reports/01" v-if="showBC01" >01. Báo cáo thông tin khách hàng</router-link></p>
             <p class="h6"><router-link to="/reports/02" v-if="showBC02" >02. Báo cáo tuần Sale HUB</router-link></p> -->
             <p class="h6"><router-link to="/reports/03" v-if="showBC03" >01. Báo cáo cuộc gọi</router-link></p>
-            <p class="h6"><router-link to="/reports/04" v-if="showBC04" >04. Báo cáo chi tiết cuộc gọi</router-link></p>
+            <p class="h6"><router-link to="/reports/04" v-if="showBC04" >02. Báo cáo chi tiết cuộc gọi</router-link></p>
+            <p class="h6"><router-link to="/reports/05" v-if="showBC05" >03. Báo cáo bàn giao khách hàng</router-link></p>
           </div>
         </div>
       </div>
@@ -31,6 +32,7 @@ export default {
       showBC02:false,
       showBC03:false,
       showBC04:false,
+      showBC05:false,
     }
   },
   created() {
@@ -39,7 +41,7 @@ export default {
     this.showBC04 = true;
     const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
     if(arr_role.indexOf("admin")> -1){
-      this.showBC02 = true
+      this.showBC05 = true
     }
   },
   methods: {

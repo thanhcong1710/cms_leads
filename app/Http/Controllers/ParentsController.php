@@ -186,7 +186,7 @@ class ParentsController extends Controller
     }
     public function assign(Request $request)
     {
-        $pre_parent_info = u::first("SELECT owner_id,last_assign_date FROM cms_parents WHERE id=$request->parent_id");
+        $pre_parent_info = u::first("SELECT owner_id,last_assign_date, mobile_1 FROM cms_parents WHERE id=$request->parent_id");
         $data = u::updateSimpleRow(array(
             'updated_at' => date('Y-m-d H:i:s'),
             'updator_id' => Auth::user()->id,
@@ -206,6 +206,15 @@ class ParentsController extends Controller
                 }
             }
         }
+        u::insertSimpleRow([
+            'parent_id' => $request->parent_id,
+            'phone' => $pre_parent_info->mobile_1,
+            'pre_owner_id'=> $pre_parent_info->owner_id,
+            'owner_id'=> $request->owner_id,
+            'assign_date'=> date('Y-m-d'),
+            'creator_id'=> Auth::user()->id,
+            'created_at'=> date('Y-m-d H:i:s'),
+        ],'cms_parent_assign');
 
         return response()->json($data);
     }
@@ -213,12 +222,16 @@ class ParentsController extends Controller
     {
         $cond = implode(",",$request->parents);
         $arr_owner = $request->owners;
-        $list_parent_info = u::query("SELECT p.id AS parent_id,p.owner_id,(SELECT CONCAT(name,' (',hrm_id,')') FROM users WHERE id= p.owner_id) AS pre_owner,p.last_assign_date FROM cms_parents AS p WHERE p.id IN ($cond)");
+        $list_parent_info = u::query("SELECT p.id AS parent_id,p.owner_id,(SELECT CONCAT(name,' (',hrm_id,')') FROM users WHERE id= p.owner_id) AS pre_owner,p.last_assign_date, p.mobile_1 FROM cms_parents AS p WHERE p.id IN ($cond)");
+        $queryInsert = "INSERT INTO cms_parent_assign (parent_id, phone, pre_owner_id, owner_id, assign_date, creator_id, created_at) VALUES ";
+        $assign_date = date('Y-m-d');
+        $created_at = date('Y-m-d H:i:s');
         foreach($list_parent_info AS $k=>$row){
             $owner_id =  $arr_owner[$k%count($arr_owner)];
             $last_assign_date = $owner_id != $row->owner_id ? date('Y-m-d H:i:s') : $row->last_assign_date;
             u::query("UPDATE cms_parents SET owner_id= $owner_id,last_assign_date='$last_assign_date' WHERE id =$row->parent_id");
             LogParents::logAssign($row->parent_id,$row->owner_id,$owner_id,Auth::user()->id);
+            $queryInsert.= "('$row->parent_id', '$row->mobile_1', '$row->owner_id', '$owner_id', '$assign_date', '".Auth::user()->id."', '$created_at' ),";
 
             // $students = u::query('SELECT crm_id FROM cms_students WHERE parent_id='.$row->parent_id);
             // if(!empty($students)){
@@ -233,6 +246,8 @@ class ParentsController extends Controller
             //     }
             // }
         }
+        $queryInsert = substr($queryInsert, 0, -1);
+        u::query($queryInsert);
         return response()->json("ok");
     }
     public function changeStaus(Request $request)
@@ -623,4 +638,5 @@ class ParentsController extends Controller
             }
         }
     }
+
 }

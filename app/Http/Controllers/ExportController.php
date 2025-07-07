@@ -561,4 +561,66 @@ class ExportController extends Controller
             throw $exception;
         }
     }
+
+    public function report05(Request $request , $key,$value) {
+        set_time_limit(300);
+        ini_set('memory_limit', '-1');
+        $cond = "1";
+        $arr_key =explode(',',$key);
+        $arr_value =explode(',',$value);
+        foreach($arr_key AS $k=>$key){
+            if($key=='keyword'){
+                $cond.= " AND (p.phone LIKE '%".$arr_value[$k]."%')";
+            }
+            if($key=='start_date'){
+                $cond .= " AND p.assign_date >= '".date('Y-m-d',strtotime($arr_value[$k]))."'";
+            }
+            if($key=='end_date'){
+                $cond .= " AND p.assign_date <= '".date('Y-m-d',strtotime($arr_value[$k]))."'";
+            }
+        }
+        
+        $list = u::query("SELECT p.phone, p.assign_date,
+                CONCAT(u1.full_name,' - ', u1.hrm_id ) AS pre_owner_name,
+                CONCAT(u2.full_name,' - ', u2.hrm_id ) AS  p.owner_name
+            FROM cms_parent_assign AS p 
+                LEFT JOIN users AS u1 ON u1.id= p.pre_owner_id
+                LEFT JOIN users AS u2 ON u2.id= p.owner_id
+            WHERE $cond 
+            ORDER BY p.id DESC ");
+            
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'STT');
+        $sheet->setCellValue('B1', 'SĐT khách hàng');
+        $sheet->setCellValue('C1', 'Nhân viên bàn giao');
+        $sheet->setCellValue('D1', 'Nhân viên được bàn giao');
+        $sheet->setCellValue('E1', 'Ngày bàn giao');
+
+        $sheet->getColumnDimension("A")->setWidth(5);
+        $sheet->getColumnDimension("B")->setWidth(20);
+        $sheet->getColumnDimension("C")->setWidth(20);
+        $sheet->getColumnDimension("D")->setWidth(20);
+        $sheet->getColumnDimension("E")->setWidth(20);
+        for ($i = 0; $i < count($list) ; $i++) {
+            $x = $i + 2;
+            $sheet->setCellValue('A' . $x, $i+1);
+            $sheet->setCellValue('B' . $x, $list[$i]->phone);
+            $sheet->setCellValue('C' . $x, $list[$i]->pre_owner_name) ;
+            $sheet->setCellValue('D' . $x, $list[$i]->owner_name);
+            $sheet->setCellValue('E' . $x, $list[$i]->assign_date);
+            
+            $sheet->getRowDimension($x)->setRowHeight(23);
+
+        }
+        $writer = new Xlsx($spreadsheet);
+        try {
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="Báo cáo bàn giao khách hàng.xlsx"');
+            header('Cache-Control: max-age=0');
+            $writer->save("php://output");
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
 }

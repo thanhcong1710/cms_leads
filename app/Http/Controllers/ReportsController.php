@@ -218,4 +218,35 @@ class ReportsController extends Controller
             
         return response()->json($data);
     }
+
+    public function report05(Request $request)
+    {
+        $keyword = isset($request->keyword) ? $request->keyword : '';
+        
+        $pagination = (object)$request->pagination;
+        $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
+        $limit = isset($pagination->limit) ? (int) $pagination->limit : 20;
+        $offset = $page == 1 ? 0 : $limit * ($page-1);
+        $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
+        $cond = "1";
+        if($keyword!==''){
+            $cond .= " AND (p.phone LIKE '%$keyword%')";
+        }
+        if($request->start_date){
+            $cond .= " AND p.assign_date >= '".date('Y-m-d',strtotime($request->start_date))."'";
+        }
+        if($request->end_date){
+            $cond .= " AND p.assign_date <= '".date('Y-m-d',strtotime($request->end_date))."'";
+        }
+        $total = u::first("SELECT count(pre_owner_id.id) AS total FROM cms_parent_assign AS p  
+            WHERE $cond GROUP BY p.pre_owner_id,p.owner_id");
+        $list = u::query("SELECT p.pre_owner_id, p.owner_id, count(p.parent_id) AS total,
+                (SELECT CONCAT(full_name,' - ', hrm_id ) FROM users WHERE id = p.pre_owner_id) AS p.pre_owner_name,
+                (SELECT CONCAT(full_name,' - ', hrm_id ) FROM users WHERE id = p.owner_id) AS p.owner_name
+            FROM cms_parent_assign AS p WHERE $cond GROUP BY p.pre_owner_id,p.owner_id 
+            ORDER BY p.pre_owner_id DESC $limitation");
+            
+        $data = u::makingPagination($list, $total->total, $page, $limit);
+        return response()->json($data);
+    }
 }
