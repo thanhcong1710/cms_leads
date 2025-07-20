@@ -83,6 +83,7 @@
                     <th>Số nhận</th>
                     <th>Thời gian</th>
                     <th>Thời lượng (s)</th>
+                    <th>Trạng thái</th>
                     <th>Ghi âm cuộc gọi</th> 
                   </tr>
                 </thead>
@@ -96,6 +97,7 @@
                     <td>{{ item.dst}}</td>
                     <td>{{ item.calldate}}</td>
                     <td>{{ item.duration}}</td>
+                    <td>{{ item.disposition}}</td>
                     <td>
                       <audio v-if="item.recording_url" controls style="height: 40px; width: 256px; border: 1px solid #ccc;">
                         <source :src="item.recording_url" type="audio/x-wav">
