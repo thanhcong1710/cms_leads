@@ -122,6 +122,7 @@ class JobsDownloadCdrPA extends Command
     public function handle(Request $request)
     {
         $voipControll = new VoipController();
+        $voipControll->getCDRReportAll();
         $sips = u::query("SELECT DISTINCT sip_id FROM users");
         foreach($sips AS $sip){
             $sip_id = data_get($sip,'sip_id');
