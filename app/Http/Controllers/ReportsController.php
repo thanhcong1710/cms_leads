@@ -249,4 +249,42 @@ class ReportsController extends Controller
         $data = u::makingPagination($list, $total->total?? 0, $page, $limit);
         return response()->json($data);
     }
+
+    public function report06(Request $request)
+    {
+        $keyword = isset($request->keyword) ? $request->keyword : '';
+        
+        $pagination = (object)$request->pagination;
+        $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
+        $limit = isset($pagination->limit) ? (int) $pagination->limit : 20;
+        $offset = $page == 1 ? 0 : $limit * ($page-1);
+        $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
+        $cond = "1";
+        if($keyword!==''){
+            $cond .= " AND (p.source LIKE '%$keyword%' OR p.dst LIKE '%$keyword%')";
+        }
+        if($request->ext){
+            $cond .= " AND (p.source LIKE '$request->ext' OR p.dst LIKE '$request->ext')";
+        }
+        if($request->start_date){
+            $cond .= " AND p.calldate >= '".date('Y-m-d 00:00:00',strtotime($request->start_date))."'";
+        }
+        if($request->end_date){
+            $cond .= " AND p.calldate <= '".date('Y-m-d 23:59:59',strtotime($request->end_date))."'";
+        }
+        if($request->call_status){
+            $cond .= " AND p.disposition = '".$request->call_status."'";
+        }
+        if($request->call_type){
+            $cond .= " AND p.call_type = '".$request->call_type."'";
+        }
+        $total = u::first("SELECT count(p.uniqueid) AS total FROM pbx_data AS p  
+            WHERE $cond ");
+        $list = u::query("SELECT p.*
+            FROM pbx_data AS p WHERE $cond 
+            ORDER BY p.calldate DESC $limitation");
+            
+        $data = u::makingPagination($list, $total->total?? 0, $page, $limit);
+        return response()->json($data);
+    }
 }

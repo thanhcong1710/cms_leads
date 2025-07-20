@@ -12,6 +12,7 @@
             <p class="h6"><router-link to="/reports/03" v-if="showBC03" >01. Báo cáo cuộc gọi</router-link></p>
             <p class="h6"><router-link to="/reports/04" v-if="showBC04" >02. Báo cáo chi tiết cuộc gọi</router-link></p>
             <p class="h6"><router-link to="/reports/05" v-if="showBC05" >03. Báo cáo bàn giao khách hàng</router-link></p>
+            <p class="h6"><router-link to="/reports/06" v-if="showBC06" >04. Báo cáo tổng đài</router-link></p>
           </div>
         </div>
       </div>
@@ -33,6 +34,7 @@ export default {
       showBC03:false,
       showBC04:false,
       showBC05:false,
+      showBC06:false,
     }
   },
   created() {
@@ -42,6 +44,9 @@ export default {
     const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
     if(arr_role.indexOf("admin")> -1){
       this.showBC05 = true
+    }
+    if(arr_role.indexOf("admin","Leader","Supervisor")> -1){
+      this.showBC06 = true;
     }
   },
   methods: {
