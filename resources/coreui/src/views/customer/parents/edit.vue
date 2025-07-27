@@ -100,10 +100,10 @@
                       ></vue-select>
                     </div>
                     <div class="form-group col-sm-6">
-                      <label for="nf-email">Quận huyện</label>
+                      <label for="nf-email">Xã/Phường</label>
                       <vue-select
                             label="name"
-                            placeholder="Chọn Quận/Huyện/Thị Xã"
+                            placeholder="Chọn Xã/Phường"
                             :options="html.district.list"
                             v-model="parent.district"
                             :searchable="true"
