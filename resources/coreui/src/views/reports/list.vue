@@ -45,7 +45,13 @@ export default {
     if(arr_role.indexOf("admin")> -1){
       this.showBC05 = true
     }
-    if(arr_role.indexOf("admin","Leader","Supervisor")> -1){
+    if(arr_role.indexOf("admin")> -1){
+      this.showBC06 = true;
+    }
+    if(arr_role.indexOf("Leader")> -1){
+      this.showBC06 = true;
+    }
+    if(arr_role.indexOf("Supervisor")> -1){
       this.showBC06 = true;
     }
   },
