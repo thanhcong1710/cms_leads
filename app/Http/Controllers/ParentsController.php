@@ -82,7 +82,7 @@ class ParentsController extends Controller
             $cond .= " AND ( p.last_care_date > '$end_date_care 23:59:59' OR p.last_care_date < '$start_date_care 00:00:00' OR p.last_care_date IS NULL)";
         }
         if ($start_date_assign != '' && $end_date_assign != '') {
-            $cond .= " AND ( p.last_assign_date <= '$end_date_care 23:59:59' AND p.last_assign_date >= '$start_date_care 00:00:00')";
+            $cond .= " AND ( p.last_assign_date <= '$end_date_assign 23:59:59' AND p.last_assign_date >= '$start_date_assign 00:00:00')";
         }
         // if (date('d') >= '11') {
         //     $cond .= " AND p.status = -1";
