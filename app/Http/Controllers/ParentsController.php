@@ -28,6 +28,8 @@ class ParentsController extends Controller
         $end_date = isset($request->end_date) ? $request->end_date : '';
         $start_date = isset($request->start_date) ? $request->start_date : '';
         $end_date_care = isset($request->end_date_care) ? $request->end_date_care : '';
+        $start_date_assign = isset($request->start_date_assign) ? $request->start_date_assign : '';
+        $end_date_assign = isset($request->end_date_assign) ? $request->end_date_assign : '';
         $start_date_care = isset($request->start_date_care) ? $request->start_date_care : '';
         $type_seach = isset($request->type_seach) ? $request->type_seach : 0;
         $student_year = isset($request->student_year) ? $request->student_year : 0;
@@ -78,6 +80,9 @@ class ParentsController extends Controller
         }
         if ($end_date_care !== '' && $start_date_care !== '') {
             $cond .= " AND ( p.last_care_date > '$end_date_care 23:59:59' OR p.last_care_date < '$start_date_care 00:00:00' OR p.last_care_date IS NULL)";
+        }
+        if ($start_date_assign != '' && $end_date_assign != '') {
+            $cond .= " AND ( p.last_assign_date <= '$end_date_care 23:59:59' AND p.last_assign_date >= '$start_date_care 00:00:00')";
         }
         // if (date('d') >= '11') {
         //     $cond .= " AND p.status = -1";

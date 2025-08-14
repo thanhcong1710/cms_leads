@@ -120,6 +120,19 @@
                   ></date-picker>
               </div>
               <div class="form-group col-sm-3">
+                <label for="ccmonth">Ngày bàn giao trong khoảng</label>
+                  <date-picker
+                    style="width:100%;"
+                    v-model="searchData.dateRangeAssign"
+                    :clearable="true"
+                    :lang="datepickerOptions.lang"
+                    range
+                    format="YYYY-MM-DD"
+                    id="apax-date-range"
+                    placeholder="Chọn thời gian tìm kiếm từ ngày đến ngày"
+                  ></date-picker>
+              </div>
+              <div class="form-group col-sm-3">
                 <label for="ccmonth">Năm sinh của học sinh</label>
                 <input type="number"  v-model="searchData.studentYear" class="form-control" placeholder="YYYY" min="1999" max="2030">
               </div>
@@ -393,6 +406,7 @@ export default {
         pagination: this.pagination,
         dateRange: "",
         dateRangeCare:"",
+        dateRangeAssign:"",
         type_seach: 1,
         studentYear:"",
       },
@@ -515,6 +529,8 @@ export default {
       const endDate = this.searchData.dateRange!='' && this.searchData.dateRange[1] ?`${u.dateToString(this.searchData.dateRange[1])}`:''
       const startDateCare = this.searchData.dateRangeCare!='' && this.searchData.dateRangeCare[0] ?`${u.dateToString(this.searchData.dateRangeCare[0])}`:''
       const endDateCare = this.searchData.dateRangeCare!='' && this.searchData.dateRangeCare[1] ?`${u.dateToString(this.searchData.dateRangeCare[1])}`:''
+      const startDateAssign = this.searchData.dateRangeAssign!='' && this.searchData.dateRangeAssign[0] ?`${u.dateToString(this.searchData.dateRangeAssign[0])}`:''
+      const endDateAssign = this.searchData.dateRangeAssign!='' && this.searchData.dateRangeAssign[1] ?`${u.dateToString(this.searchData.dateRangeAssign[1])}`:''
       
       const ids = []
       this.searchData.arr_status = u.is.obj(this.searchData.arr_status) ? [this.searchData.arr_status] : this.searchData.arr_status
@@ -563,6 +579,8 @@ export default {
         end_date:endDate,
         start_date_care:startDateCare,
         end_date_care:endDateCare,
+        start_date_assign:startDateAssign,
+        end_date_assign:endDateAssign,
         pagination:this.pagination,
         type_seach:this.searchData.type_seach,
         student_year: this.searchData.studentYear
