@@ -130,30 +130,30 @@ class AuthController extends Controller
     }
     public function switchSystem(Request $request){
         $key ="CMS@abcd1234";
-        if(env('APP_ENV', 'staging')=='production'){
+        if(env('APP_ENV')=='production'){
             $tmp_link_redirect = 'https://account.logiclab.vn/#/single-sign-on/';
         }else{
-            $tmp_link_redirect = 'https://stg-account.logiclab.vn/#/single-sign-on/';
+            $tmp_link_redirect = 'https://dev-account.logiclab.vn/#/single-sign-on/';
         }
         return response()->json(['link_redirect' => $tmp_link_redirect.$request->user()->hrm_id."/".md5($key.$request->user()->hrm_id)]);
     }
     protected function logoutSingleSignOn(Request $request){
         $key ="CMS@abcd1234";
         $method = "GET";
-        if(env('APP_ENV', 'staging')=='production'){
+        if(env('APP_ENV')=='production'){
             $tmp_link = 'https://account.logiclab.vn/api/logout-single-sign-on?hrm_id=';
         }else{
-            $tmp_link = 'https://stg-account.logiclab.vn/api/logout-single-sign-on?hrm_id=';
+            $tmp_link = 'https://dev-account.logiclab.vn/api/logout-single-sign-on?hrm_id=';
         }
         $url = $tmp_link.$request->user()->hrm_id."/".md5($key.$request->user()->hrm_id);
         $res = curl::curl($url, $method);
         return $res;
     }
     public function getLoginRedirect(){
-        if(env('APP_ENV', 'staging')=='production'){
+        if(env('APP_ENV')=='production'){
             $data = 'https://account.logiclab.vn/#/login';
         }else{
-            $data = 'https://stg-account.logiclab.vn/#/login';
+            $data = 'https://dev-account.logiclab.vn/#/login';
         }
         return response()->json($data);
     }
