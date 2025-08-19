@@ -117,10 +117,10 @@ class StudentsController extends Controller
             'creator_hrm' => isset(Auth::user()->hrm_id) ? Auth::user()->hrm_id : $student_info->owner_hrm,
             'sibling_id' => $student_info->sibling_id ? $student_info->sibling_id : 0,
         );
-        if(env('APP_ENV', 'staging')=='production'){
+        if(env('APP_ENV')=='production'){
             $url = sprintf('%s/api/leads-create-checkin', 'https://crm.logiclab.vn/');
         }else{
-            $url = sprintf('%s/api/leads-create-checkin', 'https://staging.logiclab.vn/');
+            $url = sprintf('%s/api/leads-create-checkin', 'https://dev-crm.logiclab.vn/');
         }
         $res = curl::curl($url, $method,[],$data);
         u::logRequest($url,$method,[],$data,$res,'log_request_outbound');
@@ -191,10 +191,10 @@ class StudentsController extends Controller
                 'list_student_crm'=>$list_student_crm
             );
 
-            if(env('APP_ENV', 'staging')=='production'){
+            if(env('APP_ENV')=='production'){
                 $url = sprintf('%s/api/leads-update-parent-info', 'https://crm.logiclab.vn/');
             }else{
-                $url = sprintf('%s/api/leads-update-parent-info', 'https://staging.logiclab.vn/');
+                $url = sprintf('%s/api/leads-update-parent-info', 'https://dev-crm.logiclab.vn/');
             }
             $res = curl::curl($url, $method,[],$data);
             u::logRequest($url,$method,[],$data,$res,'log_request_outbound');
@@ -217,10 +217,10 @@ class StudentsController extends Controller
             'updator_hrm' => Auth::user()->hrm_id,
             'type_product'=>$type_product
         );
-        if(env('APP_ENV', 'staging')=='production'){
+        if(env('APP_ENV')=='production'){
             $url = sprintf('%s/api/leads-update-checkin', 'https://crm.logiclab.vn/');
         }else{
-            $url = sprintf('%s/api/leads-update-checkin', 'https://staging.logiclab.vn/');
+            $url = sprintf('%s/api/leads-update-checkin', 'https://dev-crm.logiclab.vn/');
         }
         $res = curl::curl($url, $method,[],$data);
         u::logRequest($url,$method,[],$data,$res,'log_request_outbound');
