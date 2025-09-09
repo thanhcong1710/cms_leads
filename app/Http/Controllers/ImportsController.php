@@ -370,10 +370,12 @@ class ImportsController extends Controller
     public function OverwirteItemDataParent($list,$arr_owner,$source_id,$creator_id,$source_detail_id) {
         if ($list) {
             $created_at = date('Y-m-d H:i:s');
+            $assign_date = date('Y-m-d');
             $sql_update_owner = "INSERT INTO cms_parents (id,updated_at,updator_id,owner_id,last_assign_date,is_lock,source_id,source_detail_id,`name`,email,`address`,note) VALUES ";
             $sql_cms_parent_overwrite = "INSERT INTO cms_parent_overwrite (`parent_id`,last_owner_id,owner_id,`created_at`,creator_id) VALUES ";
             $sql_cms_parent_logs = "INSERT INTO cms_parent_logs (`parent_id`,`content`,creator_id,created_at,`status`) VALUES ";
             $query_student = "INSERT INTO cms_students (`name`,`birthday`,created_at,creator_id,gud_mobile_1, checkin_at, checkin_branch_accounting_id) VALUES ";
+            $queryInsert = "INSERT INTO cms_parent_assign (parent_id, phone, pre_owner_id, owner_id, assign_date, creator_id, created_at) VALUES ";
             $check_import_student =0;
             $check_student =0;
             if (count($list) > 10000) {
@@ -382,6 +384,7 @@ class ImportsController extends Controller
                     $owner_id = $item->owner_id? $item->owner_id : $arr_owner[$i%count($arr_owner)];
                     $sql_update_owner.=" ($item->parent_id,'$created_at',$creator_id,$owner_id,'$created_at',1,'$source_id','$source_detail_id','$item->name','$item->email','$item->address','$item->note'),";
                     $sql_cms_parent_overwrite.=" ($item->parent_id,'$item->curr_owner_id',$owner_id,'$created_at',$creator_id),";
+                    $queryInsert.=" ($item->parent_id,'$item->gud_mobile1','$item->curr_owner_id',$owner_id,'$assign_date',$creator_id,'$created_at'),";
                     
                     $content = "Ghi đè người phụ trách khi import: từ $item->curr_owner_id thành $owner_id`";
                     $sql_cms_parent_logs.=" ($item->parent_id,'$content',$creator_id,'$created_at',0),";
@@ -409,6 +412,8 @@ class ImportsController extends Controller
                     u::query($sql_update_owner);
                     $sql_cms_parent_overwrite = substr($sql_cms_parent_overwrite, 0, -1);
                     u::query($sql_cms_parent_overwrite);
+                    $queryInsert = substr($queryInsert, 0, -1);
+                    u::query($queryInsert);
                     $sql_cms_parent_logs = substr($sql_cms_parent_logs, 0, -1);
                     u::query($sql_cms_parent_logs);
                 }
@@ -423,6 +428,7 @@ class ImportsController extends Controller
                     $owner_id = $item->owner_id? $item->owner_id : $arr_owner[$i%count($arr_owner)];
                     $sql_update_owner.=" ($item->parent_id,'$created_at',$creator_id,$owner_id,'$created_at',1,'$source_id','$source_detail_id','$item->name','$item->email','$item->address','$item->note'),";
                     $sql_cms_parent_overwrite.=" ($item->parent_id,'$item->curr_owner_id',$owner_id,'$created_at',$creator_id),";
+                    $queryInsert.=" ($item->parent_id,'$item->gud_mobile1','$item->curr_owner_id',$owner_id,'$assign_date',$creator_id,'$created_at'),";
                     
                     $content = "Ghi đè người phụ trách khi import: từ $item->curr_owner_id thành $owner_id`";
                     $sql_cms_parent_logs.=" ($item->parent_id,'$content',$creator_id,'$created_at',1),";
@@ -448,6 +454,8 @@ class ImportsController extends Controller
                     u::query($sql_update_owner);
                     $sql_cms_parent_overwrite = substr($sql_cms_parent_overwrite, 0, -1);
                     u::query($sql_cms_parent_overwrite);
+                    $queryInsert = substr($queryInsert, 0, -1);
+                    u::query($queryInsert);
                     $sql_cms_parent_logs = substr($sql_cms_parent_logs, 0, -1);
                     u::query($sql_cms_parent_logs);
                 }
