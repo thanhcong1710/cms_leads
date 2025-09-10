@@ -56,6 +56,7 @@
                     <th>Người được bàn giao</th>
                     <th>Số lượng bàn giao</th>
                     <th>Ngày bàn giao</th>
+                    <th>Người thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -67,6 +68,7 @@
                     <td>{{ item.owner_name }}</td>
                     <td>{{ item.total}}</td>
                     <td>{{ item.assign_date}}</td>
+                    <td>{{ item.creator_name}}</td>
                   </tr>
                 </tbody>
               </table>
