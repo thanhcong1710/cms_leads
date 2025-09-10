@@ -32,7 +32,7 @@
                   ></date-picker>
               </div>
               <div class="form-group col-sm-12">
-                <button class="btn btn-success" @click="exportExcel()">
+                <button class="btn btn-success" @click="exportExcel()" v-if="!disabled_export">
                   <i class="fas fa-file-excel"></i> Xuất báo cáo
                 </button>
                 <button class="btn btn-info" type="submit" @click="search()">
@@ -55,6 +55,7 @@
                     <th>Người bàn giao</th>
                     <th>Người được bàn giao</th>
                     <th>Số lượng bàn giao</th>
+                    <th>Ngày bàn giao</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -65,6 +66,7 @@
                     <td>{{ item.pre_owner_name }}</td> 
                     <td>{{ item.owner_name }}</td>
                     <td>{{ item.total}}</td>
+                    <td>{{ item.assign_date}}</td>
                   </tr>
                 </tbody>
               </table>
@@ -160,10 +162,14 @@ export default {
         limitSource: [10, 20, 30, 40, 50],
         pages: [],
       },
-      
+      disabled_export: true
     };
   },
   created() {
+  const arr_role = JSON.parse(localStorage.getItem("roles")).split(",");
+    if(arr_role.indexOf("admin")> -1){
+      this.disabled_export = false
+    }
     u.g(`/api/branches`)
       .then(response => {
       this.list_branches = response.data
