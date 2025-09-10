@@ -238,12 +238,12 @@ class ReportsController extends Controller
         if($request->end_date){
             $cond .= " AND p.assign_date <= '".date('Y-m-d',strtotime($request->end_date))."'";
         }
-        $total = u::first("SELECT COUNT(*) AS total FROM (SELECT p.pre_owner_id, p.owner_id,p.passign_date  FROM cms_parent_assign AS p  
-            WHERE $cond GROUP BY p.pre_owner_id,p.owner_id,p.passign_date ) AS t");
-        $list = u::query("SELECT p.pre_owner_id, p.owner_id,p.passign_date, count(p.parent_id) AS total,
+        $total = u::first("SELECT COUNT(*) AS total FROM (SELECT p.pre_owner_id, p.owner_id,p.assign_date  FROM cms_parent_assign AS p  
+            WHERE $cond GROUP BY p.pre_owner_id,p.owner_id,p.assign_date ) AS t");
+        $list = u::query("SELECT p.pre_owner_id, p.owner_id,p.assign_date, count(p.parent_id) AS total,
                 (SELECT CONCAT(name,' - ', hrm_id ) FROM users WHERE id = p.pre_owner_id) AS pre_owner_name,
                 (SELECT CONCAT(name,' - ', hrm_id ) FROM users WHERE id = p.owner_id) AS owner_name
-            FROM cms_parent_assign AS p WHERE $cond GROUP BY p.pre_owner_id,p.owner_id,p.passign_date 
+            FROM cms_parent_assign AS p WHERE $cond GROUP BY p.pre_owner_id,p.owner_id,p.assign_date 
             ORDER BY p.pre_owner_id DESC $limitation");
             
         $data = u::makingPagination($list, $total->total?? 0, $page, $limit);
