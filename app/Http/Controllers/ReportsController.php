@@ -239,7 +239,7 @@ class ReportsController extends Controller
             $cond .= " AND p.assign_date <= '".date('Y-m-d',strtotime($request->end_date))."'";
         }
         $total = u::first("SELECT COUNT(*) AS total FROM (SELECT p.pre_owner_id, p.owner_id,p.assign_date,p.creator_id  FROM cms_parent_assign AS p  
-            WHERE $cond GROUP BY p.pre_owner_id,p.owner_id,p.assign_date ) AS t");
+            WHERE $cond GROUP BY p.pre_owner_id,p.owner_id,p.assign_date,p.creator_id ) AS t");
         $list = u::query("SELECT p.pre_owner_id, p.owner_id,p.assign_date, count(p.parent_id) AS total,
                 (SELECT CONCAT(name,' - ', hrm_id ) FROM users WHERE id = p.creator_id) AS creator_name,
                 (SELECT CONCAT(name,' - ', hrm_id ) FROM users WHERE id = p.pre_owner_id) AS pre_owner_name,
