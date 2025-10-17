@@ -579,6 +579,9 @@ class ExportController extends Controller
                 $cond .= " AND p.assign_date <= '".date('Y-m-d',strtotime($arr_value[$k]))."'";
             }
         }
+        if(!in_array($request->user()->id, explode(',', config('app.group_user_ids')))){
+            $cond .= " AND p.owner_id NOT IN (".config('app.group_user_ids').") ";
+        }
         
         $list = u::query("SELECT p.phone, p.assign_date,
                 CONCAT(u1.name,' - ', u1.hrm_id ) AS pre_owner_name,

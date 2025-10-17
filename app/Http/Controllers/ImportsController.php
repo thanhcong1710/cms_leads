@@ -26,6 +26,9 @@ class ImportsController extends Controller
         $offset = $page == 1 ? 0 : $limit * ($page-1);
         $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
         $cond = " 1 ";
+        if(!in_array($request->user()->id, explode(',', config('app.group_user_ids')))){
+            $cond .= " AND i.creator_id NOT IN (".config('app.group_user_ids').") ";
+        }
         if($status!==''){
             $cond .= " AND status=$status";
         }

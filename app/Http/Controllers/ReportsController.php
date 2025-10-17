@@ -142,7 +142,9 @@ class ReportsController extends Controller
         if($request->end_date_care){
             $cond .= " AND c.next_care_date <= '".date('Y-m-d 23:59:59',strtotime($request->end_date_care))."'";
         }
-        
+        if(!in_array($request->user()->id, explode(',', config('app.group_user_ids')))){
+            $cond .= " AND p.owner_id NOT IN (".config('app.group_user_ids').") ";
+        }
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
         }
@@ -195,7 +197,10 @@ class ReportsController extends Controller
             $cond1 .= " AND p.source_detail_id IN (".implode(",",$request->source_detail_id).")";
         }
         
-       
+        if(!in_array($request->user()->id, explode(',', config('app.group_user_ids')))){
+            $cond .= " AND p.owner_id NOT IN (".config('app.group_user_ids').") ";
+            $cond1.= " AND p.owner_id NOT IN (".config('app.group_user_ids').") ";
+        }
         if(!$request->user()->hasRole('admin') && !$request->user()->hasRole('Supervisor')){
             $cond .= " AND u.id IN (".$request->user_info->users_manager.")";
             $cond1 .= " AND u.id IN (".$request->user_info->users_manager.")";
@@ -229,6 +234,9 @@ class ReportsController extends Controller
         $offset = $page == 1 ? 0 : $limit * ($page-1);
         $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
         $cond = "1";
+        if(!in_array($request->user()->id, explode(',', config('app.group_user_ids')))){
+            $cond .= " AND p.owner_id NOT IN (".config('app.group_user_ids').") ";
+        }
         if($keyword!==''){
             $cond .= " AND (p.phone LIKE '%$keyword%')";
         }
