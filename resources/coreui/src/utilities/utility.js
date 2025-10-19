@@ -190,7 +190,8 @@ const is = {
   for: obj => Object.keys(obj)
 }
 
-function dateToString (date) {
+function dateToString (dateStr) {
+  const date = new Date(dateStr) // chuyển string -> Date
   const mm = date.getMonth() + 1
   const dd = date.getDate()
   const yyyy = date.getFullYear()
