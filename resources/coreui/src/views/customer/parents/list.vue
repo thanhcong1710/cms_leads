@@ -169,11 +169,11 @@
                 <a class="nav-link" @click.prevent="setActive('type_3')" :class="{ active: isActive('type_3') }" href="#type_3">KH quá hạn xử lý <span class="badge badge-sm bg-danger ms-auto">{{total.total_3}}</span></a>
               </li>
             </ul>
-            <div class="wrapper1">
+            <div class="wrapper1 scroll-top">
                 <div class="div1" style="width:1800px;height: 1px;">
                 </div>
             </div>
-            <div class="wrapper2">
+            <div class="wrapper2 scroll-container">
               <table class="table table-striped table-hover" style="width:1800px">
                 <thead>
                   <tr>
