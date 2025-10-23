@@ -457,7 +457,7 @@ export default {
     externalScript.setAttribute('src', 'https://code.jquery.com/jquery-1.12.4.js')
     document.head.appendChild(externalScript)
     let externalScript1 = document.createElement('script')
-    externalScript1.setAttribute('src', './js/scroll.js')
+    externalScript1.setAttribute('src', '/js/scroll.js')
     document.head.appendChild(externalScript1)
   },
   computed: {
