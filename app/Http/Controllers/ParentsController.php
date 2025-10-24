@@ -354,19 +354,22 @@ class ParentsController extends Controller
                         if (in_array($duplicate_info->status,[0,1,2,5])){
                             if($duplicate_info->last_care_date){
                                 $thoi_gian_con = 15 - floor((time() - strtotime($duplicate_info->last_care_date))/(3600*24));
-                            }else{
+                            }
+                            if (!$duplicate_info->last_care_date || $duplicate_info->last_assign_date > $duplicate_info->last_care_date){
                                 $thoi_gian_con = 15 - floor((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
                             }
                         }elseif (in_array($duplicate_info->status,[3,4,6,7,11])){
                             if($duplicate_info->last_care_date){
                                 $thoi_gian_con = 30 - floor((time() - strtotime($duplicate_info->last_care_date))/(3600*24));
-                            }else{
+                            }
+                            if (!$duplicate_info->last_care_date || $duplicate_info->last_assign_date > $duplicate_info->last_care_date){
                                 $thoi_gian_con = 30 - floor((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
                             }
                         }else {
                             if($duplicate_info->last_care_date){
                                 $thoi_gian_con = 60 - floor((time() - strtotime($duplicate_info->last_care_date))/(3600*24));
-                            }else{
+                            }
+                            if (!$duplicate_info->last_care_date || $duplicate_info->last_assign_date > $duplicate_info->last_care_date){
                                 $thoi_gian_con = 60 - floor((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
                             }
                         }
