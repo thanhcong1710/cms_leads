@@ -580,7 +580,7 @@ class ExportController extends Controller
             }
         }
         if(!in_array($request->user()->id, explode(',', config('app.group_user_ids')))){
-            $cond .= " AND p.owner_id NOT IN (".config('app.group_user_ids').") ";
+            $cond .= " AND (p.owner_id NOT IN (".config('app.group_user_ids').") OR p.pre_owner_id = '".$request->user()->id."' OR p.owner_id = '".$request->user()->id."') ";
         }
         
         $list = u::query("SELECT p.phone, p.assign_date,
