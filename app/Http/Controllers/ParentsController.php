@@ -92,11 +92,11 @@ class ParentsController extends Controller
         //     $cond .= " AND p.status = -1";
         // }
         //type_search=1
-        $cond_1 = " AND (p.care_date IS NULL OR p.care_date < p.last_assign_date) AND p.status NOT IN (8,9,10,12) ";
+        $cond_1 = " AND (p.care_date IS NULL OR p.care_date < p.last_assign_date) ";
         //type_search=2
         $cond_2 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') = '".date('Y-m-d')."'";
         $cond_3 = " AND next_care_date < '".date('Y-m-d')."' 
-            AND (p.care_date < p.next_care_date OR p.care_date IS NULL) AND p.status NOT IN (8,9,10,12)";
+            AND (p.care_date < p.next_care_date OR p.care_date IS NULL) ";
         $order_by = " ORDER BY p.id DESC ";
         $tmp_cond="";
         if($type_seach==1){
