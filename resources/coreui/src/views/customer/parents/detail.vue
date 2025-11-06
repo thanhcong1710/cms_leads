@@ -209,7 +209,7 @@
                                 <button :disabled="disabled_action" v-if="item.status>0" class="btn btn-sm btn-success" @click="showModalUpdateCheckin(item)"> <i class="fa fa-edit"></i></button>
                               </p>
                               <p v-if="itm.crm_id">
-                                <a href="https://crm.logiclab.vn/students/{{ item.crm_id }}?view=1" target="_blank"> Xem thông tin</a>
+                                <a :href="{{ 'https://crm.logiclab.vn/students/'+item.crm_id+ '?view=1' }}" target="_blank"> Xem thông tin</a>
                               </p>
                             </div>
                           </div>
