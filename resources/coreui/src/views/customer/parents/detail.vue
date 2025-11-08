@@ -202,13 +202,15 @@
                               <p>Ghi chú: {{ item.note}}</p>
                               <p>Ngày tạo: {{ item.created_at}}</p>
                               <p>Người tạo: {{ item.creator_name}}</p>
-                              <p>Trạng thái: <b>{{ item.status | genStudentStatus}}</b></p>
+                              <p>Trạng thái checkin: <b>{{ item.status | genStudentStatus}}</b></p>
                               <p v-if="item.status>0">Trung tâm checkin: {{ item.checkin_branch_name}}</p>
                               <p v-if="item.status>0">Thời gian checkin: {{ item.checkin_at}}</p>
                               <p v-if="item.status>0">Cập nhật checkin: 
                                 <button :disabled="disabled_action" v-if="item.status>0" class="btn btn-sm btn-success" @click="showModalUpdateCheckin(item)"> <i class="fa fa-edit"></i></button>
                               </p>
                               <p v-if="item.crm_id">
+                                <p v-if="item.info_crm">Trạng thái: <b>{{ item.info_crm.status}}</b></p>
+                                <p v-if="item.info_crm">{{ item.info_crm.last_date}}</p>
                                 <a :href="'https://crm.logiclab.vn/students/'+item.crm_id+ '?view=1'" target="_blank"> Xem thông tin</a>
                               </p>
                             </div>

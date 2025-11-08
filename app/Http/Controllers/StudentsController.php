@@ -49,7 +49,46 @@ class StudentsController extends Controller
         $data = u::query("SELECT s.*, (SELECT name FROM users WHERE id=s.creator_id) AS creator_name,
                 (SELECT name FROM cms_branches WHERE id=s.checkin_branch_id) AS checkin_branch_name
             FROM cms_students AS s WHERE s.parent_id=$parent_id ORDER BY s.id DESC");
+        foreach ($data AS $k=> $student){
+            if($student->crm_id){
+                $contract_active =u::firstCRM("SELECT id, status, enrolment_last_date FROM contracts WHERe student_id= ".$student->crm_id." AND status!=7 ORDER BY count_rechage LIMIT 1");
+                $contract_last =u::firstCRM("SELECT id, enrolment_last_date FROM contracts WHERe student_id= ".$student->crm_id."  ORDER BY count_rechage DESC LIMIT 1");
+                $data['info_crm'] = $this->genStatus($contract_active, $contract_last);
+            }
+        }
         return response()->json($data);
+    }
+    public static function genStatus($contractActive, $contractLastWithdraw){
+        $data = [
+            'status' => 'Chưa có gói phí chính thức',
+            'last_date' => ''
+        ];
+        if ($contractActive){
+            if (data_get($contractActive, 'status')==6){
+                if (data_get($contractLastWithdraw, 'id') == data_get($contractActive, 'id')){
+                    $data = [
+                        'status' => 'Đang đi học',
+                        'last_date' => 'Ngày dự kiến kết thúc: '.data_get($contractActive, 'enrolment_last_date')
+                    ];
+                } else {
+                    $data = [
+                        'status' => 'Đang đi học',
+                        'last_date' => 'Đã tái phí',
+                    ];
+                }
+            } else{
+                $data = [
+                    'status' => 'Đang chờ xếp lớp',
+                    'last_date' => ''
+                ];
+            }
+        } else {
+            $data = [
+                'status' => 'Đã hết phí',
+                'last_date' => 'Ngày kết thúc: '.data_get($contractLastWithdraw, 'enrolment_last_date'),
+            ];
+        }
+        return $data;
     }
     public function checkin(Request $request){
         $student_info = u::first("SELECT * FROM cms_students WHERE id = $request->student_id");
