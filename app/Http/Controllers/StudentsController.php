@@ -51,8 +51,8 @@ class StudentsController extends Controller
             FROM cms_students AS s WHERE s.parent_id=$parent_id ORDER BY s.id DESC");
         foreach ($data AS $k=> $student){
             if($student->crm_id){
-                $contract_active =u::firstCRM("SELECT id, status, enrolment_last_date FROM contracts WHERe student_id= ".$student->crm_id." AND status!=7 ORDER BY count_rechage LIMIT 1");
-                $contract_last =u::firstCRM("SELECT id, enrolment_last_date FROM contracts WHERe student_id= ".$student->crm_id."  ORDER BY count_rechage DESC LIMIT 1");
+                $contract_active =u::firstCRM("SELECT id, status, enrolment_last_date FROM contracts WHERe student_id= ".$student->crm_id." AND status!=7 ORDER BY count_recharge LIMIT 1");
+                $contract_last =u::firstCRM("SELECT id, enrolment_last_date FROM contracts WHERe student_id= ".$student->crm_id."  ORDER BY count_recharge DESC LIMIT 1");
                 $data['info_crm'] = $this->genStatus($contract_active, $contract_last);
             }
         }
