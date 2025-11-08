@@ -53,7 +53,7 @@ class StudentsController extends Controller
             if($student->crm_id){
                 $contract_active =u::firstCRM("SELECT id, status, enrolment_last_date FROM contracts WHERe student_id= ".$student->crm_id." AND status!=7 ORDER BY count_recharge LIMIT 1");
                 $contract_last =u::firstCRM("SELECT id, enrolment_last_date FROM contracts WHERe student_id= ".$student->crm_id."  ORDER BY count_recharge DESC LIMIT 1");
-                $data[$k]['info_crm'] = $this->genStatus($contract_active, $contract_last);
+                $data[$k]->info_crm = $this->genStatus($contract_active, $contract_last);
             }
         }
         return response()->json($data);
