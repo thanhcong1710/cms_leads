@@ -208,7 +208,7 @@
                               <p v-if="item.status>0">Cập nhật checkin: 
                                 <button :disabled="disabled_action" v-if="item.status>0" class="btn btn-sm btn-success" @click="showModalUpdateCheckin(item)"> <i class="fa fa-edit"></i></button>
                               </p>
-                              <p v-if="item.crm_id && item.crm_id != null">
+                              <p v-if="item.crm_id && item.crm_id != null && item.crm_id != 'null'">
                                 <p v-if="item.info_crm">Trạng thái: <b>{{ item.info_crm.status}}</b></p>
                                 <p v-if="item.info_crm">{{ item.info_crm.last_date}}</p>
                                 <a :href="'https://crm.logiclab.vn/students/'+item.crm_id+ '?view=1'" target="_blank"> Xem thông tin</a>
