@@ -82,7 +82,7 @@ class StudentsController extends Controller
                     'last_date' => ''
                 ];
             }
-        } else {
+        } elseif($contractLastWithdraw) {
             $data = [
                 'status' => 'Đã hết phí',
                 'last_date' => 'Ngày kết thúc: '.data_get($contractLastWithdraw, 'enrolment_last_date'),
