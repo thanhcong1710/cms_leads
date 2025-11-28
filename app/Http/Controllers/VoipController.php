@@ -107,42 +107,55 @@ class VoipController extends Controller
 
     public function makeToCall($phone,$sip=0)
     {
-
         $header = array(
             'app-key: '.$this->apiKey,
-            'tenant: 1',
-            'Content-Type: application/json',
-            'Cookie: HttpOnly; HttpOnly; HttpOnly'
+            'tenant: 1'
         );
-        $method = "POST";
-        $url = sprintf('%s/api/v2/core/click_to_call',$this->baseUriCall);
-        $data_request = [
-            'caller' => $sip,
-            'callee'   => $phone,
-            'cos_id'   => 1,
-        ];
-    
-        $res = curl::curl($url, $method,$header,$data_request);
-        u::logRequest($url,$method,$header,$data_request,$res,'log_request_outbound');
-        $res = json_decode($res);
-
-        if(data_get($res, 'status') == 'success'){
-            $id = u::insertSimpleRow(array(
-                'phone' => $phone,
-                'sip_id' => $sip,
-                'created_at' => date('Y-m-d H:i:s')
-            ), 'pa_cdr_data');
-            return [
-                'status'=>1,
-                'call_id'=> $id,
+        $method = "GET";
+        $url = sprintf('%s/api/v2/extensions/%s',$this->baseUriCall,$sip);
+        $resultSip = curl::curl($url, $method, $header);
+        $resultSip = json_decode($resultSip);
+        if (data_get($resultSip, 'status') == 'success'){
+            $header = array(
+                'app-key: '.$this->apiKey,
+                'tenant: 1',
+                'Content-Type: application/json',
+                'Cookie: HttpOnly; HttpOnly; HttpOnly'
+            );
+            $method = "POST";
+            $url = sprintf('%s/api/v2/core/click_to_call',$this->baseUriCall);
+            $data_request = [
+                'caller' => $sip,
+                'callee'   => $phone,
+                'cos_id'   => data_get($resultSip, 'data.class_of_service_id','1'),
             ];
-        } else{
+        
+            $res = curl::curl($url, $method,$header,$data_request);
+            u::logRequest($url,$method,$header,$data_request,$res,'log_request_outbound');
+            $res = json_decode($res);
+    
+            if(data_get($res, 'status') == 'success'){
+                $id = u::insertSimpleRow(array(
+                    'phone' => $phone,
+                    'sip_id' => $sip,
+                    'created_at' => date('Y-m-d H:i:s')
+                ), 'pa_cdr_data');
+                return [
+                    'status'=>1,
+                    'call_id'=> $id,
+                ];
+            } else{
+                return [
+                    'status'=>0,
+                    'message'=> 'Thực hiện cuộc gọi thất bại, vui lòng thử lại'
+                ];
+            }
+        } else {
             return [
                 'status'=>0,
                 'message'=> 'Thực hiện cuộc gọi thất bại, vui lòng thử lại'
             ];
         }
-        
     }
     public function getCDRReport($sip_id)
     {
