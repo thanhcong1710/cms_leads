@@ -103,18 +103,20 @@ class ImportsController extends Controller
             $query = "INSERT INTO cms_import_parents (import_id,`name`,email,gud_mobile1,`address`,note,created_at,creator_id,`status`,error_message,student_name_1,student_name_2,student_birthday_1,student_birthday_2,owner_hrm,gud_mobile2, checkin_at, checkin_branch_accounting_id) VALUES ";
             if (count($list) > 10000) {
                 for($i = 0; $i < 10000; $i++) {
-                    $item = $this->convertData($list[$i]);
-                    $validate = $this->validateData($item);
-                    $status = $validate->has_error ? 2 : 1;
-                    $error_message = $validate->message;
-                    $gud_mobile1 = $item->gud_mobile1 ? $item->gud_mobile1 : $list[$i][1];
-                    $gud_mobile2 = $item->gud_mobile2 ? $item->gud_mobile2 : $list[$i][2];
-                    $student_birthday_1 = $item->student_birthday_1 ? "'".$item->student_birthday_1."'" :'NULL';
-                    $student_birthday_2 = $item->student_birthday_2 ? "'".$item->student_birthday_2."'" :'NULL';
-                    $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :'NULL';
-                    $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :'NULL';
-                    $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message','$item->student_name_1','$item->student_name_2',$student_birthday_1,$student_birthday_2,'$item->owner_hrm','$gud_mobile2',$checkin_at,$checkin_branch_accounting_id),";
-                    
+                    if (isset($list[$i])){
+                        $item = $this->convertData($list[$i]);
+                        $validate = $this->validateData($item);
+                        $status = $validate->has_error ? 2 : 1;
+                        $error_message = $validate->message;
+                        $gud_mobile1 = $item->gud_mobile1 ? $item->gud_mobile1 : $list[$i][1];
+                        $gud_mobile2 = $item->gud_mobile2 ? $item->gud_mobile2 : $list[$i][2];
+                        $student_birthday_1 = $item->student_birthday_1 ? "'".$item->student_birthday_1."'" :'NULL';
+                        $student_birthday_2 = $item->student_birthday_2 ? "'".$item->student_birthday_2."'" :'NULL';
+                        $checkin_at = $item->checkin_at ? "'".$item->checkin_at."'" :'NULL';
+                        $checkin_branch_accounting_id = $item->checkin_branch_accounting_id ? "'".$item->checkin_branch_accounting_id."'" :'NULL';
+                        $query.= "('$import_id','$item->name','$item->email','$gud_mobile1','$item->address','$item->note','$created_at','$creator_id',$status,'$error_message','$item->student_name_1','$item->student_name_2',$student_birthday_1,$student_birthday_2,'$item->owner_hrm','$gud_mobile2',$checkin_at,$checkin_branch_accounting_id),";
+                    }
+                        
                 }
                 $query = substr($query, 0, -1);
                 u::query($query);
