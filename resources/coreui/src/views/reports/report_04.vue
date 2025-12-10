@@ -303,7 +303,10 @@ export default {
           this.users_manager = response.data
         })
       }else {
-        this.users_manager = []
+        u.g(`/api/user/get-users-manager}`)
+          .then(response => {
+          this.users_manager = response.data
+        })
       }
       
     },
