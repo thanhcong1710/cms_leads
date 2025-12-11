@@ -107,15 +107,15 @@ class VoipController extends Controller
 
     public function makeToCall($phone,$sip=0)
     {
-        $header = array(
-            'app-key: '.$this->apiKey,
-            'tenant: 1'
-        );
-        $method = "GET";
-        $url = sprintf('%s/api/v2/extensions/%s',$this->baseUriCall,$sip);
-        $resultSip = curl::curl($url, $method, $header);
-        $resultSip = json_decode($resultSip);
-        if (data_get($resultSip, 'status') == 'success'){
+        // $header = array(
+        //     'app-key: '.$this->apiKey,
+        //     'tenant: 1'
+        // );
+        // $method = "GET";
+        // $url = sprintf('%s/api/v2/extensions/%s',$this->baseUriCall,$sip);
+        // $resultSip = curl::curl($url, $method, $header);
+        // $resultSip = json_decode($resultSip);
+        // if (data_get($resultSip, 'status') == 'success'){
             $header = array(
                 'app-key: '.$this->apiKey,
                 'tenant: 1',
@@ -127,7 +127,7 @@ class VoipController extends Controller
             $data_request = [
                 'caller' => $sip,
                 'callee'   => $phone,
-                'cos_id'   => data_get($resultSip, 'data.class_of_service_id','1'),
+                // 'cos_id'   => data_get($resultSip, 'data.class_of_service_id','1'),
             ];
         
             $res = curl::curl($url, $method,$header,$data_request);
@@ -150,12 +150,12 @@ class VoipController extends Controller
                     'message'=> 'Thực hiện cuộc gọi thất bại, vui lòng thử lại'
                 ];
             }
-        } else {
-            return [
-                'status'=>0,
-                'message'=> 'Thực hiện cuộc gọi thất bại, vui lòng thử lại'
-            ];
-        }
+        // } else {
+        //     return [
+        //         'status'=>0,
+        //         'message'=> 'Thực hiện cuộc gọi thất bại, vui lòng thử lại'
+        //     ];
+        // }
     }
     public function getCDRReport($sip_id)
     {
