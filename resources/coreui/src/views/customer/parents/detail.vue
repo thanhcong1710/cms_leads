@@ -217,6 +217,25 @@
                           </div>
                         </div>
                       </div>
+                      <div v-if="studentCRM.length >0">
+                        <h4>SĐT đã tồn tại các học sinh khác</h4>
+                        <table class="table table-striped table-hover">
+                          <thead>
+                            <tr>
+                              <th>Học sinh</th>
+                              <th>Mã CRM</th>
+                              <th>Thao tác</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            <tr v-for="(item, index) in logs" :key="index">
+                              <td>{{ item.name }}</td>
+                              <td>{{ item.crm_id }}</td>
+                              <td><a :href="'https://crm.logiclab.vn/students/'+item.id+ '?view=1'" target="_blank"> Xem thông tin</a></td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                     <div class="tab-pane fade" :class="{ 'active show': isActive('logs') }" id="logs">
                       <table class="table table-striped table-hover">
@@ -592,6 +611,7 @@ export default {
         file_name:"",
       },
       students:[],
+      studentCRM:[],
       student:{
         id:0,
         parent_id:"",
@@ -861,7 +881,8 @@ export default {
         u.g(`/api/students/get_all_data/${parent_id}`)
         .then((response) => {
           this.loading.processing = false;
-          this.students=response.data;
+          this.students=response.data.data;
+          this.studentCRM= response.data.listDataStudentCRM;
         })
         .catch((e) => {
         });

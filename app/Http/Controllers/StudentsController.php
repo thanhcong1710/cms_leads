@@ -46,9 +46,13 @@ class StudentsController extends Controller
         return response()->json("ok");
     }
     public function getAllDataByParent($parent_id){
+        $parent_info = u::first("SELECT mobile_1 FROM cms_parents WHERE id=$parent_id");
         $data = u::query("SELECT s.*, (SELECT name FROM users WHERE id=s.creator_id) AS creator_name,
                 (SELECT name FROM cms_branches WHERE id=s.checkin_branch_id) AS checkin_branch_name
             FROM cms_students AS s WHERE s.parent_id=$parent_id ORDER BY s.id DESC");
+
+        $listDataStudentCRM =[];
+        $whereStudent='0';
         foreach ($data AS $k=> $student){
             if($student->crm_id){
                 $contract_active =u::firstCRM("SELECT id, status, enrolment_last_date FROM contracts WHERe student_id= ".$student->crm_id." AND status!=7 AND type>0 ORDER BY count_recharge LIMIT 1");
@@ -56,9 +60,14 @@ class StudentsController extends Controller
                 $crm_student_info =u::firstCRM("SELECT status FROM students WHERe id= ".$student->crm_id);
                 $data[$k]->info_crm = $this->genStatus($contract_active, $contract_last);
                 $data[$k]->student_active = data_get($crm_student_info, 'status') ? 1 : 0;
+                $whereStudent = $whereStudent ? ','.$whereStudent : $whereStudent;
             }
         }
-        return response()->json($data);
+        $gud_mobile_1 = data_get($parent_info, 'mobile_1');
+        if($gud_mobile_1){
+            $listDataStudentCRM = u::queryCRM("SELECT name, crm_id, id WHERE gud_mobie1 = '$gud_mobile_1' AND id NOT iN ($whereStudent)");
+        }
+        return response()->json( ['data'=>$data, 'listDataStudentCRM'=>$listDataStudentCRM]);
     }
     public static function genStatus($contractActive, $contractLastWithdraw){
         $data = [
