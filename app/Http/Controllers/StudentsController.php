@@ -65,7 +65,7 @@ class StudentsController extends Controller
         }
         $gud_mobile_1 = data_get($parent_info, 'mobile_1');
         if($gud_mobile_1){
-            $listDataStudentCRM = u::queryCRM("SELECT name, crm_id, id FROM students WHERE gud_mobie1 = '$gud_mobile_1' AND id NOT iN ($whereStudent)");
+            $listDataStudentCRM = u::queryCRM("SELECT name, crm_id, id FROM students WHERE gud_mobile1 = '$gud_mobile_1' AND id NOT iN ($whereStudent)");
         }
         return response()->json( ['data'=>$data, 'listDataStudentCRM'=>$listDataStudentCRM]);
     }
