@@ -228,7 +228,7 @@
                             </tr>
                           </thead>
                           <tbody>
-                            <tr v-for="(item, index) in logs" :key="index">
+                            <tr v-for="(item, index) in studentCRM" :key="index">
                               <td>{{ item.name }}</td>
                               <td>{{ item.crm_id }}</td>
                               <td><a :href="'https://crm.logiclab.vn/students/'+item.id+ '?view=1'" target="_blank"> Xem thông tin</a></td>
