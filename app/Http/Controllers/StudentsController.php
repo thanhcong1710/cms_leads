@@ -60,7 +60,7 @@ class StudentsController extends Controller
                 $crm_student_info =u::firstCRM("SELECT status FROM students WHERe id= ".$student->crm_id);
                 $data[$k]->info_crm = $this->genStatus($contract_active, $contract_last);
                 $data[$k]->student_active = data_get($crm_student_info, 'status') ? 1 : 0;
-                $whereStudent = $whereStudent ? ','.$student->crm_id : $student->crm_id;
+                $whereStudent.= $whereStudent ? ','.$student->crm_id : $student->crm_id;
             }
         }
         $gud_mobile_1 = data_get($parent_info, 'mobile_1');
