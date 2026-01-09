@@ -373,6 +373,7 @@ class ParentsController extends Controller
                                 $thoi_gian_con = 60 - floor((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
                             }
                         }
+                        $thoi_gian_con = $thoi_gian_con + 1;
                         
                         $text="<br> Thời gian còn lại sẽ được ghi đè sau $thoi_gian_con ngày";
                     }
