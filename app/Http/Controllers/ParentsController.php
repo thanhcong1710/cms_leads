@@ -618,7 +618,7 @@ class ParentsController extends Controller
                     IF(t.checked>0,8, p.`status`)
                 )
          )
-        WHERE t.id IS NOT NULL ");
+        WHERE t.id IS NOT NULL  AND p.status NOT IN (9,10,11)");
 
         u::query(" UPDATE cms_parents AS p
             LEFT JOIN tmp_cms_parents AS t ON t.gud_mobile1 = p.mobile_1 AND t.gud_mobile1!='' AND t.gud_mobile1 IS NOT NULL
@@ -628,7 +628,7 @@ class ParentsController extends Controller
                     IF(t.checked>0,8, p.`status`)
                 )
         )
-        WHERE t.id IS NOT NULL  ");
+        WHERE t.id IS NOT NULL AND p.status NOT IN (9,10,11) ");
     }
 
     public static function addItemsTmpCmsParents($list) {
