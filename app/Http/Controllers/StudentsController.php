@@ -208,54 +208,54 @@ class StudentsController extends Controller
         }
     }
     public static function updateParentCRM($parent_id){
-        $list_student = u::query("SELECT crm_id FROM cms_students WHERE parent_id= $parent_id AND crm_id IS NOT NULL");
-        $list_student_crm = "";
-        foreach($list_student AS $student){
-            $list_student_crm.=$list_student_crm ? ",".$student->crm_id : $student->crm_id;
-        }
-        if($list_student_crm){
-            $student_info = u::first("SELECT p.name AS gud_name,p.email AS gud_email,p.address,p.province_id,p.district_id,
-                p.mobile_1 AS gud_mobile_1,
-                p.mobile_2 AS gud_mobile_2,
-                p.gender AS gud_gender,
-                p.birthday AS gud_birthday,
-                p.source_id AS source,
-                p.source_detail_id AS source_detail, 
-                p.job_id AS  gud_job
-            FROM cms_parents AS p WHERE p.id=$parent_id");
-            $method = "POST";
-            $data = array(
-                'gud_name'=>$student_info->gud_name,
-                'gud_email'=>$student_info->gud_email,
-                'gud_mobile_1'=>$student_info->gud_mobile_1,
-                'gud_mobile_2'=>$student_info->gud_mobile_2,
-                'gud_gender'=>$student_info->gud_gender,
-                'gud_birthday'=>$student_info->gud_birthday,
-                'gud_job'=>$student_info->gud_job,
-                'source'=>$student_info->source,
-                'source_detail'=>$student_info->source_detail,
-                'address'=>$student_info->address,
-                'province_id'=>$student_info->province_id,
-                'district_id'=>$student_info->district_id,
-                'updator_hrm' => Auth::user()->hrm_id,
-                'list_student_crm'=>$list_student_crm
-            );
+        // $list_student = u::query("SELECT crm_id FROM cms_students WHERE parent_id= $parent_id AND crm_id IS NOT NULL");
+        // $list_student_crm = "";
+        // foreach($list_student AS $student){
+        //     $list_student_crm.=$list_student_crm ? ",".$student->crm_id : $student->crm_id;
+        // }
+        // if($list_student_crm){
+        //     $student_info = u::first("SELECT p.name AS gud_name,p.email AS gud_email,p.address,p.province_id,p.district_id,
+        //         p.mobile_1 AS gud_mobile_1,
+        //         p.mobile_2 AS gud_mobile_2,
+        //         p.gender AS gud_gender,
+        //         p.birthday AS gud_birthday,
+        //         p.source_id AS source,
+        //         p.source_detail_id AS source_detail, 
+        //         p.job_id AS  gud_job
+        //     FROM cms_parents AS p WHERE p.id=$parent_id");
+        //     $method = "POST";
+        //     $data = array(
+        //         'gud_name'=>$student_info->gud_name,
+        //         'gud_email'=>$student_info->gud_email,
+        //         'gud_mobile_1'=>$student_info->gud_mobile_1,
+        //         'gud_mobile_2'=>$student_info->gud_mobile_2,
+        //         'gud_gender'=>$student_info->gud_gender,
+        //         'gud_birthday'=>$student_info->gud_birthday,
+        //         'gud_job'=>$student_info->gud_job,
+        //         'source'=>$student_info->source,
+        //         'source_detail'=>$student_info->source_detail,
+        //         'address'=>$student_info->address,
+        //         'province_id'=>$student_info->province_id,
+        //         'district_id'=>$student_info->district_id,
+        //         'updator_hrm' => Auth::user()->hrm_id,
+        //         'list_student_crm'=>$list_student_crm
+        //     );
 
-            if(env('APP_ENV')=='production'){
-                $url = sprintf('%s/api/leads-update-parent-info', 'https://crm.logiclab.vn/');
-            }else{
-                $url = sprintf('%s/api/leads-update-parent-info', 'https://dev-crm.logiclab.vn/');
-            }
-            $res = curl::curl($url, $method,[],$data);
-            u::logRequest($url,$method,[],$data,$res,'log_request_outbound');
-            $res = json_decode($res);
-        }
+        //     if(env('APP_ENV')=='production'){
+        //         $url = sprintf('%s/api/leads-update-parent-info', 'https://crm.logiclab.vn/');
+        //     }else{
+        //         $url = sprintf('%s/api/leads-update-parent-info', 'https://dev-crm.logiclab.vn/');
+        //     }
+        //     $res = curl::curl($url, $method,[],$data);
+        //     u::logRequest($url,$method,[],$data,$res,'log_request_outbound');
+        //     $res = json_decode($res);
+        // }
 
-        if(isset($res->data->student_id)){
-            return $res->data->student_id;
-        }else{
-            return NULL;
-        }
+        // if(isset($res->data->student_id)){
+        //     return $res->data->student_id;
+        // }else{
+        //     return NULL;
+        // }
     }
     public static function updateCheckinCRM($student_id,$checkin_at,$checkin_branch_id,$type_product){
         $student_info = u::first("SELECT s.* FROM cms_students AS s LEFT JOIN cms_parents AS p ON p.id=s.parent_id WHERE s.id=$student_id");
