@@ -27,7 +27,7 @@ class VoipController extends Controller
         // $this->baseUriSocket = "103.226.250.52";
         // $this->baseUriCall = "https://crm.pavietnam.vn";
         $this->baseUriCall = "https://voip.apps.vn";
-        $this->apiKey = "eec23ce1aac22627bb6d1b3115c8518a";
+        $this->apiKey = "0764eec00a8098dfd6d6fe428fffbd71";
     }
     // public function makeToCall($phone,$sip=0)
     // {
