@@ -230,5 +230,5 @@ return [
         'View' => Illuminate\Support\Facades\View::class,
 
     ],
-    'group_user_ids' => env('GROUP_USER_IDS', '')
+    'group_user_ids' => env('GROUP_USER_IDS', '38')
 ];
