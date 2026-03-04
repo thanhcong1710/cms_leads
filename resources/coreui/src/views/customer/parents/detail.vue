@@ -484,6 +484,7 @@
                 <option value="3">Logicmath</option>
                 <option value="4">Brick4kidz</option>
                 <option value="5">Gói Combo</option>
+                <option value="6">Logicmath & Brick4kidz</option>
               </select>
             </div>
           </div>
