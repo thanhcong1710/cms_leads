@@ -479,10 +479,11 @@
               <label for="nf-email">Sản phẩm</label>
               <select class="form-control" v-model="modal_checkin.type_product">
                 <option value="">Chọn sản phẩm</option>
-                <option value="1">CMS</option>
+                <!-- <option value="1">CMS</option> -->
                 <!-- <option value="2">Accelium</option> -->
                 <option value="3">Logicmath</option>
                 <option value="4">Brick4kidz</option>
+                <option value="5">Gói Combo</option>
               </select>
             </div>
           </div>
