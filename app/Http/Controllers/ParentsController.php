@@ -125,11 +125,19 @@ class ParentsController extends Controller
         $total_1 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $cond_1 ");
         $total_2 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $cond_2 ");
         $total_3 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $cond_3 ");
+
+        $start_of_week = date('Y-m-d', strtotime('monday this week'));
+        $today = date('Y-m-d');
+        $cond_overdue_weekly = " AND next_care_date >= '$start_of_week 00:00:00' AND next_care_date < '$today 00:00:00' 
+            AND (p.care_date < p.next_care_date OR p.care_date IS NULL) ";
+        $total_overdue_weekly = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $cond_overdue_weekly");
+
         $data->detail_total = (object)array(
             'total_0' => $total_0->total,
             'total_1' => $total_1->total,
             'total_2' => $total_2->total,
             'total_3' => $total_3->total,
+            'total_overdue_weekly' => $total_overdue_weekly->total,
         );
         return response()->json($data);
     }

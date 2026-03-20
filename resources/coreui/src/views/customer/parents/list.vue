@@ -326,6 +326,25 @@
         >
       </template>
     </CModal>
+    <CModal
+      title="THÔNG BÁO KHÁCH HÀNG QUÁ HẠN"
+      :show.sync="modal_overdue.show"
+      color="danger"
+      :closeOnBackdrop="false"
+    >
+      <div class="text-center">
+        <h4 class="text-danger">Cảnh báo!</h4>
+        <p>Bạn đang có <b>{{ total.total_overdue_weekly }}</b> khách hàng quá hạn xử lý trong tuần này.</p>
+        <p>Vui lòng kiểm tra và xử lý ngay để đảm bảo chất lượng chăm sóc.</p>
+      </div>
+      <template #header>
+        <h5 class="modal-title">THÔNG BÁO KHÁCH HÀNG QUÁ HẠN</h5>
+      </template>
+      <template #footer>
+        <CButton color="success" @click="markOverdueAsUnderstood" type="button">Đã hiểu</CButton>
+        <CButton color="secondary" @click="modal_overdue.show = false" type="button">Đóng</CButton>
+      </template>
+    </CModal>
   </div>
 </template>
 
@@ -448,6 +467,11 @@ export default {
         total_0:0,
         total_1:0,
         total_2:0,
+        total_3:0,
+        total_overdue_weekly: 0
+      },
+      modal_overdue: {
+        show: false
       },
       disabled_action:false
     };
@@ -594,6 +618,7 @@ export default {
           this.loading.processing = false;
           this.parents = response.data.list;
           this.total = response.data.detail_total
+          this.checkOverduePopup();
           this.pagination.spage = response.data.paging.spage;
           this.pagination.ppage = response.data.paging.ppage;
           this.pagination.npage = response.data.paging.npage;
@@ -679,6 +704,19 @@ export default {
       }
       this.activeItem = menuItem
       this.search();
+    },
+    checkOverduePopup() {
+      const today = new Date().toISOString().slice(0, 10);
+      const lastUnderstood = localStorage.getItem('last_overdue_popup_understood_at');
+      
+      if (this.total.total_overdue_weekly > 0 && lastUnderstood !== today) {
+        this.modal_overdue.show = true;
+      }
+    },
+    markOverdueAsUnderstood() {
+      const today = new Date().toISOString().slice(0, 10);
+      localStorage.setItem('last_overdue_popup_understood_at', today);
+      this.modal_overdue.show = false;
     },
   },
   filters: {
