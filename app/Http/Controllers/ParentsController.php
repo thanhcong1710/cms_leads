@@ -132,12 +132,30 @@ class ParentsController extends Controller
             AND (p.care_date < p.next_care_date OR p.care_date IS NULL) ";
         $total_overdue_weekly = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $cond_overdue_weekly");
 
+        // Kiểm tra user hiện tại có phải quản lý không (có nhân viên cấp dưới)
+        $is_manager = false;
+        $overdue_by_staff = [];
+        $users_manager_ids = $request->user_info->users_manager ?? $request->user()->id;
+        $arr_manager_ids = explode(',', $users_manager_ids);
+        if (count($arr_manager_ids) > 1) {
+            $is_manager = true;
+            $overdue_by_staff = u::query("SELECT CONCAT(u.name, ' - ', u.hrm_id) AS staff_name, count(p.id) AS total 
+                FROM cms_parents AS p 
+                LEFT JOIN users AS u ON u.id = p.owner_id 
+                WHERE p.owner_id IN ($users_manager_ids) $cond_overdue_weekly 
+                GROUP BY p.owner_id 
+                HAVING count(p.id) > 0 
+                ORDER BY total DESC");
+        }
+
         $data->detail_total = (object)array(
             'total_0' => $total_0->total,
             'total_1' => $total_1->total,
             'total_2' => $total_2->total,
             'total_3' => $total_3->total,
             'total_overdue_weekly' => $total_overdue_weekly->total,
+            'is_manager' => $is_manager,
+            'overdue_by_staff' => $overdue_by_staff,
         );
         return response()->json($data);
     }

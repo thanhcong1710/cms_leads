@@ -331,11 +331,35 @@
       :show.sync="modal_overdue.show"
       color="danger"
       :closeOnBackdrop="false"
+      :size="total.is_manager ? 'lg' : ''"
     >
-      <div class="text-center">
+      <div class="text-center" v-if="!total.is_manager">
         <h4 class="text-danger">Cảnh báo!</h4>
         <p>Bạn đang có <b>{{ total.total_overdue_weekly }}</b> khách hàng quá hạn xử lý trong tuần này.</p>
         <p>Vui lòng kiểm tra và xử lý ngay để đảm bảo chất lượng chăm sóc.</p>
+      </div>
+      <div v-else>
+        <div class="text-center">
+          <h4 class="text-danger">Cảnh báo!</h4>
+          <p>Team của bạn đang có <b>{{ total.total_overdue_weekly }}</b> khách hàng quá hạn xử lý trong tuần này.</p>
+        </div>
+        <table class="table table-striped table-bordered table-sm" v-if="total.overdue_by_staff && total.overdue_by_staff.length">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Nhân viên</th>
+              <th class="text-right">Số KH quá hạn</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(item, index) in total.overdue_by_staff" :key="index">
+              <td>{{ index + 1 }}</td>
+              <td>{{ item.staff_name }}</td>
+              <td class="text-right"><b class="text-danger">{{ item.total }}</b></td>
+            </tr>
+          </tbody>
+        </table>
+        <p class="text-center">Vui lòng kiểm tra và đôn đốc nhân viên xử lý ngay.</p>
       </div>
       <template #header>
         <h5 class="modal-title">THÔNG BÁO KHÁCH HÀNG QUÁ HẠN</h5>
@@ -469,7 +493,9 @@ export default {
         total_1:0,
         total_2:0,
         total_3:0,
-        total_overdue_weekly: 0
+        total_overdue_weekly: 0,
+        is_manager: false,
+        overdue_by_staff: []
       },
       modal_overdue: {
         show: false
