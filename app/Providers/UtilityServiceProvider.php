@@ -355,34 +355,37 @@ class UtilityServiceProvider extends ServiceProvider
                 $tmp = 'KH mới';
                 break;
             case 2:
-                $tmp = 'KH không liên lạc được';
+                $tmp = 'KH Không nghe máy';
                 break;
             case 3:
-                $tmp = 'KH ở vùng CMS không có cơ sở';
+                $tmp = 'KH Thuê bao / Không đúng số';
                 break;
             case 4:
-                $tmp = 'KH hẹn gọi lại sau';
+                $tmp = 'Không đúng đối tượng / vùng LGL không có cơ sở';
                 break;
             case 5:
-                $tmp = 'KH không quan tâm';
+                $tmp = 'KH Bận, gọi lại sau';
                 break;
             case 6:
-                $tmp = 'KH quan tâm, cần follow up date';
+                $tmp = 'KH Không có nhu cầu';
                 break;
             case 7:
-                $tmp = 'KH đồng ý đặt lịch Checkin';
+                $tmp = 'KH Tiếp tục chăm sóc (Quan tâm, cần follow)';
                 break;
             case 8:
-                $tmp = 'KH đã đến checkin';
+                $tmp = 'KH Hẹn lịch Checkin';
                 break;
             case 9:
-                $tmp = 'KH đã mua gói phí';
+                $tmp = 'KH Đã đến Checkin';
                 break;
             case 10:
-                $tmp = 'KH đến hạn tái tục';
+                $tmp = 'KH Đã mua gói phí';
                 break;
             case 11:
-                $tmp = 'Danh sách đen';
+                $tmp = 'KH Đến hạn tái tục';
+                break;
+            case 12:
+                $tmp = 'KH Danh sách đen';
                 break;
             default:
                 $tmp = 'KH mới';

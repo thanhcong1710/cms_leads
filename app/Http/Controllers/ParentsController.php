@@ -356,22 +356,29 @@ class ParentsController extends Controller
                     $result->dup_parent_id = $duplicate_info->parent_id;
                     $text="";
                     
-                    if($duplicate_info->status ==9 || $duplicate_info->status==10){
+                    if(in_array($duplicate_info->status, [10, 11])){
                         $text="<br> Khách hàng thuộc các trường hợp không được phép ghi đè - ".u::getStatus($duplicate_info->status);
                     } else {
-                        if (in_array($duplicate_info->status,[0,1,2,5])){
+                        if (in_array($duplicate_info->status,[0,1,2,3,4,6])){
                             if($duplicate_info->last_care_date){
                                 $thoi_gian_con = 15 - floor((time() - strtotime($duplicate_info->last_care_date))/(3600*24));
                             }
                             if (!$duplicate_info->last_care_date || $duplicate_info->last_assign_date > $duplicate_info->last_care_date){
                                 $thoi_gian_con = 15 - floor((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
                             }
-                        }elseif (in_array($duplicate_info->status,[3,4,6,7,11])){
+                        }elseif (in_array($duplicate_info->status,[5,12])){
                             if($duplicate_info->last_care_date){
                                 $thoi_gian_con = 30 - floor((time() - strtotime($duplicate_info->last_care_date))/(3600*24));
                             }
                             if (!$duplicate_info->last_care_date || $duplicate_info->last_assign_date > $duplicate_info->last_care_date){
                                 $thoi_gian_con = 30 - floor((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
+                            }
+                        }elseif (in_array($duplicate_info->status,[7,8])){
+                            if($duplicate_info->last_care_date){
+                                $thoi_gian_con = 45 - floor((time() - strtotime($duplicate_info->last_care_date))/(3600*24));
+                            }
+                            if (!$duplicate_info->last_care_date || $duplicate_info->last_assign_date > $duplicate_info->last_care_date){
+                                $thoi_gian_con = 45 - floor((time() - strtotime($duplicate_info->last_assign_date))/(3600*24));
                             }
                         }else {
                             if($duplicate_info->last_care_date){
@@ -554,14 +561,15 @@ class ParentsController extends Controller
         u::query("UPDATE cms_parents AS p SET p.last_care_date=(SELECT care_date FROM cms_customer_care WHERE parent_id=p.id AND creator_id=p.owner_id AND `status`=1 ORDER BY id DESC LIMIT 1)");
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE
-                (last_care_date IS NULL AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15 AND status NOT IN( 9,10)) OR
+                (last_care_date IS NULL AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15 AND status NOT IN( 10,11)) OR
                 (
                     last_care_date IS NOT NULL  
-                    AND is_lock=1 AND status NOT IN( 9,10)
+                    AND is_lock=1 AND status NOT IN( 10,11)
                     AND ( 
-                        (DATEDIFF( CURRENT_DATE, last_care_date )> 15 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15 AND status IN (1,2,5))
-                        OR  (DATEDIFF( CURRENT_DATE, last_care_date )> 30 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 30 AND status IN (3,4,6,7,11))
-                        OR  (DATEDIFF( CURRENT_DATE, last_care_date )> 60 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 60 AND status IN (8))
+                        (DATEDIFF( CURRENT_DATE, last_care_date )> 15 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15 AND status IN (0,1,2,3,4,6))
+                        OR  (DATEDIFF( CURRENT_DATE, last_care_date )> 30 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 30 AND status IN (5,12))
+                        OR  (DATEDIFF( CURRENT_DATE, last_care_date )> 45 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 45 AND status IN (7,8))
+                        OR  (DATEDIFF( CURRENT_DATE, last_care_date )> 60 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 60 AND status IN (9))
                     ) 
                 )");
         return "ok";
@@ -578,13 +586,14 @@ class ParentsController extends Controller
         u::query("UPDATE cms_parents SET is_lock = 0 
             WHERE
                 id=$parent_id AND (
-                (last_care_date IS NULL AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15 AND status NOT IN( 9,10)) OR
+                (last_care_date IS NULL AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15 AND status NOT IN( 10,11)) OR
                     (last_care_date IS NOT NULL  
-                        AND is_lock=1 AND status NOT IN( 9,10)
+                        AND is_lock=1 AND status NOT IN( 10,11)
                         AND ( 
-                            (DATEDIFF( CURRENT_DATE, last_care_date )> 15 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15 AND status IN (1,2,5))
-                            OR  (DATEDIFF( CURRENT_DATE, last_care_date )> 30 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 30 AND status IN (3,4,6,7,11))
-                            OR  (DATEDIFF( CURRENT_DATE, last_care_date )> 60 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 60 AND status IN (8))
+                            (DATEDIFF( CURRENT_DATE, last_care_date )> 15 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 15 AND status IN (0,1,2,3,4,6))
+                            OR  (DATEDIFF( CURRENT_DATE, last_care_date )> 30 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 30 AND status IN (5,12))
+                            OR  (DATEDIFF( CURRENT_DATE, last_care_date )> 45 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 45 AND status IN (7,8))
+                            OR  (DATEDIFF( CURRENT_DATE, last_care_date )> 60 AND DATEDIFF( CURRENT_DATE, last_assign_date )> 60 AND status IN (9))
                         ))
                 ) ");
         return true;

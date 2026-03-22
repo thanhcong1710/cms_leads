@@ -154,16 +154,17 @@
                       <label for="nf-email">Trạng thái</label>
                       <select class="form-control" v-model="parent.status">
                         <option value="1">1. KH mới</option>
-                        <option value="2">2. KH không liên lạc được</option>
-                        <option value="3">3. KH ở vùng CMS không có cơ sở</option>
-                        <option value="4">4. KH hẹn gọi lại sau</option>
-                        <option value="5">5. KH không quan tâm</option>
-                        <option value="6">6. KH quan tâm, cần follow up date</option>
-                        <option value="7">7. KH đồng ý đặt lịch Checkin</option>
-                        <option value="8">8. KH đã đến checkin</option>
-                        <option value="9">9. KH đã mua gói phí</option>
-                        <option value="10">10. KH đến hạn tái tục</option>
-                        <option value="11">11. Danh sách đen</option>
+                        <option value="2">2. KH Không nghe máy</option>
+                        <option value="3">3. KH Thuê bao / Không đúng số</option>
+                        <option value="4">4. Không đúng đối tượng / vùng LGL không có cơ sở</option>
+                        <option value="5">5. KH Bận, gọi lại sau</option>
+                        <option value="6">6. KH Không có nhu cầu</option>
+                        <option value="7">7. KH Tiếp tục chăm sóc (Quan tâm, cần follow)</option>
+                        <option value="8">8. KH Hẹn lịch Checkin</option>
+                        <option value="9">9. KH Đã đến Checkin</option>
+                        <option value="10">10. KH Đã mua gói phí</option>
+                        <option value="11">11. KH Đến hạn tái tục</option>
+                        <option value="12">12. KH Danh sách đen</option>
                       </select>
                     </div>
                     <div class="form-group col-sm-6">

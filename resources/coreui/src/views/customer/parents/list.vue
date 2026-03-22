@@ -371,16 +371,17 @@ export default {
       source_detail_list:[],
       list_status:[
         {id:1,label:'KH mới'},
-        {id:2,label:'KH không liên lạc được'},
-        {id:3,label:'KH ở vùng CMS không có cơ sở'},
-        {id:4,label:'KH hẹn gọi lại sau'},
-        {id:5,label:'KH không quan tâm'},
-        {id:6,label:'KH quan tâm, cần follow up date'},
-        {id:7,label:'KH đồng ý đặt lịch Checkin'},
-        {id:8,label:'KH đã đến checkin'},
-        {id:9,label:'KH đã mua gói phí'},
-        {id:10,label:'KH đến hạn tái tục'},
-        {id:11,label:'Danh sách đen'},
+        {id:2,label:'KH Không nghe máy'},
+        {id:3,label:'KH Thuê bao / Không đúng số'},
+        {id:4,label:'Không đúng đối tượng / vùng LGL không có cơ sở'},
+        {id:5,label:'KH Bận, gọi lại sau'},
+        {id:6,label:'KH Không có nhu cầu'},
+        {id:7,label:'KH Tiếp tục chăm sóc (Quan tâm, cần follow)'},
+        {id:8,label:'KH Hẹn lịch Checkin'},
+        {id:9,label:'KH Đã đến Checkin'},
+        {id:10,label:'KH Đã mua gói phí'},
+        {id:11,label:'KH Đến hạn tái tục'},
+        {id:12,label:'KH Danh sách đen'},
       ],
       checked_list: [],
       temp: [],
@@ -727,34 +728,37 @@ export default {
               resp = 'KH mới';
               break;
           case 2:
-              resp = 'KH không liên lạc được';
+              resp = 'KH Không nghe máy';
               break;
           case 3:
-              resp = 'KH ở vùng CMS không có cơ sở';
+              resp = 'KH Thuê bao / Không đúng số';
               break;
           case 4:
-              resp = 'KH hẹn gọi lại sau';
+              resp = 'Không đúng đối tượng / vùng LGL không có cơ sở';
               break;
           case 5:
-              resp = 'KH không quan tâm';
+              resp = 'KH Bận, gọi lại sau';
               break;
           case 6:
-              resp = 'KH quan tâm, cần follow up date';
+              resp = 'KH Không có nhu cầu';
               break;
           case 7:
-              resp = 'KH đồng ý đặt lịch Checkin';
+              resp = 'KH Tiếp tục chăm sóc (Quan tâm, cần follow)';
               break;
           case 8:
-              resp = 'KH đã đến checkin';
+              resp = 'KH Hẹn lịch Checkin';
               break;
           case 9:
-              resp = 'KH đã mua gói phí';
+              resp = 'KH Đã đến Checkin';
               break;
           case 10:
-              resp = 'KH đến hạn tái tục';
+              resp = 'KH Đã mua gói phí';
               break;
           case 11:
-              resp = 'Danh sách đen';
+              resp = 'KH Đến hạn tái tục';
+              break;
+          case 12:
+              resp = 'KH Danh sách đen';
               break;
           default:
               resp = 'KH mới'
