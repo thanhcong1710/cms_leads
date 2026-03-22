@@ -145,6 +145,11 @@ Route::group(['middleware' => 'api'], function ($router) {
         Route::get('/export/report05/{key}/{value}', 'ExportController@report05');
         Route::post('/reports/06', 'ReportsController@report06');
 
+        Route::post('/reports/overdue_overview', 'ReportsController@getOverdueOverview');
+        Route::post('/reports/overdue_detail', 'ReportsController@getOverdueDetail');
+        Route::get('/export/overdue_detail/{key}/{value}', 'ExportController@exportOverdueDetail');
+        Route::get('/export/overdue_overview/{key}/{value}', 'ExportController@exportOverdueOverview');
+
         Route::post('/camera-ai/list-action', 'CameraAIController@listAction');
         Route::post('/camera-ai/list-student', 'CameraAIController@listStudent');
         Route::post('/camera-ai/update-student', 'CameraAIController@updateStudent');

@@ -5,19 +5,10 @@
         <div class="card">
           <loader :active="loading.processing" :text="loading.text" />
           <div class="card-header">
-            <strong>Báo cáo chi tiết khách hàng quá hạn xử lý</strong>
+            <strong>Báo cáo tổng quan khách hàng quá hạn xử lý theo người phụ trách</strong>
           </div>
           <div class="card-body">
             <div class="row">
-              <div class="form-group col-sm-3">
-                <label for="name">Từ khóa</label>
-                <input
-                  class="form-control"
-                  v-model="searchData.keyword"
-                  type="text"
-                  placeholder="Tên phụ huynh, số điện thoại"
-                />
-              </div>
               <div class="form-group col-sm-3">
                 <label>Trung tâm</label>
                 <select class="form-control" v-model="searchData.branch_id">
@@ -58,47 +49,26 @@
               <thead>
                 <tr>
                   <th>#</th>
-                  <th>Họ tên</th>
-                  <th>Số điện thoại</th>
-                  <th>Ngày hẹn chăm sóc</th>
-                  <th>Ngày chăm sóc</th>
                   <th>Trung tâm</th>
                   <th>Người phụ trách</th>
+                  <th>Mã HRM</th>
+                  <th>Tổng quá hạn</th>
+                  <th>Chưa xử lý</th>
+                  <th>Đã xử lý</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="(item, index) in imports" :key="index">
-                  <td>
-                    {{ index + 1 + (pagination.cpage - 1) * pagination.limit }}
-                  </td>
-                  <td>{{ item.parent_name }}</td>
-                  <td>{{ item.parent_phone }}</td>
-                  <td>{{ item.next_care_date }}</td>
-                  <td>{{ item.actual_care_date ? item.actual_care_date : 'Chưa chăm sóc' }}</td>
+                  <td>{{ index + 1 }}</td>
                   <td>{{ item.branch_name }}</td>
                   <td>{{ item.owner_name }}</td>
+                  <td>{{ item.hrm_id }}</td>
+                  <td>{{ item.total_overdue }}</td>
+                  <td><span class="text-danger">{{ item.total_unresolved }}</span></td>
+                  <td><span class="text-success">{{ item.total_resolved }}</span></td>
                 </tr>
               </tbody>
             </table>
-            <div class="text-center">
-              <nav aria-label="Page navigation">
-                <paging
-                  :rootLink="pagination.url"
-                  :id="pagination.id"
-                  :listStyle="pagination.style"
-                  :customClass="pagination.class"
-                  :firstPage="pagination.spage"
-                  :previousPage="pagination.ppage"
-                  :nextPage="pagination.npage"
-                  :lastPage="pagination.lpage"
-                  :currentPage="pagination.cpage"
-                  :pagesItems="pagination.total"
-                  :pagesLimit="pagination.limit"
-                  :pageList="pagination.pages"
-                  :routing="changePage"
-                ></paging>
-              </nav>
-            </div>
           </div>
         </div>
       </div>
@@ -107,7 +77,6 @@
 </template>
 
 <script>
-import paging from "../../components/Pagination";
 import u from "../../utilities/utility";
 import loader from "../../components/Loading";
 import DatePicker from "vue2-datepicker";
@@ -115,9 +84,8 @@ export default {
   components: {
     DatePicker,
     loader: loader,
-    paging: paging,
   },
-  name: "Report-Overdue-Detail",
+  name: "Report-Overdue-Overview",
   data() {
     return {
       loading: {
@@ -126,27 +94,10 @@ export default {
       },
       searchData: {
         dateRange: "",
-        keyword: "",
         branch_id: "",
-        pagination: this.pagination
       },
       imports: [],
       branches: [],
-      pagination: {
-        url: "/api/reports/overdue_detail",
-        id: "",
-        style: "line",
-        class: "",
-        spage: 1,
-        ppage: 1,
-        npage: 0,
-        lpage: 1,
-        cpage: 1,
-        total: 0,
-        limit: 20,
-        limitSource: [10, 20, 30, 40, 50],
-        pages: [],
-      },
       datepickerOptions: {
         closed: true,
         value: "",
@@ -182,55 +133,33 @@ export default {
     reset() {
       location.reload();
     },
-    search(a) {
+    search() {
       const startDate = this.searchData.dateRange!='' && this.searchData.dateRange[0] ?`${u.dateToString(this.searchData.dateRange[0])}`:'';
       const endDate = this.searchData.dateRange!='' && this.searchData.dateRange[1] ?`${u.dateToString(this.searchData.dateRange[1])}`:'';
       const data = {
         start_date: startDate,
         end_date: endDate,
-        keyword: this.searchData.keyword,
         branch_id: this.searchData.branch_id,
-        pagination: this.pagination,
       };
-      const link = "/api/reports/overdue_detail";
+      const link = "/api/reports/overdue_overview";
 
       this.loading.processing = true;
       u.p(link, data)
         .then((response) => {
           this.loading.processing = false;
-          this.imports = response.data.list;
-          this.pagination.spage = response.data.paging.spage;
-          this.pagination.ppage = response.data.paging.ppage;
-          this.pagination.npage = response.data.paging.npage;
-          this.pagination.lpage = response.data.paging.lpage;
-          this.pagination.cpage = response.data.paging.cpage;
-          this.pagination.total = response.data.paging.total;
-          this.pagination.limit = response.data.paging.limit;
+          this.imports = response.data;
         })
         .catch((e) => {
           u.processAuthen(e);
         });
     },
-    changePage(link) {
-      const info = link
-        .toString()
-        .substr(this.pagination.url.length)
-        .split("/");
-      const page = info.length > 1 ? info[1] : 1;
-      this.pagination.cpage = parseInt(page);
-      this.search();
-    },
     exportExcel() {
       const startDate = this.searchData.dateRange!='' && this.searchData.dateRange[0] ?`${u.dateToString(this.searchData.dateRange[0])}`:'';
       const endDate = this.searchData.dateRange!='' && this.searchData.dateRange[1] ?`${u.dateToString(this.searchData.dateRange[1])}`:'';
       
-      var url = `/api/export/overdue_detail/`;
+      var url = `/api/export/overdue_overview/`;
       this.key ='';
       this.value = ''
-      if (this.searchData.keyword){
-        this.key += "keyword,"
-        this.value += this.searchData.keyword+","
-      }
       if (this.searchData.branch_id){
         this.key += "branch_id,"
         this.value += this.searchData.branch_id+","

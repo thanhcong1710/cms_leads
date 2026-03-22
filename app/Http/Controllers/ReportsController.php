@@ -296,4 +296,77 @@ class ReportsController extends Controller
         $data = u::makingPagination($list, $total->total?? 0, $page, $limit);
         return response()->json($data);
     }
+
+    public function getOverdueOverview(Request $request) {
+        $cond = "1";
+        if($request->branch_id){
+            $cond .= " AND o.branch_id = $request->branch_id";
+        }
+        if($request->owner_id){
+            $cond .= " AND o.owner_id IN (".implode(",", $request->owner_id).")";
+        }
+        if($request->start_date){
+            $cond .= " AND o.next_care_date >= '".$request->start_date." 00:00:00'";
+        }
+        if($request->end_date){
+            $cond .= " AND o.next_care_date <= '".$request->end_date." 23:59:59'";
+        }
+
+        $list = u::query("SELECT u.name as owner_name, u.hrm_id, b.name as branch_name, 
+            COUNT(o.id) as total_overdue,
+            SUM(CASE WHEN o.actual_care_date IS NULL THEN 1 ELSE 0 END) as total_unresolved,
+            SUM(CASE WHEN o.actual_care_date IS NOT NULL THEN 1 ELSE 0 END) as total_resolved
+            FROM cms_report_overdue o
+            LEFT JOIN users u ON u.id = o.owner_id
+            LEFT JOIN cms_branches b ON b.id = o.branch_id
+            WHERE $cond
+            GROUP BY o.owner_id, o.branch_id
+            ORDER BY total_overdue DESC
+        ");
+
+        return response()->json($list);
+    }
+
+    public function getOverdueDetail(Request $request) {
+        $cond = "1";
+        if($request->branch_id){
+            $cond .= " AND o.branch_id = $request->branch_id";
+        }
+        if($request->owner_id){
+            $cond .= " AND o.owner_id IN (".implode(",", $request->owner_id).")";
+        }
+        if($request->start_date){
+            $cond .= " AND o.next_care_date >= '".$request->start_date." 00:00:00'";
+        }
+        if($request->end_date){
+            $cond .= " AND o.next_care_date <= '".$request->end_date." 23:59:59'";
+        }
+        if($request->keyword){
+            $keyword = addslashes($request->keyword); 
+            $cond .= " AND (p.name LIKE '%$keyword%' OR p.mobile_1 LIKE '%$keyword%')";
+        }
+
+        $pagination = (object)$request->pagination;
+        $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
+        $limit = isset($pagination->limit) ? (int) $pagination->limit : 20;
+        $offset = $page == 1 ? 0 : $limit * ($page-1);
+        $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
+        
+        $total = u::first("SELECT COUNT(o.id) as total FROM cms_report_overdue o LEFT JOIN cms_parents p ON p.id = o.parent_id WHERE $cond")->total;
+
+        $list = u::query("SELECT o.id, o.parent_id, p.name as parent_name, p.mobile_1 as parent_phone, 
+            o.next_care_date, o.actual_care_date, o.overdue_month, 
+            CONCAT(u.name,' - ',u.hrm_id) as owner_name, b.name as branch_name 
+            FROM cms_report_overdue o
+            LEFT JOIN cms_parents p ON p.id = o.parent_id
+            LEFT JOIN users u ON u.id = o.owner_id
+            LEFT JOIN cms_branches b ON b.id = o.branch_id
+            WHERE $cond
+            ORDER BY o.next_care_date DESC
+            $limitation
+        ");
+
+        $data = u::makingPagination($list, $total, $page, $limit);
+        return response()->json($data);
+    }
 }

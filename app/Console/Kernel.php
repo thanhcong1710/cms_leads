@@ -19,6 +19,7 @@ class Kernel extends ConsoleKernel
         '\App\Console\Commands\JobsProcessLockParent',
         '\App\Console\Commands\JobsProcessDataImport',
         '\App\Console\Commands\JobsDownloadCdrPA',
+        '\App\Console\Commands\JobsProcessOverdueParent',
     ];
 
     /**
@@ -34,6 +35,7 @@ class Kernel extends ConsoleKernel
         $schedule->command('jobsProcessReport:command')->everySixHours();
         // $schedule->command('jobsProcessImportCheckin:command')->cron('*/3 * * * *');
         $schedule->command('jobsProcessLockParent:command')->cron('0 0 * * *');
+        $schedule->command('parents:process-overdue')->cron('59 23 * * *');
     }
 
     /**

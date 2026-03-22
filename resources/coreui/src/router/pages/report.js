@@ -6,6 +6,7 @@ const Report03 = () => import('../../views/reports/report_03')
 const Report04 = () => import('../../views/reports/report_04')
 const Report05 = () => import('../../views/reports/report_05')
 const Report06 = () => import('../../views/reports/report_06')
+const ReportOverdue = () => import('../../views/reports/report_overdue')
 
 export default {
   router: {
@@ -24,7 +25,7 @@ export default {
       },
       {
         path: '/reports/01',
-        name: 'Báo cáo thông tin khách hàng',
+        name: 'Báo cáo chi tiết khách hàng quá hạn xử lý',
         component: Report01
       },
       {
@@ -52,6 +53,12 @@ export default {
         name: 'Báo cáo bàn giao khách hàng',
         component: Report05
       },
+      {
+        path: '/reports/overdue-overview',
+        name: 'Báo cáo tổng quan KH quá hạn xử lý',
+        component: ReportOverdue
+      },
     ]
   }
 }
+

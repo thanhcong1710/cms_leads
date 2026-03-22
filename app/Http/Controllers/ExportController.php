@@ -626,4 +626,145 @@ class ExportController extends Controller
             throw $exception;
         }
     }
+
+    public function exportOverdueDetail(Request $request, $key, $value) {
+        set_time_limit(300);
+        ini_set('memory_limit', '-1');
+        $cond = "1";
+        $arr_key = explode(',', $key);
+        $arr_value = explode(',', $value);
+        foreach ($arr_key AS $k => $key) {
+            if ($key == 'keyword') {
+                $keyword = $arr_value[$k];
+                $cond .= " AND (p.name LIKE '%$keyword%' OR p.mobile_1 LIKE '%$keyword%')";
+            }
+            if ($key == 'branch_id') {
+                $cond .= " AND o.branch_id = " . $arr_value[$k];
+            }
+            if ($key == 'start_date') {
+                $cond .= " AND o.next_care_date >= '" . $arr_value[$k] . " 00:00:00'";
+            }
+            if ($key == 'end_date') {
+                $cond .= " AND o.next_care_date <= '" . $arr_value[$k] . " 23:59:59'";
+            }
+        }
+
+        $list = u::query("SELECT o.id, p.name as parent_name, p.mobile_1 as parent_phone, 
+            o.next_care_date, o.actual_care_date,
+            CONCAT(u.name,' - ',u.hrm_id) as owner_name, b.name as branch_name 
+            FROM cms_report_overdue o
+            LEFT JOIN cms_parents p ON p.id = o.parent_id
+            LEFT JOIN users u ON u.id = o.owner_id
+            LEFT JOIN cms_branches b ON b.id = o.branch_id
+            WHERE $cond
+            ORDER BY o.next_care_date DESC LIMIT 80000");
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'STT');
+        $sheet->setCellValue('B1', 'Họ tên');
+        $sheet->setCellValue('C1', 'Số điện thoại');
+        $sheet->setCellValue('D1', 'Ngày hẹn chăm sóc');
+        $sheet->setCellValue('E1', 'Ngày chăm sóc');
+        $sheet->setCellValue('F1', 'Trung tâm');
+        $sheet->setCellValue('G1', 'Người phụ trách');
+
+        $sheet->getColumnDimension("A")->setWidth(10);
+        $sheet->getColumnDimension("B")->setWidth(30);
+        $sheet->getColumnDimension("C")->setWidth(20);
+        $sheet->getColumnDimension("D")->setWidth(25);
+        $sheet->getColumnDimension("E")->setWidth(25);
+        $sheet->getColumnDimension("F")->setWidth(25);
+        $sheet->getColumnDimension("G")->setWidth(30);
+
+        for ($i = 0; $i < count($list); $i++) {
+            $x = $i + 2;
+            $sheet->setCellValue('A' . $x, $i + 1);
+            $sheet->setCellValue('B' . $x, $list[$i]->parent_name);
+            $sheet->setCellValue('C' . $x, $list[$i]->parent_phone ? "'" . $list[$i]->parent_phone : '');
+            $sheet->setCellValue('D' . $x, $list[$i]->next_care_date);
+            $sheet->setCellValue('E' . $x, $list[$i]->actual_care_date ? $list[$i]->actual_care_date : 'Chưa chăm sóc');
+            $sheet->setCellValue('F' . $x, $list[$i]->branch_name);
+            $sheet->setCellValue('G' . $x, $list[$i]->owner_name);
+            $sheet->getRowDimension($x)->setRowHeight(23);
+        }
+        $writer = new Xlsx($spreadsheet);
+        try {
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="Bao cao chi tiet KH qua han xu ly.xlsx"');
+            header('Cache-Control: max-age=0');
+            $writer->save("php://output");
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    public function exportOverdueOverview(Request $request, $key, $value) {
+        set_time_limit(300);
+        ini_set('memory_limit', '-1');
+        $cond = "1";
+        $arr_key = explode(',', $key);
+        $arr_value = explode(',', $value);
+        foreach ($arr_key AS $k => $key) {
+            if ($key == 'branch_id') {
+                $cond .= " AND o.branch_id = " . $arr_value[$k];
+            }
+            if ($key == 'start_date') {
+                $cond .= " AND o.next_care_date >= '" . $arr_value[$k] . " 00:00:00'";
+            }
+            if ($key == 'end_date') {
+                $cond .= " AND o.next_care_date <= '" . $arr_value[$k] . " 23:59:59'";
+            }
+        }
+
+        $list = u::query("SELECT u.name as owner_name, u.hrm_id, b.name as branch_name, 
+            COUNT(o.id) as total_overdue,
+            SUM(CASE WHEN o.actual_care_date IS NULL THEN 1 ELSE 0 END) as total_unresolved,
+            SUM(CASE WHEN o.actual_care_date IS NOT NULL THEN 1 ELSE 0 END) as total_resolved
+            FROM cms_report_overdue o
+            LEFT JOIN users u ON u.id = o.owner_id
+            LEFT JOIN cms_branches b ON b.id = o.branch_id
+            WHERE $cond
+            GROUP BY o.owner_id, o.branch_id
+            ORDER BY total_overdue DESC");
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'STT');
+        $sheet->setCellValue('B1', 'Trung tâm');
+        $sheet->setCellValue('C1', 'Người phụ trách');
+        $sheet->setCellValue('D1', 'Mã HRM');
+        $sheet->setCellValue('E1', 'Tổng quá hạn');
+        $sheet->setCellValue('F1', 'Chưa xử lý');
+        $sheet->setCellValue('G1', 'Đã xử lý');
+
+        $sheet->getColumnDimension("A")->setWidth(10);
+        $sheet->getColumnDimension("B")->setWidth(25);
+        $sheet->getColumnDimension("C")->setWidth(30);
+        $sheet->getColumnDimension("D")->setWidth(15);
+        $sheet->getColumnDimension("E")->setWidth(15);
+        $sheet->getColumnDimension("F")->setWidth(15);
+        $sheet->getColumnDimension("G")->setWidth(15);
+
+        for ($i = 0; $i < count($list); $i++) {
+            $x = $i + 2;
+            $sheet->setCellValue('A' . $x, $i + 1);
+            $sheet->setCellValue('B' . $x, $list[$i]->branch_name);
+            $sheet->setCellValue('C' . $x, $list[$i]->owner_name);
+            $sheet->setCellValue('D' . $x, $list[$i]->hrm_id);
+            $sheet->setCellValue('E' . $x, $list[$i]->total_overdue);
+            $sheet->setCellValue('F' . $x, $list[$i]->total_unresolved);
+            $sheet->setCellValue('G' . $x, $list[$i]->total_resolved);
+            $sheet->getRowDimension($x)->setRowHeight(23);
+        }
+        $writer = new Xlsx($spreadsheet);
+        try {
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="Bao cao tong quan KH qua han xu ly.xlsx"');
+            header('Cache-Control: max-age=0');
+            $writer->save("php://output");
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
 }

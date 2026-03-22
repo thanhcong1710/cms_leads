@@ -13,6 +13,8 @@
             <p class="h6"><router-link to="/reports/04" v-if="showBC04" >02. Báo cáo chi tiết cuộc gọi</router-link></p>
             <p class="h6"><router-link to="/reports/05" v-if="showBC05" >03. Báo cáo bàn giao khách hàng</router-link></p>
             <p class="h6"><router-link to="/reports/06" v-if="showBC06" >04. Báo cáo tổng đài</router-link></p>
+            <p class="h6"><router-link to="/reports/overdue-overview" v-if="showBC01" >05. Báo cáo tổng quan khách hàng quá hạn xử lý</router-link></p>
+            <p class="h6"><router-link to="/reports/01" v-if="showBC01" >06. Báo cáo chi tiết khách hàng quá hạn xử lý</router-link></p>
           </div>
         </div>
       </div>
