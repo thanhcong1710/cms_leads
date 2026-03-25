@@ -92,11 +92,11 @@ class ParentsController extends Controller
         //     $cond .= " AND p.status = -1";
         // }
         //type_search=1
-        $cond_1 = " AND (p.care_date IS NULL OR p.care_date < p.last_assign_date) AND p.status NOT IN(9,10,11) ";
+        $cond_1 = " AND (p.care_date IS NULL OR p.care_date < p.last_assign_date) AND p.status NOT IN (12,10,11) ";
         //type_search=2
         $cond_2 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') = '".date('Y-m-d')."'";
         $cond_3 = " AND next_care_date < '".date('Y-m-d')."' 
-            AND (p.care_date < p.next_care_date OR p.care_date IS NULL) ";
+            AND (p.care_date < p.next_care_date OR p.care_date IS NULL) AND p.status NOT IN (12,10,11)";
         $order_by = " ORDER BY p.id DESC ";
         $tmp_cond="";
         if($type_seach==1){
@@ -648,22 +648,22 @@ class ParentsController extends Controller
         u::query(" UPDATE cms_parents AS p
             LEFT JOIN tmp_cms_parents AS t ON t.gud_mobile2 = p.mobile_1 AND t.gud_mobile2!='' AND t.gud_mobile2 IS NOT NULL
         SET p.`status` = IF(
-            t.contract_active > 0, 9,
-                IF(t.contract_total>0, 10,
-                    IF(t.checked>0,8, p.`status`)
+            t.contract_active > 0, 10,
+                IF(t.contract_total>0, 11,
+                    IF(t.checked>0,9, p.`status`)
                 )
          )
-        WHERE t.id IS NOT NULL  AND p.status NOT IN (9,10,11)");
+        WHERE t.id IS NOT NULL  AND p.status NOT IN (12,10,11)");
 
         u::query(" UPDATE cms_parents AS p
             LEFT JOIN tmp_cms_parents AS t ON t.gud_mobile1 = p.mobile_1 AND t.gud_mobile1!='' AND t.gud_mobile1 IS NOT NULL
         SET p.`status` = IF(
-            t.contract_active > 0, 9,
-                IF(t.contract_total>0, 10,
-                    IF(t.checked>0,8, p.`status`)
+            t.contract_active > 0, 10,
+                IF(t.contract_total>0, 11,
+                    IF(t.checked>0,9, p.`status`)
                 )
         )
-        WHERE t.id IS NOT NULL AND p.status NOT IN (9,10,11) ");
+        WHERE t.id IS NOT NULL AND p.status NOT IN (12,10,11) ");
     }
 
     public static function addItemsTmpCmsParents($list) {
