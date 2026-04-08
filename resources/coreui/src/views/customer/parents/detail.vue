@@ -762,10 +762,10 @@ export default {
         mess += " - Nội dung chăm sóc không được để trống<br/>";
         resp = false;
       }
-      if (this.care.file_name == "") {
-        mess += " - File đính kèm không được để trống<br/>";
-        resp = false;
-      }
+      // if (this.care.file_name == "") {
+      //   mess += " - File đính kèm không được để trống<br/>";
+      //   resp = false;
+      // }
       if(resp){
         this.loading.processing = true;
         this.exit("care");
