@@ -369,4 +369,92 @@ class ReportsController extends Controller
         $data = u::makingPagination($list, $total, $page, $limit);
         return response()->json($data);
     }
+    public function getCareOverview(Request $request) {
+        $cond = "1";
+        if($request->branch_id){
+            $cond .= " AND u.branch_id = $request->branch_id";
+        }
+        if($request->owner_id){
+            $cond .= " AND c.creator_id IN (".implode(",", $request->owner_id).")";
+        }
+        if($request->method_id){
+            $cond .= " AND c.method_id IN (".implode(",", $request->method_id).")";
+        }
+        if($request->start_date){
+            $cond .= " AND c.created_at >= '".$request->start_date." 00:00:00'";
+        } else {
+            $cond .= " AND c.created_at >= '".date('Y-m-d 00:00:00')."'";
+        }
+        if($request->end_date){
+            $cond .= " AND c.created_at <= '".$request->end_date." 23:59:59'";
+        } else {
+            $cond .= " AND c.created_at <= '".date('Y-m-d 23:59:59')."'";
+        }
+
+        $list = u::query("SELECT u.name as creator_name, u.hrm_id, b.name as branch_name, 
+            COUNT(c.id) as total_care
+            FROM cms_customer_care c
+            LEFT JOIN users u ON u.id = c.creator_id
+            LEFT JOIN cms_branches b ON b.id = u.branch_id
+            WHERE c.status=1 AND $cond
+            GROUP BY c.creator_id, u.branch_id
+            ORDER BY total_care DESC
+        ");
+
+        return response()->json($list);
+    }
+
+    public function getCareDetail(Request $request) {
+        $cond = "1";
+        if($request->branch_id){
+            $cond .= " AND u.branch_id = $request->branch_id";
+        }
+        if($request->owner_id){
+            $cond .= " AND c.creator_id IN (".implode(",", $request->owner_id).")";
+        }
+        if($request->method_id){
+            $cond .= " AND c.method_id IN (".implode(",", $request->method_id).")";
+        }
+        if($request->start_date){
+            $cond .= " AND c.created_at >= '".$request->start_date." 00:00:00'";
+        } else {
+            $cond .= " AND c.created_at >= '".date('Y-m-d 00:00:00')."'";
+        }
+        if($request->end_date){
+            $cond .= " AND c.created_at <= '".$request->end_date." 23:59:59'";
+        } else {
+            $cond .= " AND c.created_at <= '".date('Y-m-d 23:59:59')."'";
+        }
+        if($request->keyword){
+            $keyword = addslashes($request->keyword); 
+            $cond .= " AND (p.name LIKE '%$keyword%' OR p.mobile_1 LIKE '%$keyword%')";
+        }
+
+        $pagination = (object)$request->pagination;
+        $page = isset($pagination->cpage) ? (int) $pagination->cpage : 1;
+        $limit = isset($pagination->limit) ? (int) $pagination->limit : 20;
+        $offset = $page == 1 ? 0 : $limit * ($page-1);
+        $limitation =  $limit > 0 ? " LIMIT $offset, $limit": "";
+        
+        $total = u::first("SELECT COUNT(c.id) as total FROM cms_customer_care c 
+            LEFT JOIN cms_parents p ON p.id = c.parent_id 
+            LEFT JOIN users u ON u.id = c.creator_id 
+            WHERE c.status=1 AND $cond")->total;
+
+        $list = u::query("SELECT c.id, c.parent_id, p.name as parent_name, p.mobile_1 as parent_phone, 
+            m.name as method_name, CONCAT(u.name,' - ',u.hrm_id) as creator_name, b.name as branch_name,
+            DATE_FORMAT(c.created_at, '%Y-%m-%d %H:%i') as created_at_formatted
+            FROM cms_customer_care c
+            LEFT JOIN cms_parents p ON p.id = c.parent_id
+            LEFT JOIN users u ON u.id = c.creator_id
+            LEFT JOIN cms_branches b ON b.id = u.branch_id
+            LEFT JOIN cms_contact_methods m ON m.id = c.method_id
+            WHERE c.status=1 AND $cond
+            ORDER BY c.id DESC
+            $limitation
+        ");
+
+        $data = u::makingPagination($list, $total, $page, $limit);
+        return response()->json($data);
+    }
 }

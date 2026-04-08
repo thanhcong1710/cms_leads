@@ -15,6 +15,8 @@
             <p class="h6"><router-link to="/reports/06" v-if="showBC06" >04. Báo cáo tổng đài</router-link></p>
             <p class="h6"><router-link to="/reports/overdue-overview" v-if="showBC01" >05. Báo cáo tổng quan khách hàng quá hạn xử lý</router-link></p>
             <p class="h6"><router-link to="/reports/01" v-if="showBC01" >06. Báo cáo chi tiết khách hàng quá hạn xử lý</router-link></p>
+            <p class="h6"><router-link to="/reports/care-overview" v-if="showBC01" >07. Báo cáo tổng quan chăm sóc khách hàng</router-link></p>
+            <p class="h6"><router-link to="/reports/care-detail" v-if="showBC01" >08. Báo cáo chi tiết chăm sóc khách hàng</router-link></p>
           </div>
         </div>
       </div>

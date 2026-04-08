@@ -767,4 +767,146 @@ class ExportController extends Controller
             throw $exception;
         }
     }
+    public function exportCareOverview(Request $request, $key, $value) {
+        set_time_limit(300);
+        ini_set('memory_limit', '-1');
+        $cond = "1";
+        $arr_key = explode(',', $key);
+        $arr_value = explode(',', $value);
+        foreach ($arr_key AS $k => $key) {
+            if ($key == 'branch_id') {
+                $cond .= " AND u.branch_id = " . $arr_value[$k];
+            }
+            if ($key == 'method_id') {
+                $cond .= " AND c.method_id IN (" . str_replace("-",",", $arr_value[$k]) . ")";
+            }
+            if ($key == 'start_date') {
+                $cond .= " AND c.created_at >= '" . $arr_value[$k] . " 00:00:00'";
+            }
+            if ($key == 'end_date') {
+                $cond .= " AND c.created_at <= '" . $arr_value[$k] . " 23:59:59'";
+            }
+        }
+
+        $list = u::query("SELECT u.name as creator_name, u.hrm_id, b.name as branch_name, 
+            COUNT(c.id) as total_care
+            FROM cms_customer_care c
+            LEFT JOIN users u ON u.id = c.creator_id
+            LEFT JOIN cms_branches b ON b.id = u.branch_id
+            WHERE c.status=1 AND $cond
+            GROUP BY c.creator_id, u.branch_id
+            ORDER BY total_care DESC");
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'STT');
+        $sheet->setCellValue('B1', 'Trung tâm');
+        $sheet->setCellValue('C1', 'Người phụ trách');
+        $sheet->setCellValue('D1', 'Mã HRM');
+        $sheet->setCellValue('E1', 'Tổng số nội dung chăm sóc');
+
+        $sheet->getColumnDimension("A")->setWidth(10);
+        $sheet->getColumnDimension("B")->setWidth(25);
+        $sheet->getColumnDimension("C")->setWidth(30);
+        $sheet->getColumnDimension("D")->setWidth(15);
+        $sheet->getColumnDimension("E")->setWidth(30);
+
+        for ($i = 0; $i < count($list); $i++) {
+            $x = $i + 2;
+            $sheet->setCellValue('A' . $x, $i + 1);
+            $sheet->setCellValue('B' . $x, $list[$i]->branch_name);
+            $sheet->setCellValue('C' . $x, $list[$i]->creator_name);
+            $sheet->setCellValue('D' . $x, $list[$i]->hrm_id);
+            $sheet->setCellValue('E' . $x, $list[$i]->total_care);
+            $sheet->getRowDimension($x)->setRowHeight(23);
+        }
+        $writer = new Xlsx($spreadsheet);
+        try {
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="Bao cao tong quan cham soc khach hang.xlsx"');
+            header('Cache-Control: max-age=0');
+            $writer->save("php://output");
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
+
+    public function exportCareDetail(Request $request, $key, $value) {
+        set_time_limit(300);
+        ini_set('memory_limit', '-1');
+        $cond = "1";
+        $arr_key = explode(',', $key);
+        $arr_value = explode(',', $value);
+        foreach ($arr_key AS $k => $key) {
+            if ($key == 'keyword') {
+                $keyword = $arr_value[$k];
+                $cond .= " AND (p.name LIKE '%$keyword%' OR p.mobile_1 LIKE '%$keyword%')";
+            }
+            if ($key == 'branch_id') {
+                $cond .= " AND u.branch_id = " . $arr_value[$k];
+            }
+            if ($key == 'owner_id') {
+                $cond .= " AND c.creator_id IN (" . str_replace("-", ",", $arr_value[$k]) . ")";
+            }
+            if ($key == 'method_id') {
+                $cond .= " AND c.method_id IN (" . str_replace("-", ",", $arr_value[$k]) . ")";
+            }
+            if ($key == 'start_date') {
+                $cond .= " AND c.created_at >= '" . $arr_value[$k] . " 00:00:00'";
+            }
+            if ($key == 'end_date') {
+                $cond .= " AND c.created_at <= '" . $arr_value[$k] . " 23:59:59'";
+            }
+        }
+
+        $list = u::query("SELECT c.id, c.parent_id, p.name as parent_name, p.mobile_1 as parent_phone, 
+            m.name as method_name, CONCAT(u.name,' - ',u.hrm_id) as creator_name, b.name as branch_name,
+            DATE_FORMAT(c.created_at, '%Y-%m-%d %H:%i') as created_at_formatted
+            FROM cms_customer_care c
+            LEFT JOIN cms_parents p ON p.id = c.parent_id
+            LEFT JOIN users u ON u.id = c.creator_id
+            LEFT JOIN cms_branches b ON b.id = u.branch_id
+            LEFT JOIN cms_contact_methods m ON m.id = c.method_id
+            WHERE c.status=1 AND $cond
+            ORDER BY c.id DESC LIMIT 80000");
+
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setCellValue('A1', 'STT');
+        $sheet->setCellValue('B1', 'Họ tên KH');
+        $sheet->setCellValue('C1', 'Số điện thoại KH');
+        $sheet->setCellValue('D1', 'Phương thức');
+        $sheet->setCellValue('E1', 'Trung tâm');
+        $sheet->setCellValue('F1', 'Người phụ trách');
+        $sheet->setCellValue('G1', 'Thời gian tạo');
+
+        $sheet->getColumnDimension("A")->setWidth(10);
+        $sheet->getColumnDimension("B")->setWidth(30);
+        $sheet->getColumnDimension("C")->setWidth(20);
+        $sheet->getColumnDimension("D")->setWidth(20);
+        $sheet->getColumnDimension("E")->setWidth(25);
+        $sheet->getColumnDimension("F")->setWidth(30);
+        $sheet->getColumnDimension("G")->setWidth(25);
+
+        for ($i = 0; $i < count($list); $i++) {
+            $x = $i + 2;
+            $sheet->setCellValue('A' . $x, $i + 1);
+            $sheet->setCellValue('B' . $x, $list[$i]->parent_name);
+            $sheet->setCellValue('C' . $x, $list[$i]->parent_phone ? "'" . $list[$i]->parent_phone : '');
+            $sheet->setCellValue('D' . $x, $list[$i]->method_name);
+            $sheet->setCellValue('E' . $x, $list[$i]->branch_name);
+            $sheet->setCellValue('F' . $x, $list[$i]->creator_name);
+            $sheet->setCellValue('G' . $x, $list[$i]->created_at_formatted);
+            $sheet->getRowDimension($x)->setRowHeight(23);
+        }
+        $writer = new Xlsx($spreadsheet);
+        try {
+            header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+            header('Content-Disposition: attachment;filename="Bao cao chi tiet cham soc khach hang.xlsx"');
+            header('Cache-Control: max-age=0');
+            $writer->save("php://output");
+        } catch (Exception $exception) {
+            throw $exception;
+        }
+    }
 }
