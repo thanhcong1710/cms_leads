@@ -374,6 +374,9 @@ class ReportsController extends Controller
         if($request->branch_id){
             $cond .= " AND u.branch_id = $request->branch_id";
         }
+        if(!$request->user()->hasRole('admin')){
+            $cond .= " AND c.creator_id IN (".$request->user_info->users_manager.")";
+        }
         if($request->owner_id){
             $cond .= " AND c.creator_id IN (".implode(",", $request->owner_id).")";
         }
@@ -408,6 +411,9 @@ class ReportsController extends Controller
         $cond = "1";
         if($request->branch_id){
             $cond .= " AND u.branch_id = $request->branch_id";
+        }
+        if(!$request->user()->hasRole('admin')){
+            $cond .= " AND c.creator_id IN (".$request->user_info->users_manager.")";
         }
         if($request->owner_id){
             $cond .= " AND c.creator_id IN (".implode(",", $request->owner_id).")";
