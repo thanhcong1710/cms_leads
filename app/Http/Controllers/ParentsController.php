@@ -44,11 +44,7 @@ class ParentsController extends Controller
             $cond .= " AND p.owner_id IN (".$request->user_info->users_manager.")";
         }
         if($request->user()->hasRole('Marketing')){
-            // if($request->user()->id== 21){
-            //     $cond .= " AND ((p.owner_id IN (".$request->user_info->users_manager.") AND p.owner_id NOT IN (".$request->user_info->tmp_users_manager.")) OR p.source_id=27 OR p.source_id=35  OR p.source_id=26)";
-            // }else{
-                $cond .= " AND (p.creator_id IN (".$request->user()->id.") OR p.owner_id = ".$request->user()->id." OR p.source_id=26)";
-            // }
+            $cond .= " AND (p.creator_id IN (".$request->user()->id.") OR p.owner_id = ".$request->user()->id." OR p.source_id=26)";
         }
         if(!in_array($request->user()->id, explode(',', config('app.group_user_ids')))){
             $cond .= " AND p.owner_id NOT IN (".config('app.group_user_ids').") ";
@@ -80,7 +76,7 @@ class ParentsController extends Controller
             $cond .= " AND p.next_care_date > '$start_date 00:00:00'";
         }
         if ($student_year){
-            $cond .= " AND (SELECT count(id) FROM cms_students WHERE parent_id=p.id AND DATE_FORMAT( birthday,'%Y')=$student_year)>0";
+            $cond .= " AND EXISTS (SELECT 1 FROM cms_students WHERE parent_id=p.id AND birthday >= '$student_year-01-01' AND birthday <= '$student_year-12-31')";
         }
         if ($end_date_care !== '' && $start_date_care !== '') {
             $cond .= " AND ( p.last_care_date > '$end_date_care 23:59:59' OR p.last_care_date < '$start_date_care 00:00:00' OR p.last_care_date IS NULL)";
@@ -88,28 +84,49 @@ class ParentsController extends Controller
         if ($start_date_assign != '' && $end_date_assign != '') {
             $cond .= " AND ( p.last_assign_date <= '$end_date_assign 23:59:59' AND p.last_assign_date >= '$start_date_assign 00:00:00')";
         }
-        // if (date('d') >= '11') {
-        //     $cond .= " AND p.status = -1";
-        // }
+
+        $today = date('Y-m-d');
+        $start_of_week = date('Y-m-d', strtotime('monday this week'));
+
         //type_search=1
         $cond_1 = " AND (p.care_date IS NULL OR p.care_date < p.last_assign_date) AND p.status NOT IN (12,10,11) ";
         //type_search=2
-        $cond_2 = " AND DATE_FORMAT(next_care_date,'%Y-%m-%d') = '".date('Y-m-d')."'";
-        $cond_3 = " AND next_care_date < '".date('Y-m-d')."' 
+        $cond_2 = " AND p.next_care_date >= '$today 00:00:00' AND p.next_care_date <= '$today 23:59:59'";
+        $cond_3 = " AND p.next_care_date < '$today 00:00:00' 
             AND (p.care_date < p.next_care_date OR p.care_date IS NULL) AND p.status NOT IN (12,10,11)";
+        
+        $cond_overdue_weekly = " AND p.next_care_date >= '$start_of_week 00:00:00' AND p.next_care_date < '$today 00:00:00' 
+            AND (p.care_date < p.next_care_date OR p.care_date IS NULL) ";
+
         $order_by = " ORDER BY p.id DESC ";
         $tmp_cond="";
         if($type_seach==1){
             $tmp_cond = $cond_1;
         }elseif($type_seach==2){
             $tmp_cond = $cond_2;
-            $order_by = " ORDER BY next_care_date ASC ";
+            $order_by = " ORDER BY p.next_care_date ASC ";
         }elseif($type_seach==3){
             $tmp_cond = $cond_3;
-            $order_by = " ORDER BY next_care_date ASC ";
+            $order_by = " ORDER BY p.next_care_date ASC ";
         }
 
-        $total = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $tmp_cond");
+        $str_cond_1 = "(p.care_date IS NULL OR p.care_date < p.last_assign_date) AND p.status NOT IN (12,10,11)";
+        $str_cond_2 = "p.next_care_date >= '$today 00:00:00' AND p.next_care_date <= '$today 23:59:59'";
+        $str_cond_3 = "p.next_care_date < '$today 00:00:00' AND (p.care_date < p.next_care_date OR p.care_date IS NULL) AND p.status NOT IN (12,10,11)";
+        $str_cond_overdue_weekly = "p.next_care_date >= '$start_of_week 00:00:00' AND p.next_care_date < '$today 00:00:00' AND (p.care_date < p.next_care_date OR p.care_date IS NULL)";
+
+        $totals = u::first("SELECT 
+            COUNT(p.id) AS total_0,
+            SUM(IF($str_cond_1, 1, 0)) AS total_1,
+            SUM(IF($str_cond_2, 1, 0)) AS total_2,
+            SUM(IF($str_cond_3, 1, 0)) AS total_3,
+            SUM(IF($str_cond_overdue_weekly, 1, 0)) AS total_overdue_weekly
+        FROM cms_parents AS p WHERE $cond");
+
+        $total_count = (int)($totals->total_0 ?? 0);
+        if($type_seach == 1) $total_count = (int)($totals->total_1 ?? 0);
+        elseif($type_seach == 2) $total_count = (int)($totals->total_2 ?? 0);
+        elseif($type_seach == 3) $total_count = (int)($totals->total_3 ?? 0);
         
         $list = u::query("SELECT p.name,p.id,p.mobile_1,p.status,p.next_care_date, (SELECT name FROM cms_sources WHERE id=p.source_id) AS source_name,
                 (SELECT name FROM cms_source_detail WHERE id=p.source_detail_id) AS source_detail_name,
@@ -119,18 +136,7 @@ class ParentsController extends Controller
                 (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 0,1) AS hs1_name,
                 (SELECT name FROM cms_students WHERE parent_id=p.id LIMIT 1,1) AS hs2_name
             FROM cms_parents AS p WHERE $cond $tmp_cond $order_by $limitation");
-        $data = u::makingPagination($list, $total->total, $page, $limit);
-
-        $total_0 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond ");
-        $total_1 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $cond_1 ");
-        $total_2 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $cond_2 ");
-        $total_3 = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $cond_3 ");
-
-        $start_of_week = date('Y-m-d', strtotime('monday this week'));
-        $today = date('Y-m-d');
-        $cond_overdue_weekly = " AND next_care_date >= '$start_of_week 00:00:00' AND next_care_date < '$today 00:00:00' 
-            AND (p.care_date < p.next_care_date OR p.care_date IS NULL) ";
-        $total_overdue_weekly = u::first("SELECT count(id) AS total FROM cms_parents AS p WHERE $cond $cond_overdue_weekly");
+        $data = u::makingPagination($list, $total_count, $page, $limit);
 
         // Kiểm tra user hiện tại có phải quản lý không (có nhân viên cấp dưới)
         $is_manager = false;
@@ -149,11 +155,11 @@ class ParentsController extends Controller
         }
 
         $data->detail_total = (object)array(
-            'total_0' => $total_0->total,
-            'total_1' => $total_1->total,
-            'total_2' => $total_2->total,
-            'total_3' => $total_3->total,
-            'total_overdue_weekly' => $total_overdue_weekly->total,
+            'total_0' => (int)($totals->total_0 ?? 0),
+            'total_1' => (int)($totals->total_1 ?? 0),
+            'total_2' => (int)($totals->total_2 ?? 0),
+            'total_3' => (int)($totals->total_3 ?? 0),
+            'total_overdue_weekly' => (int)($totals->total_overdue_weekly ?? 0),
             'is_manager' => $is_manager,
             'overdue_by_staff' => $overdue_by_staff,
         );
